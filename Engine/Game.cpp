@@ -38,30 +38,33 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
-	Vec2 dir = { 0.0f,0.0f };
-	if( wnd.kbd.KeyIsPressed( VK_UP ) )
-	{
-		dir.y -= 1.0f;
-	}
-	if( wnd.kbd.KeyIsPressed( VK_DOWN ) )
-	{
-		dir.y += 1.0f;
-	}
-	if( wnd.kbd.KeyIsPressed( VK_LEFT ) )
-	{
-		dir.x -= 1.0f;
-	}
-	if( wnd.kbd.KeyIsPressed( VK_RIGHT ) )
-	{
-		dir.x += 1.0f;
-	}
-	link.SetDirection( dir );
-	link.Update( ft.Mark() );
+	//Vec2 dir = { 0.0f,0.0f };
+	//if( wnd.kbd.KeyIsPressed( VK_UP ) )
+	//{
+	//	dir.y -= 1.0f;
+	//}
+	//if( wnd.kbd.KeyIsPressed( VK_DOWN ) )
+	//{
+	//	dir.y += 1.0f;
+	//}
+	//if( wnd.kbd.KeyIsPressed( VK_LEFT ) )
+	//{
+	//	dir.x -= 1.0f;
+	//}
+	//if( wnd.kbd.KeyIsPressed( VK_RIGHT ) )
+	//{
+	//	dir.x += 1.0f;
+	//}
+	//link.SetDirection( dir );
+	//link.Update( ft.Mark() );
 }
 
 void Game::ComposeFrame()
 {
-    Level test;
-    test.drawTileGrid( gfx, { 0, 0 } );
-	link.Draw( gfx );
+    testLvl.drawTileGrid( gfx, { 0, 0 } );
+
+    Entity e;
+    e.draw( gfx );
+
+	//link.Draw( gfx );
 }

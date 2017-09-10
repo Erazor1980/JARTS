@@ -28,6 +28,7 @@
 #include "FrameTimer.h"
 #include "Character.h"
 #include "Level.h"
+#include "Entity.h"
 
 class Game
 {
@@ -47,7 +48,9 @@ private:
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
-	FrameTimer ft;
-	Character link = Character( { 100.0f,100.0f } );
+	//FrameTimer ft;
+	//Character link = Character( { 100.0f,100.0f } );
+
+    Level testLvl;
 	/********************************/
 };
