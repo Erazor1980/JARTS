@@ -321,6 +321,58 @@ void Graphics::PutPixel( int x,int y,Color c )
 	pSysBuffer[Graphics::ScreenWidth * y + x] = c;
 }
 
+void Graphics::DrawRect( int x0, int y0, int x1, int y1, Color c )
+{
+    if( x0 > x1 )
+    {
+        std::swap( x0, x1 );
+    }
+    if( y0 > y1 )
+    {
+        std::swap( y0, y1 );
+    }
+
+    for( int y = y0; y < y1; ++y )
+    {
+        for( int x = x0; x < x1; ++x )
+        {
+            PutPixel( x, y, c );
+        }
+    }
+}
+
+void Graphics::DrawRectBorder( const RectF& rect, const int border, Color c )
+{
+    const Vec2 topLeft( rect.left, rect.top );
+    const Vec2 bottomRight( rect.right, rect.bottom );
+
+    // top line
+    DrawRect( ( int )topLeft.x, ( int )topLeft.y, ( int )bottomRight.x, ( int )topLeft.y + border, c );
+    // bottom line
+    DrawRect( ( int )topLeft.x, ( int )bottomRight.y - border, ( int )bottomRight.x, ( int )bottomRight.y, c );
+    // left line
+    DrawRect( ( int )topLeft.x, ( int )topLeft.y, ( int )topLeft.x + border, ( int )bottomRight.y, c );
+    // right line
+    DrawRect( ( int )bottomRight.x - border, ( int )topLeft.y, ( int )bottomRight.x, ( int )bottomRight.y, c );
+}
+
+void Graphics::DrawCircle( int x, int y, int radius, Color c )
+{
+    const int rad_sq = radius * radius;
+    for( int y_loop = y - radius + 1; y_loop < y + radius; y_loop++ )
+    {
+        for( int x_loop = x - radius + 1; x_loop < x + radius; x_loop++ )
+        {
+            const int x_diff = x - x_loop;
+            const int y_diff = y - y_loop;
+            if( x_diff * x_diff + y_diff * y_diff <= rad_sq )
+            {
+                PutPixel( x_loop, y_loop, c );
+            }
+        }
+    }
+}
+
 void Graphics::DrawSpriteNonChroma( int x,int y,const Surface& s )
 {
 	DrawSpriteNonChroma( x,y,s.GetRect(),s );

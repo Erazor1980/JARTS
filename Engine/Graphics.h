@@ -26,6 +26,8 @@
 #include "Colors.h"
 #include "Surface.h"
 #include "RectI.h"
+#include "RectF.h"
+#include "Vec2.h"
 
 class Graphics
 {
@@ -59,6 +61,18 @@ public:
 		PutPixel( x,y,{ unsigned char( r ),unsigned char( g ),unsigned char( b ) } );
 	}
 	void PutPixel( int x,int y,Color c );
+    void DrawRect( int x0, int y0, int x1, int y1, Color c );
+    void DrawRect( const RectF& rect, Color c )
+    {
+        DrawRect( ( int )rect.left, ( int )rect.top, ( int )rect.right, ( int )rect.bottom, c );
+    }
+    void DrawRect( const Vec2& topLeft, const Vec2& bottomRight, Color c )
+    {
+        DrawRect( ( int )topLeft.x, ( int )topLeft.y, ( int )bottomRight.x, ( int )bottomRight.y, c );
+    }
+    void DrawRectBorder( const RectF& rect, const int border, Color c );
+    void DrawCircle( int x, int y, int radius, Color c );
+
 	void DrawSpriteNonChroma( int x,int y,const Surface& s );
 	void DrawSpriteNonChroma( int x,int y,const RectI& srcRect,const Surface& s );
 	void DrawSpriteNonChroma( int x,int y,RectI srcRect,const RectI& clip,const Surface& s );

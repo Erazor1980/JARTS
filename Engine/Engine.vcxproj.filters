@@ -78,6 +78,12 @@
     <ClInclude Include="Vec2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RectF.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Level.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -126,6 +132,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Character.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Level.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RectF.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

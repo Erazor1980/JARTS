@@ -62,4 +62,8 @@ void Game::UpdateModel()
 void Game::ComposeFrame()
 {
 	link.Draw( gfx );
+
+    RectF test( { 50, 50 }, { 100, 100 } );
+
+    gfx.DrawRect( test, Colors::Cyan );
 }

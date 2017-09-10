@@ -147,8 +147,10 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Mouse.h" />
+    <ClInclude Include="RectF.h" />
     <ClInclude Include="RectI.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Sound.h" />
@@ -166,9 +168,11 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="Level.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Mouse.cpp" />
+    <ClCompile Include="RectF.cpp" />
     <ClCompile Include="RectI.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Surface.cpp" />
