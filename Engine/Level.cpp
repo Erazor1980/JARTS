@@ -13,7 +13,8 @@ void Level::drawTileGrid( Graphics& gfx, const Vei2& sp ) const
     {
         for( int y = 0; y < m_height; ++y )
         {
-            //gfx.lin
+            RectF tile( { x * m_tileSize, y * m_tileSize }, { ( x + 1 ) * m_tileSize - 1, ( y + 1 ) * m_tileSize - 1 } );
+            gfx.DrawRect( tile, Colors::Green );
         }
     }
 }

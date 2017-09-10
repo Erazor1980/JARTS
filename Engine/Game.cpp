@@ -61,9 +61,7 @@ void Game::UpdateModel()
 
 void Game::ComposeFrame()
 {
+    Level test;
+    test.drawTileGrid( gfx, { 0, 0 } );
 	link.Draw( gfx );
-
-    RectF test( { 50, 50 }, { 100, 100 } );
-
-    gfx.DrawRect( test, Colors::Cyan );
 }

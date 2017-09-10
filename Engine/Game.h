@@ -27,6 +27,7 @@
 #include "Animation.h"
 #include "FrameTimer.h"
 #include "Character.h"
+#include "Level.h"
 
 class Game
 {

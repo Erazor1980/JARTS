@@ -1,6 +1,5 @@
 #pragma once
 #include "Graphics.h"
-#include "Vec2.h"
 
 class Level
 {
@@ -15,5 +14,5 @@ private:
     int m_height        = 20;
 
     /* tile size in pixels */
-    float m_tileSize    = 30;
+    float m_tileSize    = 22;
 };
