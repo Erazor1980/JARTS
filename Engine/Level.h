@@ -1,6 +1,8 @@
 #pragma once
 #include "Graphics.h"
 
+class PathFinder;
+
 enum class Tile
 {
     EMPTY,
@@ -27,4 +29,6 @@ private:
 
     /* Level content */
     Tile* mp_content = nullptr;
+
+    friend PathFinder;
 };

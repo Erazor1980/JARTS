@@ -21,6 +21,8 @@
 #include "MainWindow.h"
 #include "Game.h"
 
+#include "PathFinding.h"
+
 Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
@@ -52,6 +54,8 @@ void Game::UpdateModel()
             ent.update( e.GetType(), Vec2( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ), wnd.kbd.KeyIsPressed( VK_SHIFT ) );
         }
     }
+
+    PathFinder test( testLvl );
 
 	//Vec2 dir = { 0.0f,0.0f };
 	//if( wnd.kbd.KeyIsPressed( VK_UP ) )
