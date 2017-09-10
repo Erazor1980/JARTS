@@ -27,7 +27,8 @@ Game::Game( MainWindow& wnd )
 	gfx( wnd )
 {
     m_vEntities.push_back( Entity( { 142, 120 } ) );
-    m_vEntities.push_back( Entity( { 54, 54 } ) );    
+    m_vEntities.push_back( Entity( { 54, 54 } ) );
+    m_vEntities.push_back( Entity( { 76, 318 } ) );
 }
 
 void Game::Go()
@@ -48,11 +49,9 @@ void Game::UpdateModel()
         const Mouse::Event e = wnd.mouse.Read();
         for( auto &ent : m_vEntities )
         {
-            ent.update( e.GetType(), Vec2( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ) );
+            ent.update( e.GetType(), Vec2( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ), wnd.kbd.KeyIsPressed( VK_SHIFT ) );
         }
     }
-
-    //wnd.mouse.Read()
 
 	//Vec2 dir = { 0.0f,0.0f };
 	//if( wnd.kbd.KeyIsPressed( VK_UP ) )

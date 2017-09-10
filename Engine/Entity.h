@@ -11,7 +11,7 @@ public:
 
     void draw( Graphics& gfx ) const;
 
-    void update( const Mouse::Event::Type& type, const Vec2& mouse_pos );
+    void update( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed );
     void select();
     void deselect();
 private:

@@ -22,7 +22,7 @@ void Entity::draw( Graphics& gfx ) const
 #endif
 }
 
-void Entity::update( const Mouse::Event::Type& type, const Vec2& mouse_pos )
+void Entity::update( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed )
 {
     if( type == Mouse::Event::Type::LPress )
     {
@@ -36,7 +36,10 @@ void Entity::update( const Mouse::Event::Type& type, const Vec2& mouse_pos )
         }
         else
         {
-            m_bSelected = false;
+            if( !shift_pressed )
+            {
+                m_bSelected = false;
+            }
         }
     }
 }
