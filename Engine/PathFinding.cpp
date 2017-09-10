@@ -20,6 +20,7 @@ void PathFinder::init( const Level& lvl )
     assert( lvl.m_width > 0 && lvl.m_height > 0 );
     m_width     = lvl.m_width;
     m_height    = lvl.m_height;
+    mp_mapContent = lvl.mp_content;
 
     if( mp_all_H_values )
     {
@@ -31,10 +32,192 @@ void PathFinder::init( const Level& lvl )
     /////////////////////////////////
     //// PRECALCULATION h values ////
     /////////////////////////////////
-    int* curr_cell = mp_all_H_values;   // pointer to the the memory block for current cell h values
+    int* curr_block = mp_all_H_values;   // pointer to the the memory block for current cell h values
     for( int i = 0; i < num_cells; ++i )
     {
+        /* move pointer to the memory block of the next cell */
+        curr_block = &mp_all_H_values[ i * num_cells ];
+
+        /* coordinates of the current cell (we are calculating h values for) */
+        const int currX = i % m_width;
+        const int currY = i / m_width;
+
+        for( int y = 0; y < m_height; ++y )
+        {
+            const int row_offset = y * m_width;
+            for( int x = 0; x < m_width; ++x )
+            {
+                int h = abs( x - currX ) + abs( y - currY );
+
+                curr_block[ row_offset + x ] = h;
+            }
+        }
+    }
+}
+
+std::vector< int > PathFinder::getShortestPath( const int start_idx, const int target_idx )
+{
+    const int num_cells = m_width * m_height;
+    std::vector< int > vPath;
+    
+    std::vector< Node > vOpenList;
+    std::vector< Node > vClosedList;
+
+    /* pointer to h values for the current target */
+    int* current_H_values = &mp_all_H_values[ target_idx * num_cells ];
+
+    Node startNode( start_idx, current_H_values[ start_idx ], 0 );
+    vOpenList.push_back( startNode );
+
+    ////////////
+    //// A* ////
+    ////////////
+    while( true )
+    {
+        Node currNode = getAndRemoveLowestFcostNode( vOpenList );
+
+        vClosedList.push_back( currNode );
+
+        if( target_idx == currNode.m_idx )
+        {
+            //TODO done
+            break;
+        }
+
+        std::vector< int > vNeighbours = getNeighbourIndices( currNode.m_idx );
+
+        for( int n = 0; n < vNeighbours.size(); ++n )
+        {
+            const int idx = vNeighbours[ n ];
+            if( listContainsIdxNode( vClosedList, idx ) )
+            {
+                continue;   // skip if node is in closed list
+            }
+
+            if( !listContainsIdxNode( vOpenList, idx ) )
+            {
+                /* calculate g cost: currNode g + 10 (vertical/horizontal move) or + 14 (diagonal move) */
+                const int g = currNode.m_G + getMoveCosts( currNode.m_idx, idx );
+               
+                Node node( idx, current_H_values[ idx ], g, &currNode );
+            }
+        }
+
+        int deb = 0;
 
     }
 
+    return vPath;
+}
+
+Node PathFinder::getAndRemoveLowestFcostNode( std::vector<Node>& vNodes )
+{
+    Node node;
+    if( vNodes.size() == 1 )
+    {
+        node = vNodes[ 0 ];
+        vNodes.clear();
+
+        return node;
+    }
+    // find node with the lowest f cost
+    int minIdx = 0;
+    int minF = INT_MAX;
+    for( int i = 0; i < vNodes.size(); ++i )
+    {
+        if( vNodes[ i ].m_F < minF )
+        {
+            minF = vNodes[ i ].m_F;
+            minIdx = i;
+        }
+    }
+
+    node = vNodes[ minIdx ];
+
+    // remove node from list
+    auto it = vNodes.begin();
+    int cnt = 0;
+    while( true )
+    {
+        if( cnt == minIdx )
+        {
+            vNodes.erase( it );
+            break;
+        }
+        it++;
+        cnt++;
+    }
+
+    return node;
+}
+
+bool PathFinder::listContainsIdxNode( const std::vector<Node>& vNodes, const int idx )
+{
+    if( vNodes.size() > 0 )
+    {
+        for( int i = 0; i < vNodes.size(); ++i )
+        {
+            if( idx == vNodes[ i ].m_idx )
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+int PathFinder::getMoveCosts( const int idx1, const int idx2 )
+{
+    /* calculate g costs: 10 (vertical/horizontal move) or 14 (diagonal move) */
+
+    const int x1 = idx1 % m_width;
+    const int y1 = idx1 / m_width;
+
+    const int x2 = idx2 % m_width;
+    const int y2 = idx2 / m_width;
+
+    // vertical/horizontal move
+    if( x1 == x2 || y1 == y2 )
+    {
+        return 10;
+    }
+    // diagonal move
+    else
+    {
+        return 14;
+    }
+    return 0;
+}
+
+std::vector< int > PathFinder::getNeighbourIndices( const int curr_idx )
+{
+    std::vector< int > vNeighbours;
+
+    const int currX = curr_idx % m_width;
+    const int currY = curr_idx / m_width;
+
+    for( int x = -1; x < 2; ++x )
+    {
+        for( int y = -1; y < 2; ++y )
+        {
+            if( x == 0 && y == 0 )
+            {
+                continue;   // center idx itself
+            }
+            int tmpX = currX + x;
+            int tmpY = currY + y;
+
+            if( tmpX >= 0 && tmpX < m_width && tmpY >= 0 && tmpY < m_height )
+            {
+                int idx = tmpY * m_width + tmpX;
+                if( mp_mapContent[ idx ] == Tile::EMPTY )
+                {
+                    vNeighbours.push_back( idx );
+                }
+            }
+        }
+    }
+
+
+    return vNeighbours;
 }

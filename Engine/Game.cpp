@@ -56,6 +56,7 @@ void Game::UpdateModel()
     }
 
     PathFinder test( testLvl );
+    test.getShortestPath( 0, 5 );
 
 	//Vec2 dir = { 0.0f,0.0f };
 	//if( wnd.kbd.KeyIsPressed( VK_UP ) )
