@@ -26,6 +26,8 @@ Game::Game( MainWindow& wnd )
 	wnd( wnd ),
 	gfx( wnd )
 {
+    m_vEntities.push_back( Entity( { 142, 120 } ) );
+    m_vEntities.push_back( Entity( { 54, 54 } ) );    
 }
 
 void Game::Go()
@@ -38,6 +40,20 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
+    /////////////////
+    ///// MOUSE /////
+    /////////////////
+    while( !wnd.mouse.IsEmpty() )
+    {
+        const Mouse::Event e = wnd.mouse.Read();
+        for( auto &ent : m_vEntities )
+        {
+            ent.update( e.GetType(), Vec2( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ) );
+        }
+    }
+
+    //wnd.mouse.Read()
+
 	//Vec2 dir = { 0.0f,0.0f };
 	//if( wnd.kbd.KeyIsPressed( VK_UP ) )
 	//{
@@ -63,8 +79,10 @@ void Game::ComposeFrame()
 {
     testLvl.drawTileGrid( gfx, { 0, 0 } );
 
-    Entity e;
-    e.draw( gfx );
+    for( const auto& e : m_vEntities )
+    {
+        e.draw( gfx );
+    }
 
 	//link.Draw( gfx );
 }

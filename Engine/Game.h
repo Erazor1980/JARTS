@@ -52,5 +52,6 @@ private:
 	//Character link = Character( { 100.0f,100.0f } );
 
     Level testLvl;
+    std::vector< Entity > m_vEntities;
 	/********************************/
 };
