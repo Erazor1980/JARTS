@@ -69,9 +69,9 @@ std::vector< int > PathFinder::getShortestPath( const int start_idx, const int t
     Node startNode( start_idx, current_H_values[ start_idx ], 0 );
     vOpenList.push_back( startNode );
 
-    ////////////
-    //// A* ////
-    ////////////
+    ////////////////////////
+    //// A* PATHFINDING ////
+    ////////////////////////
     while( true )
     {
         Node currNode = getAndRemoveLowestFcostNode( vOpenList );
@@ -89,17 +89,32 @@ std::vector< int > PathFinder::getShortestPath( const int start_idx, const int t
         for( int n = 0; n < vNeighbours.size(); ++n )
         {
             const int idx = vNeighbours[ n ];
-            if( listContainsIdxNode( vClosedList, idx ) )
+            int neighbourNodeIdx;   /* idx in the vOpenList of the node! not its map idx! */
+
+            if( listContainsIdxNode( vClosedList, idx, neighbourNodeIdx ) )
             {
                 continue;   // skip if node is in closed list
             }
 
-            if( !listContainsIdxNode( vOpenList, idx ) )
+            /* calculate g cost: currNode g + 10 (vertical/horizontal move) or + 14 (diagonal move) */
+            const int g = currNode.m_G + getMoveCosts( currNode.m_idx, idx );
+
+            
+            if( !listContainsIdxNode( vOpenList, idx, neighbourNodeIdx ) )
+            {               
+                Node node( idx, current_H_values[ idx ], g, currNode.m_idx );
+
+                vOpenList.push_back( node );
+            }
+            else
             {
-                /* calculate g cost: currNode g + 10 (vertical/horizontal move) or + 14 (diagonal move) */
-                const int g = currNode.m_G + getMoveCosts( currNode.m_idx, idx );
-               
-                Node node( idx, current_H_values[ idx ], g, &currNode );
+                /* check if new path to neighbour is shorter */
+                if( g < vOpenList[ neighbourNodeIdx ].m_G )
+                {
+                    vOpenList[ neighbourNodeIdx ].m_G = g;
+                    vOpenList[ neighbourNodeIdx ].m_F = g + vOpenList[ neighbourNodeIdx ].m_H;
+                    vOpenList[ neighbourNodeIdx ].m_parentIdx = currNode.m_idx;
+                }
             }
         }
 
@@ -151,7 +166,7 @@ Node PathFinder::getAndRemoveLowestFcostNode( std::vector<Node>& vNodes )
     return node;
 }
 
-bool PathFinder::listContainsIdxNode( const std::vector<Node>& vNodes, const int idx )
+bool PathFinder::listContainsIdxNode( std::vector<Node>& vNodes, const int idx, int& nodeFoundIdx )
 {
     if( vNodes.size() > 0 )
     {
@@ -159,10 +174,12 @@ bool PathFinder::listContainsIdxNode( const std::vector<Node>& vNodes, const int
         {
             if( idx == vNodes[ i ].m_idx )
             {
+                nodeFoundIdx = i;
                 return true;
             }
         }
     }
+    nodeFoundIdx = -1;
     return false;
 }
 

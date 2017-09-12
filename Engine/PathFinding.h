@@ -5,19 +5,22 @@
 struct Node
 {
     Node() = default;
-    Node( int idx, int h, int g, Node* parent = nullptr )
+    Node( int idx, int h, int g, int parentIdx = -1 )
     {
         m_idx = idx;
         m_H = h;
         m_G = g;
         m_F = g + h;
-        mp_parent = parent;
+        //mp_parent = parent;
+        m_parentIdx = parentIdx;
     }
     int m_H;      // Heuristic (Manhattan distance)
     int m_G;      // Movement cost
     int m_F;      // G + H
     int m_idx;      // index of the node in map
-    Node* mp_parent = nullptr;
+    
+    //Node* mp_parent = nullptr;
+    int m_parentIdx;    // index of the parent node, -1 -> start node
 };
 
 
@@ -33,7 +36,7 @@ public:
 
 private:
     Node getAndRemoveLowestFcostNode( std::vector< Node >& vNodes );
-    bool listContainsIdxNode( const std::vector< Node >& vNodes, const int idx );
+    bool listContainsIdxNode( std::vector< Node >& vNodes, const int idx, int& nodeFoundIdx );
 
     /* g calculation for a neighbour */
     int getMoveCosts( const int idx1, const int idx2 );
