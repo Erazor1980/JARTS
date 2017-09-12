@@ -77,7 +77,7 @@ std::vector< int > PathFinder::getShortestPath( const int start_idx, const int t
     ////////////////////////
     //// A* PATHFINDING ////
     ////////////////////////
-    while( true )
+    while( !vOpenList.empty() )
     {
         Node currNode = getAndRemoveLowestFcostNode( vOpenList );
 

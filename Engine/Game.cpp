@@ -32,9 +32,8 @@ Game::Game( MainWindow& wnd )
     /*m_vEntities.push_back( Entity( { 142, 120 } ) );
     m_vEntities.push_back( Entity( { 54, 54 } ) );
     m_vEntities.push_back( Entity( { 76, 318 } ) );*/
-
-
-    testPath = testFinder.getShortestPath( 12, 32 );
+    
+    testPath = testFinder.getShortestPath( test_start_idx, test_target_idx );
 }
 
 void Game::Go()
@@ -57,29 +56,19 @@ void Game::UpdateModel()
         {
             ent.update( e.GetType(), Vec2( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ), wnd.kbd.KeyIsPressed( VK_SHIFT ) );
         }
+
+        /* test path */
+        if( e.GetType() == Mouse::Event::Type::LPress )
+        {
+            test_target_idx = testLvl.getTileIdx( e.GetPosX(), e.GetPosY() );
+            testPath = testFinder.getShortestPath( test_start_idx, test_target_idx );
+        }
+        else if( e.GetType() == Mouse::Event::Type::RPress )
+        {
+            test_start_idx = testLvl.getTileIdx( e.GetPosX(), e.GetPosY() );
+            testPath = testFinder.getShortestPath( test_start_idx, test_target_idx );
+        }
     }
-
-    //test.getShortestPath( 0, 5 );
-
-	//Vec2 dir = { 0.0f,0.0f };
-	//if( wnd.kbd.KeyIsPressed( VK_UP ) )
-	//{
-	//	dir.y -= 1.0f;
-	//}
-	//if( wnd.kbd.KeyIsPressed( VK_DOWN ) )
-	//{
-	//	dir.y += 1.0f;
-	//}
-	//if( wnd.kbd.KeyIsPressed( VK_LEFT ) )
-	//{
-	//	dir.x -= 1.0f;
-	//}
-	//if( wnd.kbd.KeyIsPressed( VK_RIGHT ) )
-	//{
-	//	dir.x += 1.0f;
-	//}
-	//link.SetDirection( dir );
-	//link.Update( ft.Mark() );
 }
 
 void Game::ComposeFrame()
@@ -91,7 +80,7 @@ void Game::ComposeFrame()
         e.draw( gfx );
     }
 
-    testLvl.drawPath( gfx, testPath );
+    testLvl.drawPath( gfx, testPath, test_start_idx, test_target_idx );
 
 	//link.Draw( gfx );
 }

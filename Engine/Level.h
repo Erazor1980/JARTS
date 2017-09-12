@@ -18,16 +18,15 @@ public:
     ~Level();
 
     void init();
+    int getTileIdx( const int x, const int y );
     
     /* test functions for visualization and debugging */
     void drawTileGrid( Graphics& gfx, const Vei2& sp ) const;
-    void drawPath( Graphics& gfx, std::vector< int > vPath );
-
-
+    void drawPath( Graphics& gfx, std::vector< int > vPath, const int startIdx, const int targetIdx );
 private:
     /* level size in tiles */
-    int m_width         = 6;
-    int m_height        = 7;
+    int m_width         = 20;
+    int m_height        = 20;
 
     /* tile size in pixels */
     float m_tileSize    = 22;
