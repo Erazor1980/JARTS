@@ -29,6 +29,7 @@
 #include "Character.h"
 #include "Level.h"
 #include "Entity.h"
+#include "PathFinding.h"
 
 class Game
 {
@@ -52,6 +53,9 @@ private:
 	//Character link = Character( { 100.0f,100.0f } );
 
     Level testLvl;
+    PathFinder testFinder;
+    std::vector< int > testPath;
+
     std::vector< Entity > m_vEntities;
 	/********************************/
 };

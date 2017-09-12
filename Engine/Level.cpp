@@ -24,17 +24,27 @@ void Level::init()
         delete[] mp_content;
     }
     mp_content = new Tile[ m_width * m_height ];
+    //for( int i = 0; i < m_width * m_height; ++i )
+    //{
+    //    if( rand() % 4 )
+    //    {
+    //        mp_content[ i ] = Tile::EMPTY;
+    //    }
+    //    else
+    //    {
+    //        mp_content[ i ] = Tile::OBSTACLE;
+    //    }
+    //}
+
     for( int i = 0; i < m_width * m_height; ++i )
     {
-        if( rand() % 4 )
-        {
-            mp_content[ i ] = Tile::EMPTY;
-        }
-        else
-        {
-            mp_content[ i ] = Tile::OBSTACLE;
-        }
+        mp_content[ i ] = Tile::EMPTY;
     }
+
+    mp_content[ 16 ] = Tile::OBSTACLE;
+    mp_content[ 26 ] = Tile::OBSTACLE;
+    mp_content[ 28 ] = Tile::OBSTACLE;
+    mp_content[ 34 ] = Tile::OBSTACLE;
 }
 
 void Level::drawTileGrid( Graphics& gfx, const Vei2& sp ) const
@@ -56,5 +66,18 @@ void Level::drawTileGrid( Graphics& gfx, const Vei2& sp ) const
                 gfx.DrawRect( tile, Colors::Red );
             }
         }
+    }
+}
+
+void Level::drawPath( Graphics& gfx, std::vector< int > vPath )
+{
+    for( auto i : vPath )
+    {
+        const int x = i % m_width;
+        const int y = i / m_width;
+
+        RectF tile( { x * m_tileSize, y * m_tileSize }, { ( x + 1 ) * m_tileSize - 1, ( y + 1 ) * m_tileSize - 1 } );
+
+        gfx.DrawCircle( ( int )tile.GetCenter().x, ( int )tile.GetCenter().y, 3, Colors::Magenta );
     }
 }

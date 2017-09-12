@@ -1,5 +1,6 @@
 #pragma once
 #include "Graphics.h"
+#include <vector>
 
 class PathFinder;
 
@@ -17,12 +18,16 @@ public:
     ~Level();
 
     void init();
-    /* test function for tile visualization */
+    
+    /* test functions for visualization and debugging */
     void drawTileGrid( Graphics& gfx, const Vei2& sp ) const;
+    void drawPath( Graphics& gfx, std::vector< int > vPath );
+
+
 private:
     /* level size in tiles */
-    int m_width         = 20;
-    int m_height        = 20;
+    int m_width         = 6;
+    int m_height        = 7;
 
     /* tile size in pixels */
     float m_tileSize    = 22;

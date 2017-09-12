@@ -1,5 +1,5 @@
-#include "PathFinding.h"
 #include <assert.h>
+#include "PathFinding.h"
 
 PathFinder::PathFinder( const Level& lvl )
 {
@@ -57,6 +57,11 @@ void PathFinder::init( const Level& lvl )
 
 std::vector< int > PathFinder::getShortestPath( const int start_idx, const int target_idx )
 {
+    assert( start_idx != target_idx );
+    assert( start_idx >= 0 && start_idx < m_width * m_height );
+    assert( target_idx >= 0 && target_idx < m_width * m_height );
+
+
     const int num_cells = m_width * m_height;
     std::vector< int > vPath;
     
@@ -78,9 +83,19 @@ std::vector< int > PathFinder::getShortestPath( const int start_idx, const int t
 
         vClosedList.push_back( currNode );
 
+        /* target reached! get path indeces */
         if( target_idx == currNode.m_idx )
         {
-            //TODO done
+            vPath.push_back( target_idx );
+
+            int parentIdx = currNode.m_parentIdx;
+
+            while( parentIdx != start_idx )
+            {
+                vPath.push_back( parentIdx );
+                parentIdx = getParentIdxAndRemoveNodeFromList( vClosedList, parentIdx );
+            }
+
             break;
         }
 
@@ -117,9 +132,6 @@ std::vector< int > PathFinder::getShortestPath( const int start_idx, const int t
                 }
             }
         }
-
-        int deb = 0;
-
     }
 
     return vPath;
@@ -164,6 +176,30 @@ Node PathFinder::getAndRemoveLowestFcostNode( std::vector<Node>& vNodes )
     }
 
     return node;
+}
+
+int PathFinder::getParentIdxAndRemoveNodeFromList( std::vector<Node>& vNodes, const int idx )
+{
+    if( vNodes.empty() )
+    {
+        return -1;
+    }
+
+    int parentIdx = -1;
+    // find and remove node from list
+    auto it = vNodes.begin();
+    while( it != vNodes.end() )
+    {
+        if( (*it).m_idx == idx )
+        {
+            parentIdx = ( *it ).m_parentIdx;
+            vNodes.erase( it );
+            break;
+        }
+        it++;
+    }
+
+    return parentIdx;
 }
 
 bool PathFinder::listContainsIdxNode( std::vector<Node>& vNodes, const int idx, int& nodeFoundIdx )

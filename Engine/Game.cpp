@@ -26,11 +26,15 @@
 Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
-	gfx( wnd )
+	gfx( wnd ),
+    testFinder( testLvl )
 {
-    m_vEntities.push_back( Entity( { 142, 120 } ) );
+    /*m_vEntities.push_back( Entity( { 142, 120 } ) );
     m_vEntities.push_back( Entity( { 54, 54 } ) );
-    m_vEntities.push_back( Entity( { 76, 318 } ) );
+    m_vEntities.push_back( Entity( { 76, 318 } ) );*/
+
+
+    testPath = testFinder.getShortestPath( 12, 32 );
 }
 
 void Game::Go()
@@ -55,8 +59,7 @@ void Game::UpdateModel()
         }
     }
 
-    PathFinder test( testLvl );
-    test.getShortestPath( 0, 5 );
+    //test.getShortestPath( 0, 5 );
 
 	//Vec2 dir = { 0.0f,0.0f };
 	//if( wnd.kbd.KeyIsPressed( VK_UP ) )
@@ -87,6 +90,8 @@ void Game::ComposeFrame()
     {
         e.draw( gfx );
     }
+
+    testLvl.drawPath( gfx, testPath );
 
 	//link.Draw( gfx );
 }
