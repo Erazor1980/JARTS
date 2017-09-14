@@ -96,6 +96,7 @@ std::vector< int > PathFinder::getShortestPath( const int start_idx, const int t
                 parentIdx = getParentIdxAndRemoveNodeFromList( vClosedList, parentIdx );
             }
 
+            std::reverse( vPath.begin(), vPath.end() );
             break;
         }
 
