@@ -52,7 +52,7 @@ void Level::init()
     m_bInitialized = true;
 }
 
-int Level::getTileIdx( const int x, const int y )
+int Level::getTileIdx( const int x, const int y ) const
 {
     int xTile = int( x / m_tileSize );
     int yTile = int( y / m_tileSize );
@@ -82,7 +82,7 @@ void Level::drawTileGrid( Graphics& gfx, const Vei2& sp ) const
     }
 }
 
-void Level::drawPath( Graphics& gfx, std::vector< int > vPath, const int startIdx, const int targetIdx )
+void Level::drawPath( Graphics& gfx, std::vector< int > vPath, const int startIdx, const int targetIdx ) const
 {
     /* draw path */
     for( auto i : vPath )
@@ -96,13 +96,16 @@ void Level::drawPath( Graphics& gfx, std::vector< int > vPath, const int startId
     }
 
     /* draw start and target */
-    const int xS = startIdx % m_width;
-    const int yS = startIdx / m_width;
-    RectF start( { xS * m_tileSize, yS * m_tileSize }, { ( xS + 1 ) * m_tileSize - 1, ( yS + 1 ) * m_tileSize - 1 } );
-    gfx.DrawRectBorder( start, 2, Colors::Red );
+    if( startIdx >= 0 && targetIdx >= 0 )
+    {
+        const int xS = startIdx % m_width;
+        const int yS = startIdx / m_width;
+        RectF start( { xS * m_tileSize, yS * m_tileSize }, { ( xS + 1 ) * m_tileSize - 1, ( yS + 1 ) * m_tileSize - 1 } );
+        gfx.DrawRectBorder( start, 2, Colors::Red );
 
-    const int xT = targetIdx % m_width;
-    const int yT = targetIdx / m_width;
-    RectF end( { xT * m_tileSize, yT * m_tileSize }, { ( xT + 1 ) * m_tileSize - 1, ( yT + 1 ) * m_tileSize - 1 } );
-    gfx.DrawRectBorder( end, 2, Colors::Blue );
+        const int xT = targetIdx % m_width;
+        const int yT = targetIdx / m_width;
+        RectF end( { xT * m_tileSize, yT * m_tileSize }, { ( xT + 1 ) * m_tileSize - 1, ( yT + 1 ) * m_tileSize - 1 } );
+        gfx.DrawRectBorder( end, 2, Colors::Blue );
+    }
 }

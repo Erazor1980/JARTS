@@ -27,7 +27,7 @@ Game::Game( MainWindow& wnd )
 	gfx( wnd ),
     m_pathFinder( m_level )
 {
-    m_vEntities.push_back( Entity( { 2, 2 }, &m_level ) );
+    m_vEntities.push_back( Entity( { 2, 2 }, &m_level, &m_pathFinder ) );
     /*m_vEntities.push_back( Entity( { 54, 54 } ) );
     m_vEntities.push_back( Entity( { 76, 318 } ) );*/
     

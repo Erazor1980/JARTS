@@ -1,10 +1,10 @@
 #include "Entity.h"
-#include "PathFinding.h"
 #include <assert.h>
 
-Entity::Entity( const Vec2 pos_tile, const Level* const pLevel )
+Entity::Entity( const Vec2 pos_tile, const Level* const pLevel, PathFinder* const pPathFinder )
     :
-    mp_level( pLevel )
+    mp_level( pLevel ),
+    mp_pathFinder( pPathFinder )
 {
     assert( pLevel->isInitialized() );
     assert( pos_tile.x >= 0 && pos_tile.x < pLevel->getWidth()
@@ -31,9 +31,33 @@ void Entity::draw( Graphics& gfx ) const
     /* draw bounding box */
     gfx.DrawRectBorder( m_bb, 1, Colors::White );
 #endif
+
+    if( m_bSelected && State::MOVING == m_state )
+    {
+        mp_level->drawPath( gfx, m_vCurrentPath );
+    }
 }
 
 void Entity::update( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed )
+{
+    handleMouse( type, mouse_pos, shift_pressed );
+
+    if( State::MOVING == m_state )
+    {
+
+    }
+}
+
+void Entity::select()
+{
+    m_bSelected = true;
+}
+void Entity::deselect()
+{
+    m_bSelected = false;
+}
+
+void Entity::handleMouse( const Mouse::Event::Type & type, const Vec2 & mouse_pos, const bool shift_pressed )
 {
     if( type == Mouse::Event::Type::LPress )
     {
@@ -53,14 +77,20 @@ void Entity::update( const Mouse::Event::Type& type, const Vec2& mouse_pos, cons
             }
         }
     }
-}
+    else if( type == Mouse::Event::Type::RPress )
+    {
+        if( m_bSelected )
+        {
+            Tile targetTile = mp_level->getTileType( ( int )mouse_pos.x, ( int )mouse_pos.y );
 
-void Entity::select()
-{
-    m_bSelected = true;
-}
+            if( Tile::EMPTY == targetTile )
+            {
+                const int startIdx = ( int )m_pos_tile.y * mp_level->getWidth() + ( int )m_pos_tile.x; 
+                const int targetIdx = mp_level->getTileIdx( ( int )mouse_pos.x, ( int )mouse_pos.y );
+                m_vCurrentPath = mp_pathFinder->getShortestPath( startIdx, targetIdx );
 
-void Entity::deselect()
-{
-    m_bSelected = false;
+                m_state = State::MOVING;
+            }
+        }
+    }
 }
