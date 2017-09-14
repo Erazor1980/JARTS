@@ -47,7 +47,18 @@ void Game::UpdateModel()
     /////////////////
     ///// MOUSE /////
     /////////////////
-    while( !wnd.mouse.IsEmpty() )
+    if( !wnd.mouse.IsEmpty() )
+    {
+        while( !wnd.mouse.IsEmpty() )
+        {
+            const Mouse::Event e = wnd.mouse.Read();
+            for( auto &ent : m_vEntities )
+            {
+                ent.update( e.GetType(), Vec2( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
+            }
+        }
+    }
+    else
     {
         const Mouse::Event e = wnd.mouse.Read();
         for( auto &ent : m_vEntities )

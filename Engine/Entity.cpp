@@ -106,7 +106,7 @@ Vec2 Entity::calcDirection()
     const Vec2 nextTileCenter = mp_level->getTileCenter( m_vPath[ m_pathIdx ] );
 
     Vec2 dist = nextTileCenter - m_pos;
-    if( fabsf( dist.x ) < 1 && fabsf( dist.y ) < 1 )
+    if( fabsf( dist.x ) < 1.5f && fabsf( dist.y ) < 1.5f )
     {
         m_pos_tile.x = ( float )( m_vPath[ m_pathIdx ] % mp_level->getWidth() );
         m_pos_tile.y = ( float )( m_vPath[ m_pathIdx ] / mp_level->getWidth() );

@@ -58,7 +58,6 @@ private:
     int test_start_idx = 0;
     int test_target_idx = 30;
 
-
     std::vector< Entity > m_vEntities;
 	/********************************/
 };
