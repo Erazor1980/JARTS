@@ -11,7 +11,6 @@ struct Node
         m_H = h;
         m_G = g;
         m_F = g + h;
-        //mp_parent = parent;
         m_parentIdx = parentIdx;
     }
     int m_idx;    // index of the node in map
@@ -20,7 +19,6 @@ struct Node
     int m_G;      // Movement cost
     int m_F;      // G + H
         
-    //Node* mp_parent = nullptr;
     int m_parentIdx;    // index of the parent node, -1 -> start node
 };
 

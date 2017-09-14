@@ -52,8 +52,6 @@ private:
 	/********************************/
 	/*  User Variables              */
 	FrameTimer ft;
-	//Character link = Character( { 100.0f,100.0f } );
-
     Level m_level;
     PathFinder m_pathFinder;
     std::vector< int > testPath;

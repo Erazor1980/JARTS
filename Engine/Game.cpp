@@ -29,11 +29,7 @@ Game::Game( MainWindow& wnd )
 {
     m_vEntities.push_back( Entity( { 2, 2 }, &m_level, &m_pathFinder ) );
     m_vEntities.push_back( Entity( { 6, 5 }, &m_level, &m_pathFinder ) );
-    m_vEntities.push_back( Entity( { 7, 8 }, &m_level, &m_pathFinder ) );
-    
-#if PATH_FINDING_TEST
-    testPath = m_pathFinder.getShortestPath( test_start_idx, test_target_idx );
-#endif
+    m_vEntities.push_back( Entity( { 7, 8 }, &m_level, &m_pathFinder ) );    
 }
 
 void Game::Go()
@@ -58,20 +54,6 @@ void Game::UpdateModel()
         {
             ent.update( e.GetType(), Vec2( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
         }
-
-        /* test path */
-#if PATH_FINDING_TEST
-        if( e.GetType() == Mouse::Event::Type::LPress )
-        {
-            test_target_idx = m_level.getTileIdx( e.GetPosX(), e.GetPosY() );
-            testPath = testFinder.getShortestPath( test_start_idx, test_target_idx );
-        }
-        else if( e.GetType() == Mouse::Event::Type::RPress )
-        {
-            test_start_idx = m_level.getTileIdx( e.GetPosX(), e.GetPosY() );
-            testPath = testFinder.getShortestPath( test_start_idx, test_target_idx );
-        }
-#endif
     }
 }
 
@@ -83,10 +65,4 @@ void Game::ComposeFrame()
     {
         e.draw( gfx );
     }
-
-#if PATH_FINDING_TEST
-    m_level.drawPath( gfx, testPath, test_start_idx, test_target_idx );
-#endif
-
-	//link.Draw( gfx );
 }
