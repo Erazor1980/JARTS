@@ -51,7 +51,7 @@ private:
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
-	//FrameTimer ft;
+	FrameTimer ft;
 	//Character link = Character( { 100.0f,100.0f } );
 
     Level m_level;

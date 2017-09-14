@@ -60,6 +60,17 @@ int Level::getTileIdx( const int x, const int y ) const
     return yTile * m_width + xTile;
 }
 
+Vec2 Level::getTileCenter( const int tileIdx ) const
+{
+    const int xTile = tileIdx % m_width;
+    const int yTile = tileIdx / m_width;
+
+    const float x = xTile * m_tileSize + m_tileSize / 2 - 1;
+    const float y = yTile * m_tileSize + m_tileSize / 2 - 1;
+
+    return Vec2( x, y );
+}
+
 void Level::drawTileGrid( Graphics& gfx, const Vei2& sp ) const
 {
     assert( m_height > 0 && m_width > 0 && m_tileSize > 0 );

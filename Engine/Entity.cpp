@@ -15,8 +15,8 @@ Entity::Entity( const Vec2 pos_tile, const Level* const pLevel, PathFinder* cons
     m_pos.x     = pos_tile.x * tSize + tSize / 2 - 1;
     m_pos.y     = pos_tile.y * tSize + tSize / 2 - 1;
 
-    float halfSize = m_size / 2.0f;
-    m_bb = RectF( m_pos - Vec2( halfSize, halfSize ), m_pos + Vec2( halfSize + 1, halfSize + 1 ) );
+    m_halfSize = m_size / 2.0f;
+    m_bb = RectF( m_pos - Vec2( m_halfSize, m_halfSize ), m_pos + Vec2( m_halfSize + 1, m_halfSize + 1 ) );
 }
 
 void Entity::draw( Graphics& gfx ) const
@@ -32,19 +32,24 @@ void Entity::draw( Graphics& gfx ) const
     gfx.DrawRectBorder( m_bb, 1, Colors::White );
 #endif
 
+    /* drawing current path when selected, will be removed later */
     if( m_bSelected && State::MOVING == m_state )
     {
-        mp_level->drawPath( gfx, m_vCurrentPath );
+        mp_level->drawPath( gfx, m_vPath );
     }
 }
 
-void Entity::update( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed )
+void Entity::update( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed, const float dt )
 {
     handleMouse( type, mouse_pos, shift_pressed );
 
     if( State::MOVING == m_state )
     {
+        calcDirection();
 
+        m_vel = m_dir * m_speed;
+        m_pos += m_vel * dt;
+        m_bb = RectF( m_pos - Vec2( m_halfSize, m_halfSize ), m_pos + Vec2( m_halfSize + 1, m_halfSize + 1 ) );
     }
 }
 
@@ -57,7 +62,7 @@ void Entity::deselect()
     m_bSelected = false;
 }
 
-void Entity::handleMouse( const Mouse::Event::Type & type, const Vec2 & mouse_pos, const bool shift_pressed )
+void Entity::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed )
 {
     if( type == Mouse::Event::Type::LPress )
     {
@@ -87,10 +92,36 @@ void Entity::handleMouse( const Mouse::Event::Type & type, const Vec2 & mouse_po
             {
                 const int startIdx = ( int )m_pos_tile.y * mp_level->getWidth() + ( int )m_pos_tile.x; 
                 const int targetIdx = mp_level->getTileIdx( ( int )mouse_pos.x, ( int )mouse_pos.y );
-                m_vCurrentPath = mp_pathFinder->getShortestPath( startIdx, targetIdx );
+                m_vPath = mp_pathFinder->getShortestPath( startIdx, targetIdx );
 
                 m_state = State::MOVING;
+                m_pathIdx = 0;
             }
         }
     }
 }
+
+Vec2 Entity::calcDirection()
+{
+    const Vec2 nextTileCenter = mp_level->getTileCenter( m_vPath[ m_pathIdx ] );
+
+    Vec2 dist = nextTileCenter - m_pos;
+    if( fabsf( dist.x ) < 1 && fabsf( dist.y ) < 1 )
+    {
+        m_pos_tile.x = ( float )( m_vPath[ m_pathIdx ] % mp_level->getWidth() );
+        m_pos_tile.y = ( float )( m_vPath[ m_pathIdx ] / mp_level->getWidth() );
+        m_pathIdx++;        
+    }
+    if( m_pathIdx == m_vPath.size() )
+    {
+        m_state = State::STANDING;
+    }
+
+    m_dir.x = nextTileCenter.x - m_pos.x;
+    m_dir.y = nextTileCenter.y - m_pos.y;
+
+    m_dir.Normalize();
+    
+    return m_dir;
+}
+

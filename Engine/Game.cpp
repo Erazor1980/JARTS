@@ -28,8 +28,8 @@ Game::Game( MainWindow& wnd )
     m_pathFinder( m_level )
 {
     m_vEntities.push_back( Entity( { 2, 2 }, &m_level, &m_pathFinder ) );
-    /*m_vEntities.push_back( Entity( { 54, 54 } ) );
-    m_vEntities.push_back( Entity( { 76, 318 } ) );*/
+    m_vEntities.push_back( Entity( { 6, 5 }, &m_level, &m_pathFinder ) );
+    m_vEntities.push_back( Entity( { 7, 8 }, &m_level, &m_pathFinder ) );
     
 #if PATH_FINDING_TEST
     testPath = m_pathFinder.getShortestPath( test_start_idx, test_target_idx );
@@ -46,6 +46,8 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
+    const float dt = ft.Mark();
+
     /////////////////
     ///// MOUSE /////
     /////////////////
@@ -54,7 +56,7 @@ void Game::UpdateModel()
         const Mouse::Event e = wnd.mouse.Read();
         for( auto &ent : m_vEntities )
         {
-            ent.update( e.GetType(), Vec2( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ), wnd.kbd.KeyIsPressed( VK_SHIFT ) );
+            ent.update( e.GetType(), Vec2( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
         }
 
         /* test path */

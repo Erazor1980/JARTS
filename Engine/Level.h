@@ -29,6 +29,7 @@ public:
     {
         return getTileType( getTileIdx( x, y ) );
     }
+    Vec2 getTileCenter( const int tileIdx ) const;  /* return tile center in pixel coordinates */
 
     /* test functions for visualization and debugging */
     void drawTileGrid( Graphics& gfx, const Vei2& sp ) const;
