@@ -48,12 +48,14 @@ void Level::init()
     mp_content[ 28 ] = Tile::OBSTACLE;
     mp_content[ 34 ] = Tile::OBSTACLE;
 #endif
+
+    m_bInitialized = true;
 }
 
 int Level::getTileIdx( const int x, const int y )
 {
-    int xTile = x / m_tileSize;
-    int yTile = y / m_tileSize;
+    int xTile = int( x / m_tileSize );
+    int yTile = int( y / m_tileSize );
 
     return yTile * m_width + xTile;
 }

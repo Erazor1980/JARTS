@@ -1,8 +1,19 @@
 #include "Entity.h"
+#include "PathFinding.h"
+#include <assert.h>
 
-Entity::Entity( const Vec2 pos )
+Entity::Entity( const Vec2 pos_tile, const Level* const pLevel )
+    :
+    mp_level( pLevel )
 {
-    m_pos = pos;
+    assert( pLevel->isInitialized() );
+    assert( pos_tile.x >= 0 && pos_tile.x < pLevel->getWidth()
+            && pos_tile.y >= 0 && pos_tile.y < pLevel->getHeight() );
+
+    const float tSize = pLevel->getTileSize();
+    m_pos_tile  = pos_tile;
+    m_pos.x     = pos_tile.x * tSize + tSize / 2 - 1;
+    m_pos.y     = pos_tile.y * tSize + tSize / 2 - 1;
 
     float halfSize = m_size / 2.0f;
     m_bb = RectF( m_pos - Vec2( halfSize, halfSize ), m_pos + Vec2( halfSize + 1, halfSize + 1 ) );

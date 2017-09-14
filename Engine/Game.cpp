@@ -21,19 +21,19 @@
 #include "MainWindow.h"
 #include "Game.h"
 
-#include "PathFinding.h"
-
 Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
 	gfx( wnd ),
-    testFinder( testLvl )
+    m_pathFinder( m_level )
 {
-    /*m_vEntities.push_back( Entity( { 142, 120 } ) );
-    m_vEntities.push_back( Entity( { 54, 54 } ) );
+    m_vEntities.push_back( Entity( { 2, 2 }, &m_level ) );
+    /*m_vEntities.push_back( Entity( { 54, 54 } ) );
     m_vEntities.push_back( Entity( { 76, 318 } ) );*/
     
-    testPath = testFinder.getShortestPath( test_start_idx, test_target_idx );
+#if PATH_FINDING_TEST
+    testPath = m_pathFinder.getShortestPath( test_start_idx, test_target_idx );
+#endif
 }
 
 void Game::Go()
@@ -58,29 +58,33 @@ void Game::UpdateModel()
         }
 
         /* test path */
+#if PATH_FINDING_TEST
         if( e.GetType() == Mouse::Event::Type::LPress )
         {
-            test_target_idx = testLvl.getTileIdx( e.GetPosX(), e.GetPosY() );
+            test_target_idx = m_level.getTileIdx( e.GetPosX(), e.GetPosY() );
             testPath = testFinder.getShortestPath( test_start_idx, test_target_idx );
         }
         else if( e.GetType() == Mouse::Event::Type::RPress )
         {
-            test_start_idx = testLvl.getTileIdx( e.GetPosX(), e.GetPosY() );
+            test_start_idx = m_level.getTileIdx( e.GetPosX(), e.GetPosY() );
             testPath = testFinder.getShortestPath( test_start_idx, test_target_idx );
         }
+#endif
     }
 }
 
 void Game::ComposeFrame()
 {
-    testLvl.drawTileGrid( gfx, { 0, 0 } );
+    m_level.drawTileGrid( gfx, { 0, 0 } );
 
     for( const auto& e : m_vEntities )
     {
         e.draw( gfx );
     }
 
-    testLvl.drawPath( gfx, testPath, test_start_idx, test_target_idx );
+#if PATH_FINDING_TEST
+    m_level.drawPath( gfx, testPath, test_start_idx, test_target_idx );
+#endif
 
 	//link.Draw( gfx );
 }

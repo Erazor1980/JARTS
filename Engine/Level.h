@@ -23,7 +23,27 @@ public:
     /* test functions for visualization and debugging */
     void drawTileGrid( Graphics& gfx, const Vei2& sp ) const;
     void drawPath( Graphics& gfx, std::vector< int > vPath, const int startIdx, const int targetIdx );
+
+    /* getter functions */
+    float getTileSize() const
+    {
+        return m_tileSize;
+    }
+    int getWidth() const
+    {
+        return m_width;
+    }
+    int getHeight() const
+    {
+        return m_height;
+    }
+    bool isInitialized() const
+    {
+        return m_bInitialized;
+    }
 private:
+    bool m_bInitialized = false;
+
     /* level size in tiles */
     int m_width         = 20;
     int m_height        = 20;

@@ -31,6 +31,8 @@
 #include "Entity.h"
 #include "PathFinding.h"
 
+#include "Defines.h"
+
 class Game
 {
 public:
@@ -52,8 +54,8 @@ private:
 	//FrameTimer ft;
 	//Character link = Character( { 100.0f,100.0f } );
 
-    Level testLvl;
-    PathFinder testFinder;
+    Level m_level;
+    PathFinder m_pathFinder;
     std::vector< int > testPath;
     int test_start_idx = 0;
     int test_target_idx = 30;
