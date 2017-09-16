@@ -1,4 +1,5 @@
 #include "RectI.h"
+#include <algorithm>
 
 RectI::RectI( int left_in,int right_in,int top_in,int bottom_in )
 	:
@@ -33,9 +34,32 @@ bool RectI::IsContainedBy( const RectI & other ) const
 		top >= other.top && bottom <= other.bottom;
 }
 
-bool RectI::Contains( const Vei2& point ) const
+bool RectI::Contains( const Vei2& point )
 {
+    if( left > right )
+    {
+        std::swap( left, right );
+    }
+    if( bottom < top )
+    {
+        std::swap( bottom, top );
+    }
+
 	return point.x >= left && point.x < right && point.y >= top && point.y < bottom;
+}
+
+bool RectI::Contains( const Vec2& point )
+{
+    if( left > right )
+    {
+        std::swap( left, right );
+    }
+    if( bottom < top )
+    {
+        std::swap( bottom, top );
+    }
+
+    return point.x >= left && point.x < right && point.y >= top && point.y < bottom;
 }
 
 RectI RectI::FromCenter( const Vei2 & center,int halfWidth,int halfHeight )

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Vei2.h"
+#include "Vec2.h"
 
 class RectI
 {
@@ -11,7 +12,8 @@ public:
 	RectI( const Vei2& topLeft,int width,int height );
 	bool IsOverlappingWith( const RectI& other ) const;
 	bool IsContainedBy( const RectI& other ) const;
-	bool Contains( const Vei2& point ) const;
+	bool Contains( const Vei2& point );
+    bool Contains( const Vec2& point );
 	static RectI FromCenter( const Vei2& center,int halfWidth,int halfHeight );
 	RectI GetExpanded( int offset ) const;
 	Vei2 GetCenter() const;
