@@ -36,29 +36,13 @@ bool RectI::IsContainedBy( const RectI & other ) const
 
 bool RectI::Contains( const Vei2& point )
 {
-    if( left > right )
-    {
-        std::swap( left, right );
-    }
-    if( bottom < top )
-    {
-        std::swap( bottom, top );
-    }
-
+    Normalize();
 	return point.x >= left && point.x < right && point.y >= top && point.y < bottom;
 }
 
 bool RectI::Contains( const Vec2& point )
 {
-    if( left > right )
-    {
-        std::swap( left, right );
-    }
-    if( bottom < top )
-    {
-        std::swap( bottom, top );
-    }
-
+    Normalize();
     return point.x >= left && point.x < right && point.y >= top && point.y < bottom;
 }
 
@@ -86,4 +70,23 @@ int RectI::GetWidth() const
 int RectI::GetHeight() const
 {
 	return bottom - top;
+}
+
+void RectI::Normalize()
+{
+    if( left > right )
+    {
+        std::swap( left, right );
+    }
+    if( bottom < top )
+    {
+        std::swap( bottom, top );
+    }
+}
+
+RectI RectI::getNormalized() const
+{
+    RectI n = *this;
+    n.Normalize();
+    return n;
 }

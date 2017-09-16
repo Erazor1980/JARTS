@@ -19,6 +19,8 @@ public:
 	Vei2 GetCenter() const;
 	int GetWidth() const;
 	int GetHeight() const;
+    void Normalize();
+    RectI getNormalized() const;
 public:
 	int left;
 	int right;
