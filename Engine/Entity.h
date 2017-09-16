@@ -16,6 +16,10 @@ public:
     void update( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed, const float dt );
     void select();
     void deselect();
+    Vec2 getPosition() const
+    {
+        return m_pos;
+    }
 
     enum class State
     {

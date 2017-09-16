@@ -54,9 +54,9 @@ private:
 	FrameTimer ft;
     Level m_level;
     PathFinder m_pathFinder;
-    std::vector< int > testPath;
-    int test_start_idx = 0;
-    int test_target_idx = 30;
+
+    RectI m_selection;
+    bool m_bSelecting = false;
 
     std::vector< Entity > m_vEntities;
 	/********************************/

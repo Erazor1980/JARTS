@@ -65,8 +65,8 @@ Vec2 Level::getTileCenter( const int tileIdx ) const
     const int xTile = tileIdx % m_width;
     const int yTile = tileIdx / m_width;
 
-    const float x = xTile * m_tileSize + m_tileSize / 2 - 1;
-    const float y = yTile * m_tileSize + m_tileSize / 2 - 1;
+    const float x = xTile * m_tileSize + m_tileSize / 2.0f - 1;
+    const float y = yTile * m_tileSize + m_tileSize / 2.0f - 1;
 
     return Vec2( x, y );
 }
@@ -79,7 +79,7 @@ void Level::drawTileGrid( Graphics& gfx, const Vei2& sp ) const
     {
         for( int y = 0; y < m_height; ++y )
         {
-            RectF tile( { x * m_tileSize, y * m_tileSize }, { ( x + 1 ) * m_tileSize - 1, ( y + 1 ) * m_tileSize - 1 } );
+            RectI tile( { x * m_tileSize, y * m_tileSize }, { ( x + 1 ) * m_tileSize - 1, ( y + 1 ) * m_tileSize - 1 } );
 
             if( Tile::EMPTY == mp_content[ y * m_width + x ] )
             {
@@ -101,9 +101,9 @@ void Level::drawPath( Graphics& gfx, std::vector< int > vPath, const int startId
         const int x = i % m_width;
         const int y = i / m_width;
 
-        RectF tile( { x * m_tileSize, y * m_tileSize }, { ( x + 1 ) * m_tileSize - 1, ( y + 1 ) * m_tileSize - 1 } );
+        RectI tile( { x * m_tileSize, y * m_tileSize }, { ( x + 1 ) * m_tileSize - 1, ( y + 1 ) * m_tileSize - 1 } );
 
-        gfx.DrawCircle( ( int )tile.GetCenter().x, ( int )tile.GetCenter().y, 3, Colors::Magenta );
+        gfx.DrawCircle( tile.GetCenter().x, tile.GetCenter().y, 3, Colors::Magenta );
     }
 
     /* draw start and target */
@@ -111,12 +111,12 @@ void Level::drawPath( Graphics& gfx, std::vector< int > vPath, const int startId
     {
         const int xS = startIdx % m_width;
         const int yS = startIdx / m_width;
-        RectF start( { xS * m_tileSize, yS * m_tileSize }, { ( xS + 1 ) * m_tileSize - 1, ( yS + 1 ) * m_tileSize - 1 } );
+        RectI start( { xS * m_tileSize, yS * m_tileSize }, { ( xS + 1 ) * m_tileSize - 1, ( yS + 1 ) * m_tileSize - 1 } );
         gfx.DrawRectBorder( start, 2, Colors::Red );
 
         const int xT = targetIdx % m_width;
         const int yT = targetIdx / m_width;
-        RectF end( { xT * m_tileSize, yT * m_tileSize }, { ( xT + 1 ) * m_tileSize - 1, ( yT + 1 ) * m_tileSize - 1 } );
+        RectI end( { xT * m_tileSize, yT * m_tileSize }, { ( xT + 1 ) * m_tileSize - 1, ( yT + 1 ) * m_tileSize - 1 } );
         gfx.DrawRectBorder( end, 2, Colors::Blue );
     }
 }

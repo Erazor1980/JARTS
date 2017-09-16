@@ -10,7 +10,7 @@ Entity::Entity( const Vec2 pos_tile, const Level* const pLevel, PathFinder* cons
     assert( pos_tile.x >= 0 && pos_tile.x < pLevel->getWidth()
             && pos_tile.y >= 0 && pos_tile.y < pLevel->getHeight() );
 
-    const float tSize = pLevel->getTileSize();
+    const int tSize = pLevel->getTileSize();
     m_pos_tile  = pos_tile;
     m_pos.x     = pos_tile.x * tSize + tSize / 2 - 1;
     m_pos.y     = pos_tile.y * tSize + tSize / 2 - 1;
@@ -41,7 +41,10 @@ void Entity::draw( Graphics& gfx ) const
 
 void Entity::update( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed, const float dt )
 {
-    handleMouse( type, mouse_pos, shift_pressed );
+    if( mp_level->getLevelRect().Contains( mouse_pos ) )
+    {
+        handleMouse( type, mouse_pos, shift_pressed );
+    }
 
     if( State::MOVING == m_state )
     {
@@ -94,8 +97,11 @@ void Entity::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos,
                 const int targetIdx = mp_level->getTileIdx( ( int )mouse_pos.x, ( int )mouse_pos.y );
                 m_vPath = mp_pathFinder->getShortestPath( startIdx, targetIdx );
 
-                m_state = State::MOVING;
-                m_pathIdx = 0;
+                if( !m_vPath.empty() )
+                {
+                    m_state = State::MOVING;
+                    m_pathIdx = 0;
+                }
             }
         }
     }

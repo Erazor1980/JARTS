@@ -47,7 +47,8 @@ void Game::UpdateModel()
     /////////////////
     ///// MOUSE /////
     /////////////////
-    if( !wnd.mouse.IsEmpty() )
+    //if( m_level.getLevelRect().Contains( Vec2( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ) ) && !wnd.mouse.IsEmpty() )
+    if( wnd.mouse.IsInWindow() && !wnd.mouse.IsEmpty() )
     {
         while( !wnd.mouse.IsEmpty() )
         {
@@ -55,6 +56,30 @@ void Game::UpdateModel()
             for( auto &ent : m_vEntities )
             {
                 ent.update( e.GetType(), Vec2( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
+            }
+
+            /* multi selection rectangle */
+            if( e.GetType() == Mouse::Event::Type::LPress )
+            {
+                m_selection.left = wnd.mouse.GetPosX();
+                m_selection.top = wnd.mouse.GetPosY();
+            }
+            if( e.LeftIsPressed() )
+            {
+                m_bSelecting = true;
+                m_selection.right = wnd.mouse.GetPosX();
+                m_selection.bottom = wnd.mouse.GetPosY();
+            }
+            if( e.GetType() == Mouse::Event::Type::LRelease )
+            {
+                m_bSelecting = false;
+                for( auto &ent : m_vEntities )
+                {
+                    if( m_selection.Contains( ent.getPosition() ) )
+                    {
+                        ent.select();
+                    }
+                }
             }
         }
     }
@@ -75,5 +100,10 @@ void Game::ComposeFrame()
     for( const auto& e : m_vEntities )
     {
         e.draw( gfx );
+    }
+
+    if( m_bSelecting )
+    {
+        gfx.DrawRectBorder( m_selection.getNormalized(), 1, Colors::White );
     }
 }

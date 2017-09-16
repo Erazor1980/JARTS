@@ -36,7 +36,7 @@ public:
     void drawPath( Graphics& gfx, std::vector< int > vPath, const int startIdx = -1, const int targetIdx = -1 ) const;
 
     /* getter functions */
-    float getTileSize() const
+    int getTileSize() const
     {
         return m_tileSize;
     }
@@ -52,6 +52,12 @@ public:
     {
         return m_bInitialized;
     }
+    RectI getLevelRect() const
+    {
+        assert( m_bInitialized );
+
+        return RectI( { 0, 0 }, m_width * m_tileSize, m_height * m_tileSize );
+    }
 private:
     bool m_bInitialized = false;
 
@@ -60,7 +66,7 @@ private:
     int m_height        = 20;
 
     /* tile size in pixels */
-    float m_tileSize    = 22;
+    int m_tileSize    = 22;
 
     /* Level content */
     Tile* mp_content = nullptr;
