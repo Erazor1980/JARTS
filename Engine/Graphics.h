@@ -66,6 +66,10 @@ public:
     {
         DrawRect( ( int )rect.left, ( int )rect.top, ( int )rect.right, ( int )rect.bottom, c );
     }
+    void DrawRect( const RectI& rect, Color c )
+    {
+        DrawRect( rect.left, rect.top, rect.right, rect.bottom, c );
+    }
     void DrawRect( const Vec2& topLeft, const Vec2& bottomRight, Color c )
     {
         DrawRect( ( int )topLeft.x, ( int )topLeft.y, ( int )bottomRight.x, ( int )bottomRight.y, c );
