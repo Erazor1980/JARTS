@@ -25,11 +25,12 @@ Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
 	gfx( wnd ),
+    m_level( "..\\images\\testLvl2_800x600.bmp" ),
     m_pathFinder( m_level )
 {
-    m_vEntities.push_back( Entity( { 2, 2 }, &m_level, &m_pathFinder ) );
-    m_vEntities.push_back( Entity( { 6, 5 }, &m_level, &m_pathFinder ) );
-    m_vEntities.push_back( Entity( { 7, 8 }, &m_level, &m_pathFinder ) );    
+    m_vEntities.push_back( Entity( { 3, 3 }, &m_level, &m_pathFinder ) );
+    m_vEntities.push_back( Entity( { 17, 2 }, &m_level, &m_pathFinder ) );
+    m_vEntities.push_back( Entity( { 13, 13 }, &m_level, &m_pathFinder ) );    
 }
 
 void Game::Go()
@@ -95,7 +96,7 @@ void Game::UpdateModel()
 
 void Game::ComposeFrame()
 {
-    m_level.drawTileGrid( gfx, { 0, 0 } );
+    m_level.draw( gfx, false );
 
     for( const auto& e : m_vEntities )
     {

@@ -15,7 +15,7 @@ enum class Tile
 class Level
 {
 public:
-    Level();
+    Level( const std::string& filename );
     ~Level();
 
     void init();
@@ -31,8 +31,9 @@ public:
     }
     Vec2 getTileCenter( const int tileIdx ) const;  /* return tile center in pixel coordinates */
 
+    void draw( Graphics& gfx, const bool drawGrid = false /* for debugging */ ) const;
     /* test functions for visualization and debugging */
-    void drawTileGrid( Graphics& gfx, const Vei2& sp ) const;
+    void drawTileGrid( Graphics& gfx ) const;
     void drawPath( Graphics& gfx, std::vector< int > vPath, const int startIdx = -1, const int targetIdx = -1 ) const;
 
     /* getter functions */
@@ -62,14 +63,17 @@ private:
     bool m_bInitialized = false;
 
     /* level size in tiles */
-    int m_width         = 20;
-    int m_height        = 20;
+    int m_width;
+    int m_height;
 
     /* tile size in pixels */
-    int m_tileSize    = 22;
+    int m_tileSize = 40;
 
-    /* Level content */
+    /* level content */
     Tile* mp_content = nullptr;
+
+    /* level image */
+    Surface m_image;
 
     friend PathFinder;
 };

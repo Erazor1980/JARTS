@@ -23,9 +23,9 @@ void Entity::draw( Graphics& gfx ) const
 {
     if( m_bSelected )
     {
-        gfx.DrawCircle( ( int )m_pos.x, ( int )m_pos.y, 10, Colors::Blue );
+        gfx.DrawCircle( ( int )m_pos.x, ( int )m_pos.y, 16, Colors::Blue );
     }
-    gfx.DrawCircle( ( int )m_pos.x, ( int )m_pos.y, 7, Colors::Gray );
+    gfx.DrawCircle( ( int )m_pos.x, ( int )m_pos.y, 12, Colors::Black );
 
 #if DEBUG_INFOS
     /* draw bounding box */
