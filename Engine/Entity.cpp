@@ -90,11 +90,11 @@ void Entity::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos,
         if( m_bSelected )
         {
             Tile targetTile = mp_level->getTileType( ( int )mouse_pos.x, ( int )mouse_pos.y );
+            const int startIdx = ( int )m_pos_tile.y * mp_level->getWidth() + ( int )m_pos_tile.x;
+            const int targetIdx = mp_level->getTileIdx( ( int )mouse_pos.x, ( int )mouse_pos.y );
 
-            if( Tile::EMPTY == targetTile )
+            if( startIdx != targetIdx && Tile::EMPTY == targetTile )
             {
-                const int startIdx = ( int )m_pos_tile.y * mp_level->getWidth() + ( int )m_pos_tile.x; 
-                const int targetIdx = mp_level->getTileIdx( ( int )mouse_pos.x, ( int )mouse_pos.y );
                 m_vPath = mp_pathFinder->getShortestPath( startIdx, targetIdx );
 
                 if( !m_vPath.empty() )
