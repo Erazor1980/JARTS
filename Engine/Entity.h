@@ -9,9 +9,9 @@
 class Entity
 {
 public:
-    Entity( const Vec2 pos_tile, const Level* const pLevel, PathFinder* const pPathFinder );
+    Entity( const Vec2 pos_tile, const Level* const pLevel, PathFinder* const pPathFinder, const Surface& sprite, const std::vector< RectI >& spriteRects );
 
-    void draw( Graphics& gfx ) const;
+    void draw( Graphics& gfx, const bool drawPath = false ) const;
 
     void update( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed, const float dt );
     void select();
@@ -27,6 +27,18 @@ public:
         MOVING,
         ATTACKING
     };
+
+    enum class Direction    /* for the 8 sprite directions */
+    {
+        UP = 0,
+        UP_RIGHT,
+        RIGHT,
+        DOWN_RIGHT,
+        DOWN,
+        DOWN_LEFT,
+        LEFT,
+        UP_LEFT
+    };
 private:
 
     void handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed );
@@ -40,16 +52,22 @@ private:
 
     /* bounding box (for selection in first place) */
     RectF m_bb;
-    float m_size = 16; // width/height of bb in pixels
-    float m_halfSize;
+    int m_size = 20; // width/height of bb in pixels
+    int m_halfSize;
 
     /* true when selected by the player and ready for receiving commands */
     bool m_bSelected = false;
 
     State m_state = State::STANDING;
 
+    /* graphics */
+    const Surface& m_sprite;
+    const std::vector< RectI >& m_vSpriteRects;
+    Direction m_spriteDirection;
+
     /* pointer to the current level */
     const Level* const mp_level;
+
 
     /* path planning */
     PathFinder* const mp_pathFinder;

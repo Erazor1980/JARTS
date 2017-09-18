@@ -32,9 +32,10 @@ public:
     Vec2 getTileCenter( const int tileIdx ) const;  /* return tile center in pixel coordinates */
 
     void draw( Graphics& gfx, const bool drawGrid = false /* for debugging */ ) const;
+
     /* test functions for visualization and debugging */
     void drawTileGrid( Graphics& gfx ) const;
-    void drawPath( Graphics& gfx, std::vector< int > vPath, const int startIdx = -1, const int targetIdx = -1 ) const;
+    void drawPath( Graphics& gfx, std::vector< int > vPath, const int currIdx = 0, const int startIdx = -1, const int targetIdx = -1 ) const;
 
     /* getter functions */
     int getTileSize() const

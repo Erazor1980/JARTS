@@ -1,42 +1,49 @@
 #include "Entity.h"
 #include <assert.h>
 
-Entity::Entity( const Vec2 pos_tile, const Level* const pLevel, PathFinder* const pPathFinder )
+Entity::Entity( const Vec2 pos_tile, const Level* const pLevel, PathFinder* const pPathFinder, const Surface& sprite, const std::vector< RectI >& spriteRects )
     :
     mp_level( pLevel ),
-    mp_pathFinder( pPathFinder )
+    mp_pathFinder( pPathFinder ),
+    m_sprite( sprite ),
+    m_vSpriteRects( spriteRects )
 {
     assert( pLevel->isInitialized() );
     assert( pos_tile.x >= 0 && pos_tile.x < pLevel->getWidth()
             && pos_tile.y >= 0 && pos_tile.y < pLevel->getHeight() );
+    assert( spriteRects.size() > 0 );
 
-    const int tSize = pLevel->getTileSize();
+    m_size = pLevel->getTileSize();
     m_pos_tile  = pos_tile;
-    m_pos.x     = pos_tile.x * tSize + tSize / 2 - 1;
-    m_pos.y     = pos_tile.y * tSize + tSize / 2 - 1;
+    m_pos.x     = pos_tile.x * m_size + m_size / 2 - 1;
+    m_pos.y     = pos_tile.y * m_size + m_size / 2 - 1;
 
-    m_halfSize = m_size / 2.0f;
-    m_bb = RectF( m_pos - Vec2( m_halfSize, m_halfSize ), m_pos + Vec2( m_halfSize + 1, m_halfSize + 1 ) );
+    m_halfSize = m_size / 2;
+    m_bb = RectF( m_pos - Vec2( ( float )m_halfSize, ( float )m_halfSize ), m_pos + Vec2( ( float )m_halfSize + 1, ( float )m_halfSize + 1 ) );
+
+    m_spriteDirection = ( Direction )( rand() % 8 );
 }
 
-void Entity::draw( Graphics& gfx ) const
+void Entity::draw( Graphics& gfx, const bool drawPath ) const
 {
+    /* drawing current (remaining) path when selected */
+    if( drawPath && m_bSelected && State::MOVING == m_state )
+    {
+        mp_level->drawPath( gfx, m_vPath, m_pathIdx );
+    }
+
     if( m_bSelected )
     {
-        gfx.DrawCircle( ( int )m_pos.x, ( int )m_pos.y, 16, Colors::Blue );
+        gfx.DrawCircle( ( int )m_pos.x, ( int )m_pos.y, ( int )m_halfSize + 1, Colors::Blue );
     }
-    gfx.DrawCircle( ( int )m_pos.x, ( int )m_pos.y, 12, Colors::Black );
+
+    gfx.DrawSprite( ( int )m_pos.x - m_halfSize, ( int )m_pos.y - m_halfSize, m_vSpriteRects[ ( int )m_spriteDirection ], m_sprite, Colors::White );
+
 
 #if DEBUG_INFOS
     /* draw bounding box */
     gfx.DrawRectBorder( m_bb, 1, Colors::White );
 #endif
-
-    /* drawing current path when selected, will be removed later */
-    if( m_bSelected && State::MOVING == m_state )
-    {
-        mp_level->drawPath( gfx, m_vPath );
-    }
 }
 
 void Entity::update( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed, const float dt )
@@ -52,7 +59,7 @@ void Entity::update( const Mouse::Event::Type& type, const Vec2& mouse_pos, cons
 
         m_vel = m_dir * m_speed;
         m_pos += m_vel * dt;
-        m_bb = RectF( m_pos - Vec2( m_halfSize, m_halfSize ), m_pos + Vec2( m_halfSize + 1, m_halfSize + 1 ) );
+        m_bb = RectF( m_pos - Vec2( ( float )m_halfSize, ( float )m_halfSize ), m_pos + Vec2( ( float )m_halfSize + 1, ( float )m_halfSize + 1 ) );
     }
 }
 
@@ -127,7 +134,39 @@ Vec2 Entity::calcDirection()
     m_dir.y = nextTileCenter.y - m_pos.y;
 
     m_dir.Normalize();
-    
+
+    if( m_dir.x > 0.1f && m_dir.y > 0.1f )
+    {
+        m_spriteDirection = Direction::DOWN_RIGHT;
+    }
+    else if( m_dir.x > 0.1f && m_dir.y < -0.1f )
+    {
+        m_spriteDirection = Direction::UP_RIGHT;
+    }
+    else if( m_dir.x > 0.1f && fabsf( m_dir.y ) < 0.1f )
+    {
+        m_spriteDirection = Direction::RIGHT;
+    }
+    else if( m_dir.x < -0.1f && m_dir.y < -0.1f )
+    {
+        m_spriteDirection = Direction::UP_LEFT;
+    }
+    else if( m_dir.x < -0.1f && m_dir.y > 0.1f )
+    {
+        m_spriteDirection = Direction::DOWN_LEFT;
+    }
+    else if( m_dir.x < -0.1f && fabsf( m_dir.y ) < 0.1f )
+    {
+        m_spriteDirection = Direction::LEFT;
+    }
+    else if( fabsf( m_dir.x ) < 0.1f && m_dir.y < -0.1f )
+    {
+        m_spriteDirection = Direction::UP;
+    }
+    else if( fabsf( m_dir.x ) < 0.1f && m_dir.y > 0.1f )
+    {
+        m_spriteDirection = Direction::DOWN;
+    }
     return m_dir;
 }
 

@@ -25,12 +25,19 @@ Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
 	gfx( wnd ),
-    m_level( "..\\images\\testLvl2_800x600.bmp" ),
+    m_level( "..\\images\\testLvl1_800x600.bmp" ),
+    m_tankSprites( "..\\images\\tank_40x40_blue.bmp" ),
     m_pathFinder( m_level )
 {
-    m_vEntities.push_back( Entity( { 3, 3 }, &m_level, &m_pathFinder ) );
-    m_vEntities.push_back( Entity( { 17, 2 }, &m_level, &m_pathFinder ) );
-    m_vEntities.push_back( Entity( { 13, 13 }, &m_level, &m_pathFinder ) );    
+    //Surface tanks( "..\\images\\tank_40x40.bmp" );
+    const int size = m_tankSprites.GetHeight();
+    for( int i = 0; i < 8; ++i )
+    {
+        m_vSpriteRects.emplace_back( i * size, ( i + 1 ) * size, 0, size );
+    }
+    m_vEntities.push_back( Entity( { 3, 3 }, &m_level, &m_pathFinder, m_tankSprites, m_vSpriteRects ) );
+    m_vEntities.push_back( Entity( { 17, 2 }, &m_level, &m_pathFinder, m_tankSprites, m_vSpriteRects ) );
+    m_vEntities.push_back( Entity( { 13, 13 }, &m_level, &m_pathFinder, m_tankSprites, m_vSpriteRects ) );
 }
 
 void Game::Go()
@@ -48,7 +55,6 @@ void Game::UpdateModel()
     /////////////////
     ///// MOUSE /////
     /////////////////
-    //if( m_level.getLevelRect().Contains( Vec2( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ) ) && !wnd.mouse.IsEmpty() )
     if( wnd.mouse.IsInWindow() && !wnd.mouse.IsEmpty() )
     {
         while( !wnd.mouse.IsEmpty() )
@@ -92,15 +98,30 @@ void Game::UpdateModel()
             ent.update( e.GetType(), Vec2( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
         }
     }
+
+    //////////////////
+    //// KEYBOARD ////
+    //////////////////
+    while( !wnd.kbd.KeyIsEmpty() )
+    {
+        const Keyboard::Event e = wnd.kbd.ReadKey();
+        if( e.IsRelease() )
+        {
+            if( e.GetCode() == VK_SPACE )
+            {
+                m_bDrawDebugStuff = !m_bDrawDebugStuff;
+            }
+        }
+    }
 }
 
 void Game::ComposeFrame()
 {
-    m_level.draw( gfx, false );
+    m_level.draw( gfx, m_bDrawDebugStuff );
 
     for( const auto& e : m_vEntities )
     {
-        e.draw( gfx );
+        e.draw( gfx, m_bDrawDebugStuff );
     }
 
     if( m_bSelecting )

@@ -185,17 +185,17 @@ void Level::drawTileGrid( Graphics& gfx ) const
     }
 }
 
-void Level::drawPath( Graphics& gfx, std::vector< int > vPath, const int startIdx, const int targetIdx ) const
+void Level::drawPath( Graphics& gfx, std::vector< int > vPath, const int currIdx, const int startIdx, const int targetIdx ) const
 {
     /* draw path */
-    for( auto i : vPath )
+    for( int i = currIdx; i < vPath.size(); ++i )
     {
-        const int x = i % m_width;
-        const int y = i / m_width;
+        const int x = vPath[ i ] % m_width;
+        const int y = vPath[ i ] / m_width;
 
         RectI tile( { x * m_tileSize, y * m_tileSize }, { ( x + 1 ) * m_tileSize - 1, ( y + 1 ) * m_tileSize - 1 } );
 
-        gfx.DrawCircle( tile.GetCenter().x, tile.GetCenter().y, 3, Colors::Magenta );
+        gfx.DrawCircle( tile.GetCenter().x, tile.GetCenter().y, 4, Colors::Black );
     }
 
     /* draw start and target */

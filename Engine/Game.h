@@ -58,6 +58,10 @@ private:
     RectI m_selection;
     bool m_bSelecting = false;
 
+    const Surface m_tankSprites;
+    std::vector< RectI > m_vSpriteRects;    /* for 8 different directions */
     std::vector< Entity > m_vEntities;
+
+    bool m_bDrawDebugStuff = false;
 	/********************************/
 };
