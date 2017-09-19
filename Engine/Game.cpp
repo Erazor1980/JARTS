@@ -30,18 +30,13 @@ Game::Game( MainWindow& wnd )
 #else
     m_level( "..\\images\\testLvl1_800x600.bmp" ),
 #endif
-    m_tankSprites( "..\\images\\tank_40x40_blue.bmp" ),
     m_pathFinder( m_level )
 {
-    //Surface tanks( "..\\images\\tank_40x40.bmp" );
-    const int size = m_tankSprites.GetHeight();
-    for( int i = 0; i < 8; ++i )
-    {
-        m_vSpriteRects.emplace_back( i * size, ( i + 1 ) * size, 0, size );
-    }
-    m_vUnits.push_back( Unit( { 3, 3 }, &m_level, &m_pathFinder, m_tankSprites, m_vSpriteRects ) );
-    m_vUnits.push_back( Unit( { 17, 2 }, &m_level, &m_pathFinder, m_tankSprites, m_vSpriteRects ) );
-    m_vUnits.push_back( Unit( { 13, 13 }, &m_level, &m_pathFinder, m_tankSprites, m_vSpriteRects ) );
+    m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );
+
+    m_vUnits.push_back( Unit( { 3, 3 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites ) );
+    m_vUnits.push_back( Unit( { 17, 2 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites ) );
+    m_vUnits.push_back( Unit( { 13, 13 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites ) );
 }
 
 void Game::Go()

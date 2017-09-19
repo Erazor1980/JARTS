@@ -1,20 +1,32 @@
 #include "Unit.h"
 #include <assert.h>
 
-Unit::Unit( const Vec2 pos_tile, const Level* const pLevel, PathFinder* const pPathFinder, const Surface& sprite, const std::vector< RectI >& spriteRects )
+Unit::Unit( const Vec2 pos_tile,
+            const Level* const pLevel,
+            PathFinder* const pPathFinder,
+            const UnitType type,
+            const std::vector< Surface >& vUnitSprites )
     :
     mp_level( pLevel ),
     mp_pathFinder( pPathFinder ),
-    m_sprite( sprite ),
-    m_vSpriteRects( spriteRects )
+    m_vUnitSprites( vUnitSprites )
 {
     assert( pLevel->isInitialized() );
     assert( pos_tile.x >= 0 && pos_tile.x < pLevel->getWidth()
             && pos_tile.y >= 0 && pos_tile.y < pLevel->getHeight() );
-    assert( spriteRects.size() > 0 );
+    assert( vUnitSprites.size() > 0 );
 
-    m_size = pLevel->getTileSize();
+    m_type      = type;
+    m_size      = m_vUnitSprites[ ( int )m_type ].GetHeight();
     m_pos_tile  = pos_tile;
+
+    /* calculating rectangles for unit sprite steps (directions) */
+    for( int i = 0; i < 8; ++i )
+    {
+        m_vSpriteRects.emplace_back( i * m_size, ( i + 1 ) * m_size, 0, m_size );
+    }
+
+    
     m_pos.x     = pos_tile.x * m_size + m_size / 2 - 1;
     m_pos.y     = pos_tile.y * m_size + m_size / 2 - 1;
 
@@ -37,7 +49,8 @@ void Unit::draw( Graphics& gfx, const bool drawPath ) const
         gfx.DrawCircle( ( int )m_pos.x, ( int )m_pos.y, ( int )m_halfSize + 1, Colors::Blue );
     }
 
-    gfx.DrawSprite( ( int )m_pos.x - m_halfSize, ( int )m_pos.y - m_halfSize, m_vSpriteRects[ ( int )m_spriteDirection ], m_sprite, Colors::White );
+    gfx.DrawSprite( ( int )m_pos.x - m_halfSize, ( int )m_pos.y - m_halfSize, m_vSpriteRects[ ( int )m_spriteDirection ],
+                    m_vUnitSprites[ ( int )m_type ], Colors::White );
 
 
 #if DEBUG_INFOS

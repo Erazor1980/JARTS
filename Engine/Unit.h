@@ -6,10 +6,21 @@
 
 #include "Defines.h"
 
+enum class UnitType
+{
+    TANK = 0,
+    SOLDIER,
+    JET
+};
+
 class Unit
 {
 public:
-    Unit( const Vec2 pos_tile, const Level* const pLevel, PathFinder* const pPathFinder, const Surface& sprite, const std::vector< RectI >& spriteRects );
+    Unit( const Vec2 pos_tile, 
+          const Level* const pLevel, 
+          PathFinder* const pPathFinder, 
+          const UnitType type,
+          const std::vector< Surface >& vUnitSprites );
 
     void draw( Graphics& gfx, const bool drawPath = false ) const;
 
@@ -52,7 +63,7 @@ private:
 
     /* bounding box (for selection in first place) */
     RectF m_bb;
-    int m_size = 20; // width/height of bb in pixels
+    int m_size; // width/height of bb in pixels
     int m_halfSize;
 
     /* true when selected by the player and ready for receiving commands */
@@ -61,13 +72,12 @@ private:
     State m_state = State::STANDING;
 
     /* graphics */
-    const Surface& m_sprite;
-    const std::vector< RectI >& m_vSpriteRects;
+    const std::vector< Surface >& m_vUnitSprites;   /* vector with sprites for all unit types, index = UnitType */
+    std::vector< RectI > m_vSpriteRects;            /* rectangles for single steps (direction) of a unit sprite set */
     Direction m_spriteDirection;
 
     /* pointer to the current level */
     const Level* const mp_level;
-
 
     /* path planning */
     PathFinder* const mp_pathFinder;
@@ -78,4 +88,7 @@ private:
     Vec2 m_vel = { 0.0f, 0.0f };
     float m_speed = 110.0f;
     Vec2 m_dir = { 0.0f, 0.0f };
+
+    UnitType m_type;
+    int m_life;
 };

@@ -200,7 +200,7 @@ void Level::drawPath( Graphics& gfx, std::vector< int > vPath, const int currIdx
 
         RectI tile( { x * m_tileSize, y * m_tileSize }, { ( x + 1 ) * m_tileSize - 1, ( y + 1 ) * m_tileSize - 1 } );
 
-        gfx.DrawCircle( tile.GetCenter().x, tile.GetCenter().y, 4, Colors::Black );
+        gfx.DrawCircle( tile.GetCenter().x, tile.GetCenter().y, 4, Colors::White );
     }
 
     /* draw start and target */
