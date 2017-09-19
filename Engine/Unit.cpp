@@ -176,35 +176,35 @@ void Unit::calcDirection()
     
     m_dir.Normalize();
 
-    if( m_dir.x > 0.1f && m_dir.y > 0.1f )
+    if( m_dir.x > 0.4f && m_dir.y > 0.4f )
     {
         m_spriteDirection = Direction::DOWN_RIGHT;
     }
-    else if( m_dir.x > 0.1f && m_dir.y < -0.1f )
+    else if( m_dir.x > 0.4f && m_dir.y < -0.4f )
     {
         m_spriteDirection = Direction::UP_RIGHT;
     }
-    else if( m_dir.x > 0.1f && fabsf( m_dir.y ) < 0.1f )
+    else if( m_dir.x > 0.4f && fabsf( m_dir.y ) < 0.4f )
     {
         m_spriteDirection = Direction::RIGHT;
     }
-    else if( m_dir.x < -0.1f && m_dir.y < -0.1f )
+    else if( m_dir.x < -0.4f && m_dir.y < -0.4f )
     {
         m_spriteDirection = Direction::UP_LEFT;
     }
-    else if( m_dir.x < -0.1f && m_dir.y > 0.1f )
+    else if( m_dir.x < -0.4f && m_dir.y > 0.4f )
     {
         m_spriteDirection = Direction::DOWN_LEFT;
     }
-    else if( m_dir.x < -0.1f && fabsf( m_dir.y ) < 0.1f )
+    else if( m_dir.x < -0.4f && fabsf( m_dir.y ) < 0.4f )
     {
         m_spriteDirection = Direction::LEFT;
     }
-    else if( fabsf( m_dir.x ) < 0.1f && m_dir.y < -0.1f )
+    else if( fabsf( m_dir.x ) < 0.4f && m_dir.y < -0.4f )
     {
         m_spriteDirection = Direction::UP;
     }
-    else if( fabsf( m_dir.x ) < 0.1f && m_dir.y > 0.1f )
+    else if( fabsf( m_dir.x ) < 0.4f && m_dir.y > 0.4f )
     {
         m_spriteDirection = Direction::DOWN;
     }
