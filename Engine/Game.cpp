@@ -39,9 +39,9 @@ Game::Game( MainWindow& wnd )
     {
         m_vSpriteRects.emplace_back( i * size, ( i + 1 ) * size, 0, size );
     }
-    m_vEntities.push_back( Entity( { 3, 3 }, &m_level, &m_pathFinder, m_tankSprites, m_vSpriteRects ) );
-    m_vEntities.push_back( Entity( { 17, 2 }, &m_level, &m_pathFinder, m_tankSprites, m_vSpriteRects ) );
-    m_vEntities.push_back( Entity( { 13, 13 }, &m_level, &m_pathFinder, m_tankSprites, m_vSpriteRects ) );
+    m_vUnits.push_back( Unit( { 3, 3 }, &m_level, &m_pathFinder, m_tankSprites, m_vSpriteRects ) );
+    m_vUnits.push_back( Unit( { 17, 2 }, &m_level, &m_pathFinder, m_tankSprites, m_vSpriteRects ) );
+    m_vUnits.push_back( Unit( { 13, 13 }, &m_level, &m_pathFinder, m_tankSprites, m_vSpriteRects ) );
 }
 
 void Game::Go()
@@ -64,9 +64,9 @@ void Game::UpdateModel()
         while( !wnd.mouse.IsEmpty() )
         {
             const Mouse::Event e = wnd.mouse.Read();
-            for( auto &ent : m_vEntities )
+            for( auto &u : m_vUnits )
             {
-                ent.update( e.GetType(), Vec2( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
+                u.update( e.GetType(), Vec2( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
             }
 
             /* multi selection rectangle */
@@ -84,11 +84,11 @@ void Game::UpdateModel()
             if( e.GetType() == Mouse::Event::Type::LRelease )
             {
                 m_bSelecting = false;
-                for( auto &ent : m_vEntities )
+                for( auto &u : m_vUnits )
                 {
-                    if( m_selection.Contains( ent.getPosition() ) )
+                    if( m_selection.Contains( u.getPosition() ) )
                     {
-                        ent.select();
+                        u.select();
                     }
                 }
             }
@@ -97,9 +97,9 @@ void Game::UpdateModel()
     else
     {
         const Mouse::Event e = wnd.mouse.Read();
-        for( auto &ent : m_vEntities )
+        for( auto &u : m_vUnits )
         {
-            ent.update( e.GetType(), Vec2( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
+            u.update( e.GetType(), Vec2( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
         }
     }
 
@@ -123,9 +123,9 @@ void Game::ComposeFrame()
 {
     m_level.draw( gfx, m_bDrawDebugStuff );
 
-    for( const auto& e : m_vEntities )
+    for( const auto& u : m_vUnits )
     {
-        e.draw( gfx, m_bDrawDebugStuff );
+        u.draw( gfx, m_bDrawDebugStuff );
     }
 
     if( m_bSelecting )

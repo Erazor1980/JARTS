@@ -6,10 +6,10 @@
 
 #include "Defines.h"
 
-class Entity
+class Unit
 {
 public:
-    Entity( const Vec2 pos_tile, const Level* const pLevel, PathFinder* const pPathFinder, const Surface& sprite, const std::vector< RectI >& spriteRects );
+    Unit( const Vec2 pos_tile, const Level* const pLevel, PathFinder* const pPathFinder, const Surface& sprite, const std::vector< RectI >& spriteRects );
 
     void draw( Graphics& gfx, const bool drawPath = false ) const;
 

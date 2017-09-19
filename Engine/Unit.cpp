@@ -1,7 +1,7 @@
-#include "Entity.h"
+#include "Unit.h"
 #include <assert.h>
 
-Entity::Entity( const Vec2 pos_tile, const Level* const pLevel, PathFinder* const pPathFinder, const Surface& sprite, const std::vector< RectI >& spriteRects )
+Unit::Unit( const Vec2 pos_tile, const Level* const pLevel, PathFinder* const pPathFinder, const Surface& sprite, const std::vector< RectI >& spriteRects )
     :
     mp_level( pLevel ),
     mp_pathFinder( pPathFinder ),
@@ -24,7 +24,7 @@ Entity::Entity( const Vec2 pos_tile, const Level* const pLevel, PathFinder* cons
     m_spriteDirection = ( Direction )( rand() % 8 );
 }
 
-void Entity::draw( Graphics& gfx, const bool drawPath ) const
+void Unit::draw( Graphics& gfx, const bool drawPath ) const
 {
     /* drawing current (remaining) path when selected */
     if( drawPath && m_bSelected && State::MOVING == m_state )
@@ -46,7 +46,7 @@ void Entity::draw( Graphics& gfx, const bool drawPath ) const
 #endif
 }
 
-void Entity::update( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed, const float dt )
+void Unit::update( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed, const float dt )
 {
     if( mp_level->getLevelRect().Contains( mouse_pos ) )
     {
@@ -63,16 +63,16 @@ void Entity::update( const Mouse::Event::Type& type, const Vec2& mouse_pos, cons
     }
 }
 
-void Entity::select()
+void Unit::select()
 {
     m_bSelected = true;
 }
-void Entity::deselect()
+void Unit::deselect()
 {
     m_bSelected = false;
 }
 
-void Entity::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed )
+void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed )
 {
     if( type == Mouse::Event::Type::LPress )
     {
@@ -114,7 +114,7 @@ void Entity::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos,
     }
 }
 
-Vec2 Entity::calcDirection()
+Vec2 Unit::calcDirection()
 {
     const Vec2 nextTileCenter = mp_level->getTileCenter( m_vPath[ m_pathIdx ] );
 

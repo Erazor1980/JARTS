@@ -28,7 +28,7 @@
 #include "FrameTimer.h"
 #include "Character.h"
 #include "Level.h"
-#include "Entity.h"
+#include "Unit.h"
 #include "PathFinding.h"
 
 #include "Defines.h"
@@ -60,7 +60,7 @@ private:
 
     const Surface m_tankSprites;
     std::vector< RectI > m_vSpriteRects;    /* for 8 different directions */
-    std::vector< Entity > m_vEntities;
+    std::vector< Unit > m_vUnits;
 
     bool m_bDrawDebugStuff = false;
 	/********************************/
