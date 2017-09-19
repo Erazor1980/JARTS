@@ -19,8 +19,13 @@ Level::~Level()
 
 void Level::init()
 {
+#if _DEBUG
+    m_width     = 800 / m_tileSize;
+    m_height    = 600 / m_tileSize;
+#else
     m_width     = m_image.GetWidth() / m_tileSize;
     m_height    = m_image.GetHeight() / m_tileSize;
+#endif
 
     assert( m_height > 0 && m_width > 0 );
 

@@ -25,7 +25,11 @@ Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
 	gfx( wnd ),
+#if _DEBUG
+    m_level( "..\\images\\testLvl1_debug.bmp" ),
+#else
     m_level( "..\\images\\testLvl1_800x600.bmp" ),
+#endif
     m_tankSprites( "..\\images\\tank_40x40_blue.bmp" ),
     m_pathFinder( m_level )
 {
