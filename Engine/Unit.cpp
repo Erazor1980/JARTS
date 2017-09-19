@@ -113,39 +113,67 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
             const int startIdx = ( int )m_pos_tile.y * mp_level->getWidth() + ( int )m_pos_tile.x;
             const int targetIdx = mp_level->getTileIdx( ( int )mouse_pos.x, ( int )mouse_pos.y );
 
-            if( startIdx != targetIdx && Tile::EMPTY == targetTile )
+            if( startIdx == targetIdx )
             {
-                m_vPath = mp_pathFinder->getShortestPath( startIdx, targetIdx );
-
-                if( !m_vPath.empty() )
+                return;
+            }
+            if( m_type == UnitType::JET )
+            {
+                m_vPath.clear();
+                m_vPath.push_back( targetIdx );
+                m_state = State::MOVING;
+                m_pathIdx = 0;
+            }
+            else
+            {
+                if( Tile::EMPTY == targetTile )
                 {
-                    m_state = State::MOVING;
-                    m_pathIdx = 0;
+                    m_vPath = mp_pathFinder->getShortestPath( startIdx, targetIdx );
+
+                    if( !m_vPath.empty() )
+                    {
+                        m_state = State::MOVING;
+                        m_pathIdx = 0;
+                    }
                 }
             }
         }
     }
 }
 
-Vec2 Unit::calcDirection()
+void Unit::calcDirection()
 {
-    const Vec2 nextTileCenter = mp_level->getTileCenter( m_vPath[ m_pathIdx ] );
-
-    Vec2 dist = nextTileCenter - m_pos;
-    if( fabsf( dist.x ) < 1.5f && fabsf( dist.y ) < 1.5f )
+    if( m_type == UnitType::JET )
     {
-        m_pos_tile.x = ( float )( m_vPath[ m_pathIdx ] % mp_level->getWidth() );
-        m_pos_tile.y = ( float )( m_vPath[ m_pathIdx ] / mp_level->getWidth() );
-        m_pathIdx++;        
+        const Vec2 targetTileCenter = mp_level->getTileCenter( m_vPath[ m_vPath.size() - 1 ] );
+        
+        m_dir = targetTileCenter - m_pos;
+        if( fabsf( m_dir.x ) < 1.5f && fabsf( m_dir.y ) < 1.5f )
+        {
+            m_pathIdx = ( int )m_vPath.size();
+        }
     }
+    else
+    {
+        const Vec2 nextTileCenter = mp_level->getTileCenter( m_vPath[ m_pathIdx ] );
+
+        Vec2 dist = nextTileCenter - m_pos;
+        if( fabsf( dist.x ) < 1.5f && fabsf( dist.y ) < 1.5f )
+        {
+            m_pos_tile.x = ( float )( m_vPath[ m_pathIdx ] % mp_level->getWidth() );
+            m_pos_tile.y = ( float )( m_vPath[ m_pathIdx ] / mp_level->getWidth() );
+            m_pathIdx++;
+        }
+
+        m_dir.x = nextTileCenter.x - m_pos.x;
+        m_dir.y = nextTileCenter.y - m_pos.y;
+    }
+    
     if( m_pathIdx == m_vPath.size() )
     {
         m_state = State::STANDING;
     }
-
-    m_dir.x = nextTileCenter.x - m_pos.x;
-    m_dir.y = nextTileCenter.y - m_pos.y;
-
+    
     m_dir.Normalize();
 
     if( m_dir.x > 0.1f && m_dir.y > 0.1f )
@@ -180,6 +208,5 @@ Vec2 Unit::calcDirection()
     {
         m_spriteDirection = Direction::DOWN;
     }
-    return m_dir;
 }
 

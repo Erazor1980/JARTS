@@ -33,10 +33,13 @@ Game::Game( MainWindow& wnd )
     m_pathFinder( m_level )
 {
     m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );
+    m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );
+    m_vUnitSprites.push_back( Surface( "..\\images\\jet_40x40.bmp" ) );
+    
 
     m_vUnits.push_back( Unit( { 3, 3 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites ) );
     m_vUnits.push_back( Unit( { 17, 2 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites ) );
-    m_vUnits.push_back( Unit( { 13, 13 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites ) );
+    m_vUnits.push_back( Unit( { 13, 13 }, &m_level, &m_pathFinder, UnitType::JET, m_vUnitSprites ) );
 }
 
 void Game::Go()
