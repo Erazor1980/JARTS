@@ -1,5 +1,6 @@
 #pragma once
 #include "Graphics.h"
+#include "Sound.h"
 #include "Mouse.h"
 #include "Level.h"
 #include "PathFinding.h"
@@ -20,7 +21,8 @@ public:
           const Level* const pLevel, 
           PathFinder* const pPathFinder, 
           const UnitType type,
-          const std::vector< Surface >& vUnitSprites );
+          const std::vector< Surface >& vUnitSprites,
+          Sound& soundSelect );
 
     void draw( Graphics& gfx, const bool drawPath = false ) const;
 
@@ -71,10 +73,11 @@ private:
 
     State m_state = State::STANDING;
 
-    /* graphics */
+    /* graphics & sounds */
     const std::vector< Surface >& m_vUnitSprites;   /* vector with sprites for all unit types, index = UnitType */
     std::vector< RectI > m_vSpriteRects;            /* rectangles for single steps (direction) of a unit sprite set */
     Direction m_spriteDirection;
+    Sound& m_soundSelect;
 
     /* pointer to the current level */
     const Level* const mp_level;

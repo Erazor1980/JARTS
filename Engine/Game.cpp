@@ -32,14 +32,18 @@ Game::Game( MainWindow& wnd )
 #endif
     m_pathFinder( m_level )
 {
+    /* load images */
     m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );
     m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );
     m_vUnitSprites.push_back( Surface( "..\\images\\jet_40x40.bmp" ) );
     
+    /* load sounds */
+    m_vSelectionSounds.push_back( Sound( L"..\\sounds\\read_for_duty.wav" ) );
 
-    m_vUnits.push_back( Unit( { 3, 3 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites ) );
-    m_vUnits.push_back( Unit( { 17, 2 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites ) );
-    m_vUnits.push_back( Unit( { 13, 13 }, &m_level, &m_pathFinder, UnitType::JET, m_vUnitSprites ) );
+    /* create units */
+    m_vUnits.push_back( Unit( { 3, 3 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ] ) );
+    m_vUnits.push_back( Unit( { 17, 2 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ] ) );
+    m_vUnits.push_back( Unit( { 13, 13 }, &m_level, &m_pathFinder, UnitType::JET, m_vUnitSprites, m_vSelectionSounds[ 0 ] ) );
 }
 
 void Game::Go()

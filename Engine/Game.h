@@ -23,6 +23,7 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Graphics.h"
+#include "Sound.h"
 #include "Surface.h"
 #include "Animation.h"
 #include "FrameTimer.h"
@@ -59,6 +60,7 @@ private:
     bool m_bSelecting = false;
 
     std::vector< Surface > m_vUnitSprites;
+    std::vector< Sound > m_vSelectionSounds;
     std::vector< Unit > m_vUnits;
 
     bool m_bDrawDebugStuff = false;

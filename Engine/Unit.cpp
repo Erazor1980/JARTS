@@ -5,11 +5,13 @@ Unit::Unit( const Vec2 pos_tile,
             const Level* const pLevel,
             PathFinder* const pPathFinder,
             const UnitType type,
-            const std::vector< Surface >& vUnitSprites )
+            const std::vector< Surface >& vUnitSprites,
+            Sound& soundSelect )
     :
     mp_level( pLevel ),
     mp_pathFinder( pPathFinder ),
-    m_vUnitSprites( vUnitSprites )
+    m_vUnitSprites( vUnitSprites ),
+    m_soundSelect( soundSelect )
 {
     assert( pLevel->isInitialized() );
     assert( pos_tile.x >= 0 && pos_tile.x < pLevel->getWidth()
@@ -79,6 +81,7 @@ void Unit::update( const Mouse::Event::Type& type, const Vec2& mouse_pos, const 
 void Unit::select()
 {
     m_bSelected = true;
+    m_soundSelect.Play();
 }
 void Unit::deselect()
 {
@@ -94,14 +97,14 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
             /* check if we click inside the bounding box */
             if( m_bb.IsOverlappingWith( RectF( mouse_pos, 1, 1 ) ) )
             {
-                m_bSelected = true;
+                select();
             }
         }
         else
         {
             if( !shift_pressed )
             {
-                m_bSelected = false;
+                deselect();
             }
         }
     }
