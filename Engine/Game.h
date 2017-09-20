@@ -61,6 +61,7 @@ private:
 
     std::vector< Surface > m_vUnitSprites;
     std::vector< Sound > m_vSelectionSounds;
+    std::vector< Sound > m_vCommandSounds;
     std::vector< Unit > m_vUnits;
 
     bool m_bDrawDebugStuff = false;

@@ -6,12 +6,14 @@ Unit::Unit( const Vec2 pos_tile,
             PathFinder* const pPathFinder,
             const UnitType type,
             const std::vector< Surface >& vUnitSprites,
-            Sound& soundSelect )
+            Sound& soundSelect,
+            Sound& soundCommand )
     :
     mp_level( pLevel ),
     mp_pathFinder( pPathFinder ),
     m_vUnitSprites( vUnitSprites ),
-    m_soundSelect( soundSelect )
+    m_soundSelect( soundSelect ),
+    m_soundCommand( soundCommand )
 {
     assert( pLevel->isInitialized() );
     assert( pos_tile.x >= 0 && pos_tile.x < pLevel->getWidth()
@@ -126,6 +128,8 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
                 m_vPath.push_back( targetIdx );
                 m_state = State::MOVING;
                 m_pathIdx = 0;
+
+                m_soundCommand.Play();
             }
             else
             {
@@ -137,6 +141,8 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
                     {
                         m_state = State::MOVING;
                         m_pathIdx = 0;
+
+                        m_soundCommand.Play();
                     }
                 }
             }

@@ -22,7 +22,8 @@ public:
           PathFinder* const pPathFinder, 
           const UnitType type,
           const std::vector< Surface >& vUnitSprites,
-          Sound& soundSelect );
+          Sound& soundSelect,
+          Sound& soundCommand );
 
     void draw( Graphics& gfx, const bool drawPath = false ) const;
 
@@ -78,6 +79,7 @@ private:
     std::vector< RectI > m_vSpriteRects;            /* rectangles for single steps (direction) of a unit sprite set */
     Direction m_spriteDirection;
     Sound& m_soundSelect;
+    Sound& m_soundCommand;
 
     /* pointer to the current level */
     const Level* const mp_level;

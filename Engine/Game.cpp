@@ -34,16 +34,20 @@ Game::Game( MainWindow& wnd )
 {
     /* load images */
     m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );
-    m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );
+    m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );   /* will be replaced by soldier sprite later */
     m_vUnitSprites.push_back( Surface( "..\\images\\jet_40x40.bmp" ) );
     
     /* load sounds */
-    m_vSelectionSounds.push_back( Sound( L"..\\sounds\\read_for_duty.wav" ) );
+    m_vSelectionSounds.push_back( Sound( L"..\\sounds\\ready_for_duty.wav" ) );
+    m_vSelectionSounds.push_back( Sound( L"..\\sounds\\yes_sir.wav" ) );
+
+    m_vCommandSounds.push_back( Sound( L"..\\sounds\\move_tank.wav" ) );
+    m_vCommandSounds.push_back( Sound( L"..\\sounds\\move_jet.wav" ) );
 
     /* create units */
-    m_vUnits.push_back( Unit( { 3, 3 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ] ) );
-    m_vUnits.push_back( Unit( { 17, 2 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ] ) );
-    m_vUnits.push_back( Unit( { 13, 13 }, &m_level, &m_pathFinder, UnitType::JET, m_vUnitSprites, m_vSelectionSounds[ 0 ] ) );
+    m_vUnits.push_back( Unit( { 3, 3 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
+    m_vUnits.push_back( Unit( { 17, 2 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
+    m_vUnits.push_back( Unit( { 13, 13 }, &m_level, &m_pathFinder, UnitType::JET, m_vUnitSprites, m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
 }
 
 void Game::Go()
