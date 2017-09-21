@@ -50,8 +50,11 @@ void Unit::draw( Graphics& gfx, const bool drawPath ) const
 
     if( m_bSelected )
     {
-        //gfx.DrawCircle( ( int )m_pos.x, ( int )m_pos.y, ( int )m_halfSize + 1, Colors::Blue );
         gfx.DrawRectCorners( m_bb, Colors::Green );
+    }
+    else if( m_bInsideSelectionRect )
+    {
+        gfx.DrawRectCorners( m_bb, Colors::Gray );
     }
 
     gfx.DrawSprite( ( int )m_pos.x - m_halfSize, ( int )m_pos.y - m_halfSize, m_vSpriteRects[ ( int )m_spriteDirection ],
@@ -71,13 +74,19 @@ void Unit::update( const Mouse::Event::Type& type, const Vec2& mouse_pos, const 
         handleMouse( type, mouse_pos, shift_pressed );
     }
 
-    if( State::MOVING == m_state )
-    {
-        calcDirection();
+    update( dt );
+}
 
-        m_vel = m_dir * m_speed;
-        m_pos += m_vel * dt;
-        m_bb = RectF( m_pos - Vec2( ( float )m_halfSize, ( float )m_halfSize ), m_pos + Vec2( ( float )m_halfSize + 1, ( float )m_halfSize + 1 ) );
+void Unit::handleSelectionRect( const RectI& selectionRect )
+{
+    RectI r = selectionRect.getNormalized();
+    if( r.Contains( m_pos ) )
+    {
+        m_bInsideSelectionRect = true;
+    }
+    else
+    {
+        m_bInsideSelectionRect = false;
     }
 }
 
@@ -89,6 +98,18 @@ void Unit::select()
 void Unit::deselect()
 {
     m_bSelected = false;
+}
+
+void Unit::update( const float dt )
+{
+    if( State::MOVING == m_state )
+    {
+        calcDirection();
+
+        m_vel = m_dir * m_speed;
+        m_pos += m_vel * dt;
+        m_bb = RectF( m_pos - Vec2( ( float )m_halfSize, ( float )m_halfSize ), m_pos + Vec2( ( float )m_halfSize + 1, ( float )m_halfSize + 1 ) );
+    }
 }
 
 void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed )

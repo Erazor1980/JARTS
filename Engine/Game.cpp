@@ -89,8 +89,13 @@ void Game::UpdateModel()
                 m_bSelecting = true;
                 m_selection.right = wnd.mouse.GetPosX();
                 m_selection.bottom = wnd.mouse.GetPosY();
+
+                for( auto &u : m_vUnits )
+                {
+                    u.handleSelectionRect( m_selection );
+                }
             }
-            if( e.GetType() == Mouse::Event::Type::LRelease )
+            if( e.GetType() == Mouse::Event::Type::LRelease && m_bSelecting )
             {
                 m_bSelecting = false;
                 for( auto &u : m_vUnits )
@@ -105,11 +110,15 @@ void Game::UpdateModel()
     }
     else
     {
-        const Mouse::Event e = wnd.mouse.Read();
         for( auto &u : m_vUnits )
         {
-            u.update( e.GetType(), wnd.mouse.GetPos(), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
+            u.update( dt );
         }
+    }
+
+    if( !wnd.mouse.IsInWindow() )
+    {
+        m_bSelecting = false;
     }
 
     //////////////////
