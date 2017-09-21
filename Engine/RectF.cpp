@@ -1,4 +1,5 @@
 #include "RectF.h"
+#include <algorithm>
 
 RectF::RectF( float left_in, float right_in, float top_in, float bottom_in )
     :
@@ -33,6 +34,18 @@ bool RectF::IsContainedBy( const RectF & other ) const
         top >= other.top && bottom <= other.bottom;
 }
 
+bool RectF::Contains( const Vei2& point )
+{
+    Normalize();
+    return point.x >= left && point.x < right && point.y >= top && point.y < bottom;
+}
+
+bool RectF::Contains( const Vec2& point )
+{
+    Normalize();
+    return point.x >= left && point.x < right && point.y >= top && point.y < bottom;
+}
+
 RectF RectF::FromCenter( const Vec2& center, float halfWidth, float halfHeight )
 {
     const Vec2 half( halfWidth, halfHeight );
@@ -47,4 +60,16 @@ RectF RectF::GetExpanded( float offset ) const
 Vec2 RectF::GetCenter() const
 {
     return Vec2( ( left + right ) / 2.0f, ( top + bottom ) / 2.0f );
+}
+
+void RectF::Normalize()
+{
+    if( left > right )
+    {
+        std::swap( left, right );
+    }
+    if( bottom < top )
+    {
+        std::swap( bottom, top );
+    }
 }
