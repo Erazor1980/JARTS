@@ -54,7 +54,7 @@ void Unit::draw( Graphics& gfx, const bool drawPath ) const
     }
     else if( m_bInsideSelectionRect )
     {
-        gfx.DrawRectCorners( m_bb, Colors::Gray );
+        gfx.DrawRectCorners( m_bb, Colors::White );
     }
 
     gfx.DrawSprite( ( int )m_pos.x - m_halfSize, ( int )m_pos.y - m_halfSize, m_vSpriteRects[ ( int )m_spriteDirection ],
