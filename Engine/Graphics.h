@@ -85,13 +85,13 @@ public:
     }
     void DrawRectBorder( const RectF& rect, const int border, Color c );
     void DrawRectBorder( const RectI& rect, const int border, Color c );
+    void DrawRectCorners( const RectF& rect, Color c );
     void DrawCircle( int x, int y, int radius, Color c );
     void DrawCircle( const Vec2 pos, int radius, Color c )
     {
         DrawCircle( ( int )pos.x, ( int )pos.y, radius, c );
     }
-
-	void DrawSpriteNonChroma( int x,int y,const Surface& s );
+ 	void DrawSpriteNonChroma( int x,int y,const Surface& s );
 	void DrawSpriteNonChroma( int x,int y,const RectI& srcRect,const Surface& s );
 	void DrawSpriteNonChroma( int x,int y,RectI srcRect,const RectI& clip,const Surface& s );
 	void DrawSprite( int x,int y,const Surface& s,Color chroma = Colors::Magenta );

@@ -73,3 +73,10 @@ void RectF::Normalize()
         std::swap( bottom, top );
     }
 }
+
+RectF RectF::getNormalized() const
+{
+    RectF n = *this;
+    n.Normalize();
+    return n;
+}

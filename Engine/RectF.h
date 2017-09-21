@@ -16,6 +16,7 @@ public:
     RectF GetExpanded( float offset ) const;
     Vec2 GetCenter() const;
     void Normalize();
+    RectF getNormalized() const;
 public:
     float left;
     float right;

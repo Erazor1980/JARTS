@@ -419,6 +419,30 @@ void Graphics::DrawRectBorder( const RectI & rect, const int border, Color c )
     DrawRect( bottomRight.x - border, topLeft.y, bottomRight.x, bottomRight.y, c );
 }
 
+void Graphics::DrawRectCorners( const RectF& rect, Color c )
+{
+    RectF r = rect.getNormalized();
+    const int w = ( int )( r.right - r.left ) / 5;
+    const int h = ( int )( r.bottom - r.top ) / 5;
+
+    const Vec2 tl = { r.left, r.top };
+    const Vec2 tr = { r.right, r.top };
+    const Vec2 bl = { r.left, r.bottom };
+    const Vec2 br = { r.right, r.bottom };
+
+    DrawLine( tl, { tl.x + w, tl.y }, c );
+    DrawLine( tl, { tl.x, tl.y + h }, c );
+
+    DrawLine( bl, { bl.x + w, bl.y }, c );
+    DrawLine( bl, { bl.x, bl.y - h }, c );
+
+    DrawLine( tr, { tr.x - w, tr.y }, c );
+    DrawLine( tr, { tr.x, tr.y + h }, c );
+    
+    DrawLine( br, { br.x - w, br.y }, c );
+    DrawLine( br, { br.x, br.y - h }, c );
+}
+
 void Graphics::DrawCircle( int x, int y, int radius, Color c )
 {
     const int rad_sq = radius * radius;
