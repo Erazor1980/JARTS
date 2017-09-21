@@ -46,6 +46,7 @@ private:
 	void UpdateModel();
 	/********************************/
 	/*  User Functions              */
+    void drawMouseCurser();
 	/********************************/
 private:
 	MainWindow& wnd;
@@ -63,6 +64,14 @@ private:
     std::vector< Sound > m_vSelectionSounds;
     std::vector< Sound > m_vCommandSounds;
     std::vector< Unit > m_vUnits;
+
+    /* Cursor stuff */
+    Surface m_cursorSprite;
+    bool m_bMouseOverUnit = false;
+    bool m_bCursorBlinkShow = false;
+    float m_cursorBlinkDelta = 0.3f;     // time between blink off/on of cursor in seconds
+    float m_cursorBlinkTime = 0;        // current on/off time
+
 
     bool m_bDrawDebugStuff = false;
 	/********************************/

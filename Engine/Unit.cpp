@@ -50,7 +50,8 @@ void Unit::draw( Graphics& gfx, const bool drawPath ) const
 
     if( m_bSelected )
     {
-        gfx.DrawCircle( ( int )m_pos.x, ( int )m_pos.y, ( int )m_halfSize + 1, Colors::Blue );
+        //gfx.DrawCircle( ( int )m_pos.x, ( int )m_pos.y, ( int )m_halfSize + 1, Colors::Blue );
+        gfx.DrawRectCorners( m_bb, Colors::Green );
     }
 
     gfx.DrawSprite( ( int )m_pos.x - m_halfSize, ( int )m_pos.y - m_halfSize, m_vSpriteRects[ ( int )m_spriteDirection ],

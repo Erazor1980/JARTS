@@ -30,6 +30,7 @@ Game::Game( MainWindow& wnd )
 #else
     m_level( "..\\images\\testLvl1_800x600.bmp" ),
 #endif
+    m_cursorSprite( "..\\images\\cursor.bmp" ),
     m_pathFinder( m_level )
 {
     /* load images */
@@ -48,6 +49,8 @@ Game::Game( MainWindow& wnd )
     m_vUnits.push_back( Unit( { 3, 3 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
     m_vUnits.push_back( Unit( { 17, 2 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
     m_vUnits.push_back( Unit( { 13, 13 }, &m_level, &m_pathFinder, UnitType::JET, m_vUnitSprites, m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
+
+    ShowCursor( false );
 }
 
 void Game::Go()
@@ -72,7 +75,7 @@ void Game::UpdateModel()
             const Mouse::Event e = wnd.mouse.Read();
             for( auto &u : m_vUnits )
             {
-                u.update( e.GetType(), Vec2( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
+                u.update( e.GetType(), wnd.mouse.GetPos(), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
             }
 
             /* multi selection rectangle */
@@ -105,7 +108,7 @@ void Game::UpdateModel()
         const Mouse::Event e = wnd.mouse.Read();
         for( auto &u : m_vUnits )
         {
-            u.update( e.GetType(), Vec2( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
+            u.update( e.GetType(), wnd.mouse.GetPos(), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
         }
     }
 
@@ -123,6 +126,42 @@ void Game::UpdateModel()
             }
         }
     }
+
+    /* Cursor */
+    if( m_bMouseOverUnit )
+    {
+        m_cursorBlinkTime += dt;
+        if( m_cursorBlinkTime >= m_cursorBlinkDelta )
+        {
+            m_bCursorBlinkShow = !m_bCursorBlinkShow;
+            m_cursorBlinkTime = 0;
+        }
+    }
+}
+
+void Game::drawMouseCurser()
+{
+    Vec2 mp = wnd.mouse.GetPos();
+    m_bMouseOverUnit = false;
+    for( const auto &u : m_vUnits )
+    {
+        RectF bb = u.getBoundigBox();
+        if( bb.Contains( mp ) )
+        {
+            if( m_bCursorBlinkShow )
+            {
+                gfx.DrawRectCorners( bb, Colors::White );
+            }
+            m_bMouseOverUnit = true;
+            break;
+        }
+    }
+    if( wnd.mouse.IsInWindow() && !m_bMouseOverUnit )
+    {
+        gfx.DrawSprite( ( int )mp.x, ( int )mp.y, m_cursorSprite, { 255, 242, 0 } );
+        m_cursorBlinkTime = 0;
+        m_bCursorBlinkShow = true;
+    }
 }
 
 void Game::ComposeFrame()
@@ -138,4 +177,6 @@ void Game::ComposeFrame()
     {
         gfx.DrawRectBorder( m_selection.getNormalized(), 1, Colors::White );
     }
+
+    drawMouseCurser();
 }

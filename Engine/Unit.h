@@ -34,6 +34,10 @@ public:
     {
         return m_pos;
     }
+    RectF getBoundigBox() const
+    {
+        return m_bb;
+    }
 
     enum class State
     {
