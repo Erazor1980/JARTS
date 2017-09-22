@@ -40,6 +40,18 @@ public:
     {
         return m_bb;
     }
+    UnitType getType() const
+    {
+        return m_type;
+    }
+    bool isGroundUnit() const
+    {
+        return m_bGroundUnit;
+    }
+    int getPosTileIdx() const
+    {
+        return ( int )m_pos_tile.y * mp_level->getWidth() + ( int )m_pos_tile.x;;
+    }
 
     enum class State
     {
@@ -103,4 +115,5 @@ private:
     /* Attributes */
     UnitType m_type;
     int m_life;
+    bool m_bGroundUnit;
 };

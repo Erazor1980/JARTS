@@ -20,9 +20,15 @@ Unit::Unit( const Vec2 pos_tile,
             && pos_tile.y >= 0 && pos_tile.y < pLevel->getHeight() );
     assert( vUnitSprites.size() > 0 );
 
-    m_type      = type;
-    m_size      = m_vUnitSprites[ ( int )m_type ].GetHeight();
-    m_pos_tile  = pos_tile;
+    m_type          = type;
+    m_size          = m_vUnitSprites[ ( int )m_type ].GetHeight();
+    m_pos_tile      = pos_tile;
+
+    m_bGroundUnit   = true;
+    if( UnitType::JET == type )     //TODO modify it after adding more flying units!
+    {
+        m_bGroundUnit = false;
+    }
 
     /* calculating rectangles for unit sprite steps (directions) */
     for( int i = 0; i < 8; ++i )
@@ -182,10 +188,45 @@ void Unit::calcDirection()
         if( fabsf( m_dir.x ) < 1.5f && fabsf( m_dir.y ) < 1.5f )
         {
             m_pathIdx = ( int )m_vPath.size();
+
+            if( m_pathIdx == m_vPath.size() )
+            {
+                m_state = State::STANDING;
+                return;
+            }
         }
     }
     else
     {
+        ///* check if tile is occupied by another unit */
+        //for( int i = 0; i < mp_level->getGroundUnitsPositions().size(); ++i )
+        //{
+        //    const int neighbourUnitIdx = mp_level->getGroundUnitsPositions()[ i ];
+        //    if( m_vPath[ m_pathIdx ] == neighbourUnitIdx )
+        //    {
+        //        if( m_pathIdx == m_vPath.size() - 1 )   /* target tile occupied, but end of path -> standing */
+        //        {
+        //            m_state = State::STANDING;
+        //            return;
+        //        }
+        //        else        /* find another path to target */
+        //        {
+        //            m_vPath = mp_pathFinder->getShortestPath( m_vPath[ m_pathIdx - 1 ], m_vPath[ m_vPath.size() - 1 ], neighbourUnitIdx );
+
+        //            if( !m_vPath.empty() )
+        //            {
+        //                m_pathIdx = 0;
+        //                return;
+        //            }
+        //            else
+        //            {
+        //                m_state = State::STANDING;
+        //                return;
+        //            }
+        //        }
+        //    }
+        //}
+
         const Vec2 nextTileCenter = mp_level->getTileCenter( m_vPath[ m_pathIdx ] );
 
         Vec2 dist = nextTileCenter - m_pos;
@@ -194,17 +235,47 @@ void Unit::calcDirection()
             m_pos_tile.x = ( float )( m_vPath[ m_pathIdx ] % mp_level->getWidth() );
             m_pos_tile.y = ( float )( m_vPath[ m_pathIdx ] / mp_level->getWidth() );
             m_pathIdx++;
+
+            if( m_pathIdx == m_vPath.size() )
+            {
+                m_state = State::STANDING;
+                return;
+            }
+
+            ///* check if tile is occupied by another unit */
+            //for( int i = 0; i < mp_level->getGroundUnitsPositions().size(); ++i )
+            //{
+            //    const int neighbourUnitIdx = mp_level->getGroundUnitsPositions()[ i ];
+            //    if( m_vPath[ m_pathIdx ] == neighbourUnitIdx )
+            //    {
+            //        if( m_pathIdx == m_vPath.size() - 1 )   /* target tile occupied, but end of path -> standing */
+            //        {
+            //            m_state = State::STANDING;
+            //            return;
+            //        }
+            //        else        /* find another path to target */
+            //        {
+            //            m_vPath = mp_pathFinder->getShortestPath( m_vPath[ m_pathIdx - 1 ], m_vPath[ m_vPath.size() - 1 ], neighbourUnitIdx );
+
+            //            if( !m_vPath.empty() )
+            //            {
+            //                m_pathIdx = 0;
+            //                return;
+            //            }
+            //            else
+            //            {
+            //                m_state = State::STANDING;
+            //                return;
+            //            }
+            //        }
+            //    }
+            //}
         }
 
         m_dir.x = nextTileCenter.x - m_pos.x;
         m_dir.y = nextTileCenter.y - m_pos.y;
     }
-    
-    if( m_pathIdx == m_vPath.size() )
-    {
-        m_state = State::STANDING;
-    }
-    
+   
     m_dir.Normalize();
 
     if( m_dir.x > 0.4f && m_dir.y > 0.4f )
