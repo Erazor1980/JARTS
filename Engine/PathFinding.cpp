@@ -55,7 +55,7 @@ void PathFinder::init( const Level& lvl )
     }
 }
 
-std::vector< int > PathFinder::getShortestPath( const int start_idx, const int target_idx )
+std::vector< int > PathFinder::getShortestPath( const int start_idx, const int target_idx, const int neighbour_unit_idx )
 {
     assert( start_idx != target_idx );
     assert( start_idx >= 0 && start_idx < m_width * m_height );
@@ -100,7 +100,7 @@ std::vector< int > PathFinder::getShortestPath( const int start_idx, const int t
             break;
         }
 
-        std::vector< int > vNeighbours = getNeighbourIndices( currNode.m_idx );
+        std::vector< int > vNeighbours = getNeighbourIndices( currNode.m_idx, neighbour_unit_idx );
 
         for( int n = 0; n < vNeighbours.size(); ++n )
         {
@@ -138,7 +138,7 @@ std::vector< int > PathFinder::getShortestPath( const int start_idx, const int t
     return vPath;
 }
 
-Node PathFinder::getAndRemoveLowestFcostNode( std::vector<Node>& vNodes )
+Node PathFinder::getAndRemoveLowestFcostNode( std::vector< Node >& vNodes )
 {
     Node node;
     if( vNodes.size() == 1 )
@@ -243,7 +243,7 @@ int PathFinder::getMoveCosts( const int idx1, const int idx2 )
     return 0;
 }
 
-std::vector< int > PathFinder::getNeighbourIndices( const int curr_idx )
+std::vector< int > PathFinder::getNeighbourIndices( const int curr_idx, const int neighbour_unit_idx )
 {
     std::vector< int > vNeighbours;
 
@@ -264,7 +264,7 @@ std::vector< int > PathFinder::getNeighbourIndices( const int curr_idx )
             if( tmpX >= 0 && tmpX < m_width && tmpY >= 0 && tmpY < m_height )
             {
                 int idx = tmpY * m_width + tmpX;
-                if( mp_mapContent[ idx ] == Tile::EMPTY )
+                if( mp_mapContent[ idx ] == Tile::EMPTY && idx != neighbour_unit_idx )
                 {
                     vNeighbours.push_back( idx );
                 }
