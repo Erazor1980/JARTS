@@ -106,6 +106,41 @@ void Unit::deselect()
     m_bSelected = false;
 }
 
+void Unit::recalculatePath( const int obstacleUnitIdx )
+{
+    if( m_state != State::MOVING )
+    {
+        return;
+    }
+
+    const int startIdx = ( int )m_pos_tile.y * mp_level->getWidth() + ( int )m_pos_tile.x;
+    const int targetIdx = m_vPath[ m_vPath.size() - 1 ];
+
+    m_vPath = mp_pathFinder->getShortestPath( startIdx, targetIdx, obstacleUnitIdx );
+
+    m_pathIdx = 0;
+    if( !m_vPath.empty() )
+    {
+        m_state = State::MOVING;
+    }
+    else
+    {
+        m_state = State::STANDING;
+    }
+}
+
+int Unit::getNextTileIdx() const
+{
+    if( State::MOVING == m_state )
+    {
+        return m_vPath[ m_pathIdx ];
+    }
+    else
+    {
+        return -1;
+    }
+}
+
 void Unit::update( const float dt )
 {
     if( State::MOVING == m_state )

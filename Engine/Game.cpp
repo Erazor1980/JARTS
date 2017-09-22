@@ -31,7 +31,8 @@ Game::Game( MainWindow& wnd )
     m_level( "..\\images\\testLvl1_800x600.bmp" ),
 #endif
     m_cursorSprite( "..\\images\\cursor.bmp" ),
-    m_pathFinder( m_level )
+    m_pathFinder( m_level ),
+    m_pathControlling( m_level )
 {
     /* load images */
     m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );
@@ -47,7 +48,8 @@ Game::Game( MainWindow& wnd )
 
     /* create units */
     m_vUnits.push_back( Unit( { 3, 3 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
-    m_vUnits.push_back( Unit( { 17, 2 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
+    m_vUnits.push_back( Unit( { 11, 3 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
+    m_vUnits.push_back( Unit( { 5, 5 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
     m_vUnits.push_back( Unit( { 13, 13 }, &m_level, &m_pathFinder, UnitType::JET, m_vUnitSprites, m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
 
     ShowCursor( false );
@@ -64,6 +66,8 @@ void Game::Go()
 void Game::UpdateModel()
 {
     const float dt = ft.Mark();
+    
+    m_pathControlling.update( m_vUnits );
 
     /////////////////
     ///// MOUSE /////

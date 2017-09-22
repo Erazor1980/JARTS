@@ -38,7 +38,7 @@ void Level::init()
 #if 0   /* random level */
     for( int i = 0; i < m_width * m_height; ++i )
     {
-        if( rand() % 4 )
+        if( rand() % 100 )
         {
             mp_content[ i ] = Tile::EMPTY;
         }

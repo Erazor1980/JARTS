@@ -60,6 +60,7 @@ public:
 
         return RectI( { 0, 0 }, m_width * m_tileSize, m_height * m_tileSize );
     }
+
 private:
     bool m_bInitialized = false;
 

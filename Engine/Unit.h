@@ -32,6 +32,8 @@ public:
     void handleSelectionRect( const RectI& selectionRect );
     void select();
     void deselect();
+    void recalculatePath( const int obstacleUnitIdx );
+
     Vec2 getPosition() const
     {
         return m_pos;
@@ -52,6 +54,7 @@ public:
     {
         return ( int )m_pos_tile.y * mp_level->getWidth() + ( int )m_pos_tile.x;;
     }
+    int getNextTileIdx() const;     /* return -1 if not moving */
 
     enum class State
     {

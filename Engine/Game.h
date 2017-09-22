@@ -31,7 +31,7 @@
 #include "Level.h"
 #include "Unit.h"
 #include "PathFinding.h"
-
+#include "PathControlling.h"
 #include "Defines.h"
 
 class Game
@@ -74,5 +74,8 @@ private:
 
 
     bool m_bDrawDebugStuff = false;
+
+    /* Path Controlling */
+    PathControlling m_pathControlling;
 	/********************************/
 };
