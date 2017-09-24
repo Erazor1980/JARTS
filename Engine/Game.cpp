@@ -35,25 +35,7 @@ Game::Game( MainWindow& wnd )
     m_pathFinder( m_level ),
     m_pathControlling( m_level )
 {
-    /* load images */
-    m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );
-    m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );   /* will be replaced by soldier sprite later */
-    m_vUnitSprites.push_back( Surface( "..\\images\\jet_40x40.bmp" ) );
-    
-    /* load sounds */
-    m_vSelectionSounds.push_back( Sound( L"..\\sounds\\ready_for_duty.wav" ) );
-    m_vSelectionSounds.push_back( Sound( L"..\\sounds\\yes_sir.wav" ) );
-
-    m_vCommandSounds.push_back( Sound( L"..\\sounds\\move_tank.wav" ) );
-    m_vCommandSounds.push_back( Sound( L"..\\sounds\\move_jet.wav" ) );
-
-    /* create units */
-    m_vUnits.push_back( Unit( { 1, 13 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
-    m_vUnits.push_back( Unit( { 1, 14 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
-    m_vUnits.push_back( Unit( { 3, 13 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
-    m_vUnits.push_back( Unit( { 11, 11 }, &m_level, &m_pathFinder, UnitType::JET, m_vUnitSprites, m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
-    m_vUnits.push_back( Unit( { 14, 14 }, &m_level, &m_pathFinder, UnitType::JET, m_vUnitSprites, m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
-
+    resetLevel();
     ShowCursor( false );
 }
 
@@ -63,6 +45,30 @@ void Game::Go()
 	UpdateModel();
 	ComposeFrame();
 	gfx.EndFrame();
+}
+
+
+void Game::resetLevel()
+{
+    /* load images */
+    m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );
+    m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );   /* will be replaced by soldier sprite later */
+    m_vUnitSprites.push_back( Surface( "..\\images\\jet_40x40.bmp" ) );
+
+    /* load sounds */
+    m_vSelectionSounds.push_back( Sound( L"..\\sounds\\ready_for_duty.wav" ) );
+    m_vSelectionSounds.push_back( Sound( L"..\\sounds\\yes_sir.wav" ) );
+
+    m_vCommandSounds.push_back( Sound( L"..\\sounds\\move_tank.wav" ) );
+    m_vCommandSounds.push_back( Sound( L"..\\sounds\\move_jet.wav" ) );
+
+    /* create units */
+    m_vUnits.clear();
+    m_vUnits.push_back( Unit( { 1, 13 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
+    m_vUnits.push_back( Unit( { 1, 14 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
+    m_vUnits.push_back( Unit( { 3, 13 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
+    m_vUnits.push_back( Unit( { 11, 11 }, &m_level, &m_pathFinder, UnitType::JET, m_vUnitSprites, m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
+    m_vUnits.push_back( Unit( { 14, 14 }, &m_level, &m_pathFinder, UnitType::JET, m_vUnitSprites, m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
 }
 
 void Game::UpdateModel()
@@ -139,6 +145,10 @@ void Game::UpdateModel()
             {
                 m_bDrawDebugStuff = !m_bDrawDebugStuff;
             }
+            else if( e.GetCode() == VK_ESCAPE )
+            {
+                resetLevel();
+            }
         }
     }
 
@@ -183,11 +193,12 @@ void Game::ComposeFrame()
 {
     m_level.draw( gfx, m_bDrawDebugStuff );
 
-    for( const auto& u : m_vUnits )
+    for( int i = 0; i < m_vUnits.size() - 1; ++i )
     {
-        u.draw( gfx, m_bDrawDebugStuff );
+        m_vUnits[ i ].draw( gfx, m_bDrawDebugStuff );
 #if _DEBUG
-        m_font.DrawText( std::to_string( u.getPosTileIdx() ), u.getPositionInt() - Vei2( 10, 10 ), Colors::White, gfx );
+        m_font.DrawText( std::to_string( m_vUnits[ i ].getPosTileIdx() ), m_vUnits[ i ].getPositionInt() - Vei2( 10, 10 ), Colors::White, gfx );
+        m_font.DrawText( std::to_string( i ), m_vUnits[ i ].getPositionInt() - Vei2( 30, 10 ), Colors::Red, gfx );
 #endif
     }
 
@@ -201,20 +212,21 @@ void Game::ComposeFrame()
     char text[ 50 ];
     for( int i = 0; i < 3; ++i )
     {
-        sprintf_s( text, "%0.3f", m_vUnits[ i ].getWaitingTime() );
+        m_font.DrawText( std::to_string( i ), { x, 1 }, Colors::Cyan, gfx );
 
-        m_font.DrawText( text, { x, 50 }, Colors::Cyan, gfx );
+        sprintf_s( text, "%0.3f", m_vUnits[ i ].getWaitingTime() );
+        m_font.DrawText( text, { x, 30 }, Colors::Cyan, gfx );
         if( m_vUnits[ i ].getState() == Unit::State::WAITING )
         {
-            m_font.DrawText( "Waiting", { x, 100 }, Colors::Cyan, gfx );
+            m_font.DrawText( "Waiting", { x, 60 }, Colors::Cyan, gfx );
         }
         else if( m_vUnits[ i ].getState() == Unit::State::MOVING )
         {
-            m_font.DrawText( "Moving", { x, 100 }, Colors::Cyan, gfx );
+            m_font.DrawText( "Moving", { x, 60 }, Colors::Cyan, gfx );
         }
         else if( m_vUnits[ i ].getState() == Unit::State::STANDING )
         {
-            m_font.DrawText( "Standing", { x, 100 }, Colors::Cyan, gfx );
+            m_font.DrawText( "Standing", { x, 60 }, Colors::Cyan, gfx );
         }
         x += 150;
     }

@@ -48,6 +48,7 @@ private:
 	/********************************/
 	/*  User Functions              */
     void drawMouseCurser();
+    void resetLevel();
 	/********************************/
 private:
 	MainWindow& wnd;
