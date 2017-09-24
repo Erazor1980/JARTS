@@ -29,7 +29,7 @@ Game::Game( MainWindow& wnd )
 #if _DEBUG
     m_level( "..\\images\\testLvl1_debug.bmp", m_font ),
 #else
-    m_level( "..\\images\\testLvl1_800x600.bmp" ),
+    m_level( "..\\images\\testLvl1_800x600.bmp", m_font ),
 #endif
     m_cursorSprite( "..\\images\\cursor.bmp" ),
     m_pathFinder( m_level ),
@@ -69,7 +69,7 @@ void Game::UpdateModel()
 {
     const float dt = ft.Mark();
     
-    m_pathControlling.update( m_vUnits );
+    m_pathControlling.update( m_vUnits, dt );
 
     /////////////////
     ///// MOUSE /////
@@ -186,12 +186,39 @@ void Game::ComposeFrame()
     for( const auto& u : m_vUnits )
     {
         u.draw( gfx, m_bDrawDebugStuff );
+#if _DEBUG
+        m_font.DrawText( std::to_string( u.getPosTileIdx() ), u.getPositionInt() - Vei2( 10, 10 ), Colors::White, gfx );
+#endif
     }
 
     if( m_bSelecting )
     {
         gfx.DrawRectBorder( m_selection.getNormalized(), 1, Colors::White );
     }
+
+#if _DEBUG  /* display waiting times */
+    int x = 100;
+    char text[ 50 ];
+    for( int i = 0; i < 3; ++i )
+    {
+        sprintf_s( text, "%0.3f", m_vUnits[ i ].getWaitingTime() );
+
+        m_font.DrawText( text, { x, 50 }, Colors::Cyan, gfx );
+        if( m_vUnits[ i ].getState() == Unit::State::WAITING )
+        {
+            m_font.DrawText( "Waiting", { x, 100 }, Colors::Cyan, gfx );
+        }
+        else if( m_vUnits[ i ].getState() == Unit::State::MOVING )
+        {
+            m_font.DrawText( "Moving", { x, 100 }, Colors::Cyan, gfx );
+        }
+        else if( m_vUnits[ i ].getState() == Unit::State::STANDING )
+        {
+            m_font.DrawText( "Standing", { x, 100 }, Colors::Cyan, gfx );
+        }
+        x += 150;
+    }
+#endif
 
     drawMouseCurser();
 }

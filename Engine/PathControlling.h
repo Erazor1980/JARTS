@@ -7,7 +7,7 @@ class PathControlling
 public:
     PathControlling( Level& currLevel );
 
-    void update( std::vector< Unit >& vUnits );
+    void update( std::vector< Unit >& vUnits, const float dt );
 private:
     struct UnitInfo
     {

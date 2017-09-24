@@ -17,6 +17,25 @@ enum class UnitType
 class Unit
 {
 public:
+    enum class State
+    {
+        STANDING,
+        MOVING,
+        WAITING,    /* unit remains in this state for x seconds, when path is blocked by other unit(s)*/
+        ATTACKING
+    };
+    enum class Direction    /* for the 8 sprite directions */
+    {
+        UP = 0,
+        UP_RIGHT,
+        RIGHT,
+        DOWN_RIGHT,
+        DOWN,
+        DOWN_LEFT,
+        LEFT,
+        UP_LEFT
+    };
+public:
     Unit( const Vec2 pos_tile, 
           const Level* const pLevel, 
           PathFinder* const pPathFinder, 
@@ -32,11 +51,15 @@ public:
     void handleSelectionRect( const RectI& selectionRect );
     void select();
     void deselect();
-    void recalculatePath( const std::vector< int >& vOccupiedNeighbourTiles );
+    void recalculatePath( const std::vector< int >& vOccupiedNeighbourTiles, const float dt );
 
     Vec2 getPosition() const
     {
         return m_pos;
+    }
+    Vei2 getPositionInt() const
+    {
+        return { ( int )m_pos.x, ( int )m_pos.y };
     }
     RectF getBoundigBox() const
     {
@@ -55,25 +78,15 @@ public:
         return ( int )m_pos_tile.y * mp_level->getWidth() + ( int )m_pos_tile.x;;
     }
     int getNextTileIdx() const;     /* return -1 if not moving */
-
-    enum class State
+    float getWaitingTime() const
     {
-        STANDING,
-        MOVING,
-        ATTACKING
-    };
-
-    enum class Direction    /* for the 8 sprite directions */
+        return m_currWaitingTime;
+    }
+    State getState() const
     {
-        UP = 0,
-        UP_RIGHT,
-        RIGHT,
-        DOWN_RIGHT,
-        DOWN,
-        DOWN_LEFT,
-        LEFT,
-        UP_LEFT
-    };
+        return m_state;
+    }
+
 private:
     void handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed );
     void calcDirection();           /* calculated direction depending on current and next tile while moving */
@@ -109,7 +122,10 @@ private:
     /* path planning */
     PathFinder* const mp_pathFinder;
     std::vector< int > m_vPath;
-    int m_pathIdx = -1;                 /* current idx from path */
+    int m_pathIdx = -1;                     /* current idx from path (vector) */
+    const float m_waitingTimeMAX = 0.5f;    /* how long to wait to find a free path in seconds */
+    float m_currWaitingTime = 0.0f;         /* curran waiting time in seconds */
+    int m_targetIdx = -1;
 
     /* Movement */
     Vec2 m_vel = { 0.0f, 0.0f };

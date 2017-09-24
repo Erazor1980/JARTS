@@ -6,7 +6,7 @@ PathControlling::PathControlling( Level& currLevel )
 {
 }
 
-void PathControlling::update( std::vector< Unit >& vUnits )
+void PathControlling::update( std::vector< Unit >& vUnits, const float dt )
 {
     std::vector< UnitInfo > vUnitInfos;
     for( int i = 0; i < vUnits.size(); ++i )
@@ -24,13 +24,17 @@ void PathControlling::update( std::vector< Unit >& vUnits )
             /* ground units */
             if( u.isGroundUnit() && infos.bIsGroundUnit )
             {
-                if( nextTile >= 0 && u.getPosTileIdx() != infos.currTileIdx )   /* all moving units checking all other (excluding themselves) */
+                /* all moving or waiting units checking all other (excluding themselves) */
+                if( u.getState() == Unit::State::MOVING || u.getState() == Unit::State::WAITING )
                 {
-                    if( nextTile == infos.nextTileIdx || nextTile == infos.currTileIdx )
+                    if( u.getPosTileIdx() != infos.currTileIdx )
                     {
-                        /* get tile indices occupied by units */
-                        vOccupiedNeighbourTiles = checkNeighbourhood( u, vUnitInfos );
-                        break;
+                        if( nextTile == infos.nextTileIdx || nextTile == infos.currTileIdx )
+                        {
+                            /* get tile indices occupied by units */
+                            vOccupiedNeighbourTiles = checkNeighbourhood( u, vUnitInfos );
+                            break;
+                        }
                     }
                 }
             }
@@ -40,9 +44,10 @@ void PathControlling::update( std::vector< Unit >& vUnits )
                 int deb = 0;
             }
         }
-        if( !vOccupiedNeighbourTiles.empty() )
+
+        if( !vOccupiedNeighbourTiles.empty() || u.getState() == Unit::State::WAITING )
         {
-            u.recalculatePath( vOccupiedNeighbourTiles );
+            u.recalculatePath( vOccupiedNeighbourTiles, dt );
         }
     }
     int deb = 0;

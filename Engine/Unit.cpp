@@ -108,17 +108,17 @@ void Unit::deselect()
     m_bSelected = false;
 }
 
-void Unit::recalculatePath( const std::vector< int >& vOccupiedNeighbourTiles )
+void Unit::recalculatePath( const std::vector< int >& vOccupiedNeighbourTiles, const float dt )
 {
-    if( m_state != State::MOVING )
+    if( m_state == State::STANDING )
     {
         return;
     }
 
     const int startIdx = ( int )m_pos_tile.y * mp_level->getWidth() + ( int )m_pos_tile.x;
-    const int targetIdx = m_vPath[ m_vPath.size() - 1 ];
+    //const int targetIdx = m_vPath[ m_vPath.size() - 1 ];
 
-    m_vPath = mp_pathFinder->getShortestPath( startIdx, targetIdx, vOccupiedNeighbourTiles );
+    m_vPath = mp_pathFinder->getShortestPath( startIdx, m_targetIdx, vOccupiedNeighbourTiles );
 
     m_pathIdx = 0;
     if( !m_vPath.empty() )
@@ -127,7 +127,16 @@ void Unit::recalculatePath( const std::vector< int >& vOccupiedNeighbourTiles )
     }
     else
     {
-        m_state = State::STANDING;
+        if( m_currWaitingTime < m_waitingTimeMAX )
+        {
+            m_currWaitingTime += dt;
+            m_state = State::WAITING;
+        }
+        else
+        {
+            m_currWaitingTime = 0;
+            m_state = State::STANDING;
+        }
     }
 }
 
@@ -152,7 +161,7 @@ void Unit::update( const float dt )
 
         move( dt );
     }
-    if( State::STANDING == m_state )
+    if( State::STANDING == m_state )//|| State::WAITING == m_state )
     {
         m_dir =  mp_level->getTileCenter( m_pos_tile ) - m_pos;
         if( fabsf( m_dir.x ) > 1.5f || fabsf( m_dir.y ) > 1.5f )
@@ -190,16 +199,17 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
         {
             Tile targetTile = mp_level->getTileType( ( int )mouse_pos.x, ( int )mouse_pos.y );
             const int startIdx = ( int )m_pos_tile.y * mp_level->getWidth() + ( int )m_pos_tile.x;
-            const int targetIdx = mp_level->getTileIdx( ( int )mouse_pos.x, ( int )mouse_pos.y );
+            //const int targetIdx = mp_level->getTileIdx( ( int )mouse_pos.x, ( int )mouse_pos.y );
+            m_targetIdx = mp_level->getTileIdx( ( int )mouse_pos.x, ( int )mouse_pos.y );
 
-            if( startIdx == targetIdx )
+            if( startIdx == m_targetIdx )
             {
                 return;
             }
             if( m_type == UnitType::JET )
             {
                 m_vPath.clear();
-                m_vPath.push_back( targetIdx );
+                m_vPath.push_back( m_targetIdx );
                 m_state = State::MOVING;
                 m_pathIdx = 0;
 
@@ -211,7 +221,7 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
             {
                 if( Tile::EMPTY == targetTile )
                 {
-                    m_vPath = mp_pathFinder->getShortestPath( startIdx, targetIdx, std::vector< int >() );
+                    m_vPath = mp_pathFinder->getShortestPath( startIdx, m_targetIdx, std::vector< int >() );
 
                     if( !m_vPath.empty() )
                     {
@@ -244,6 +254,7 @@ void Unit::calcDirection()
                 m_state = State::STANDING;
                 m_pos_tile.x = ( float )( m_vPath[ m_pathIdx - 1 ] % mp_level->getWidth() );
                 m_pos_tile.y = ( float )( m_vPath[ m_pathIdx - 1 ] / mp_level->getWidth() );
+                m_currWaitingTime = 0;
                 return;
             }
         }
@@ -262,6 +273,7 @@ void Unit::calcDirection()
             if( m_pathIdx == m_vPath.size() )
             {
                 m_state = State::STANDING;
+                m_currWaitingTime = 0;
                 return;
             }
         }
