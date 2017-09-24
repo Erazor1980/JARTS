@@ -9,5 +9,16 @@ public:
 
     void update( std::vector< Unit >& vUnits );
 private:
+    struct UnitInfo
+    {
+        int idxInUnitVector;
+        int nextTileIdx;
+        int currTileIdx;
+        bool bIsGroundUnit;
+    };
+
+    /* return indices from occupied tiles */
+    std::vector< int > checkNeighbourhood( const Unit& unit, const std::vector< UnitInfo >& vUnitInfos );
+
     Level& m_level;
 };

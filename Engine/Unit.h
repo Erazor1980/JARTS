@@ -32,7 +32,7 @@ public:
     void handleSelectionRect( const RectI& selectionRect );
     void select();
     void deselect();
-    void recalculatePath( const int obstacleUnitIdx );
+    void recalculatePath( const std::vector< int >& vOccupiedNeighbourTiles );
 
     Vec2 getPosition() const
     {

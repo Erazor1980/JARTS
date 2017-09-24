@@ -31,7 +31,7 @@ public:
 
     void init( const Level& lvl );
 
-    std::vector< int > getShortestPath( const int start_idx, const int target_idx, const int neighbour_unit_idx = -1 ); /* if there is a unit in the neighbour tile */
+    std::vector< int > getShortestPath( const int start_idx, const int target_idx, const std::vector< int >& vOccupiedNeighbourTiles ); /* if there is a unit in the neighbour tile */
 
 private:
     Node getAndRemoveLowestFcostNode( std::vector< Node >& vNodes );
@@ -45,7 +45,7 @@ private:
     int getMoveCosts( const int idx1, const int idx2 );
 
     /* return a vector with all valid (non obstacles / non neighbour units!) indices of the current index (i.e. tile/node) */
-    std::vector< int > getNeighbourIndices( const int curr_idx, const int neighbour_unit_idx = -1 );
+    std::vector< int > getNeighbourIndices( const int curr_idx, const std::vector< int >& vOccupiedNeighbourTiles );
 
     /* dimensions of the current level/map in tiles */
     int m_width;

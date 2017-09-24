@@ -108,7 +108,7 @@ void Unit::deselect()
     m_bSelected = false;
 }
 
-void Unit::recalculatePath( const int obstacleUnitIdx )
+void Unit::recalculatePath( const std::vector< int >& vOccupiedNeighbourTiles )
 {
     if( m_state != State::MOVING )
     {
@@ -118,7 +118,7 @@ void Unit::recalculatePath( const int obstacleUnitIdx )
     const int startIdx = ( int )m_pos_tile.y * mp_level->getWidth() + ( int )m_pos_tile.x;
     const int targetIdx = m_vPath[ m_vPath.size() - 1 ];
 
-    m_vPath = mp_pathFinder->getShortestPath( startIdx, targetIdx, obstacleUnitIdx );
+    m_vPath = mp_pathFinder->getShortestPath( startIdx, targetIdx, vOccupiedNeighbourTiles );
 
     m_pathIdx = 0;
     if( !m_vPath.empty() )
@@ -202,7 +202,7 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
             {
                 if( Tile::EMPTY == targetTile )
                 {
-                    m_vPath = mp_pathFinder->getShortestPath( startIdx, targetIdx );
+                    m_vPath = mp_pathFinder->getShortestPath( startIdx, targetIdx, std::vector< int >() );
 
                     if( !m_vPath.empty() )
                     {

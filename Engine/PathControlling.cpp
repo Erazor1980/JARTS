@@ -8,14 +8,6 @@ PathControlling::PathControlling( Level& currLevel )
 
 void PathControlling::update( std::vector< Unit >& vUnits )
 {
-    struct UnitInfo
-    {
-        int idxInUnitVector;
-        int nextTileIdx;
-        int currTileIdx;
-        bool bIsGroundUnit;
-    };
-
     std::vector< UnitInfo > vUnitInfos;
     for( int i = 0; i < vUnits.size(); ++i )
     {
@@ -25,21 +17,70 @@ void PathControlling::update( std::vector< Unit >& vUnits )
     for( auto& u : vUnits )
     {
         const int nextTile = u.getNextTileIdx();
+
+        std::vector< int > vOccupiedNeighbourTiles;
         for( auto infos : vUnitInfos )
         {
-            if( u.isGroundUnit() != infos.bIsGroundUnit )   /* only ground vs ground or air vs air */
+            /* ground units */
+            if( u.isGroundUnit() && infos.bIsGroundUnit )
             {
-                continue;
-            }
-
-            if( nextTile >= 0 && u.getPosTileIdx() != infos.currTileIdx )   /* all moving units checking all other (excluding themselves) */
-            {
-                if( nextTile == infos.nextTileIdx || nextTile == infos.currTileIdx )
+                if( nextTile >= 0 && u.getPosTileIdx() != infos.currTileIdx )   /* all moving units checking all other (excluding themselves) */
                 {
-                    u.recalculatePath( nextTile );
+                    if( nextTile == infos.nextTileIdx || nextTile == infos.currTileIdx )
+                    {
+                        /* get tile indices occupied by units */
+                        vOccupiedNeighbourTiles = checkNeighbourhood( u, vUnitInfos );
+                        break;
+                    }
+                }
+            }
+            /* air units */
+            else if( !u.isGroundUnit() && !infos.bIsGroundUnit )
+            {
+                int deb = 0;
+            }
+        }
+        if( !vOccupiedNeighbourTiles.empty() )
+        {
+            u.recalculatePath( vOccupiedNeighbourTiles );
+        }
+    }
+    int deb = 0;
+}
+
+std::vector< int > PathControlling::checkNeighbourhood( const Unit& unit, const std::vector< UnitInfo >& vUnitInfos )
+{
+    std::vector< int > vOccupiedNeighbourTiles;
+    const int width     = m_level.getWidth();
+    const int height    = m_level.getHeight();
+
+    const int currX     = unit.getPosTileIdx() % width;
+    const int currY     = unit.getPosTileIdx() / width;
+
+    for( int x = -1; x < 2; ++x )
+    {
+        for( int y = -1; y < 2; ++y )
+        {
+            if( x == 0 && y == 0 )
+            {
+                continue;   // center idx itself
+            }
+            int tmpX = currX + x;
+            int tmpY = currY + y;
+
+            if( tmpX >= 0 && tmpX < width && tmpY >= 0 && tmpY < height )
+            {
+                int idx = tmpY * width + tmpX;
+                for( const auto& ui : vUnitInfos )
+                {
+                    if( idx == ui.currTileIdx || idx == ui.nextTileIdx )
+                    {
+                        vOccupiedNeighbourTiles.push_back( idx );
+                    }
                 }
             }
         }
     }
-    int deb = 0;
+    
+    return vOccupiedNeighbourTiles;
 }
