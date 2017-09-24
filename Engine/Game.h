@@ -33,6 +33,7 @@
 #include "PathFinding.h"
 #include "PathControlling.h"
 #include "Defines.h"
+#include "Font.h"
 
 class Game
 {
@@ -53,6 +54,7 @@ private:
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
+    Font m_font;
 	FrameTimer ft;
     Level m_level;
     PathFinder m_pathFinder;
