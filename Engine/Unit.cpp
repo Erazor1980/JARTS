@@ -242,6 +242,8 @@ void Unit::calcDirection()
             if( m_pathIdx == m_vPath.size() )
             {
                 m_state = State::STANDING;
+                m_pos_tile.x = ( float )( m_vPath[ m_pathIdx - 1 ] % mp_level->getWidth() );
+                m_pos_tile.y = ( float )( m_vPath[ m_pathIdx - 1 ] / mp_level->getWidth() );
                 return;
             }
         }
