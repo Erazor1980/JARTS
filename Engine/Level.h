@@ -1,5 +1,6 @@
 #pragma once
 #include "Graphics.h"
+#include "Font.h"
 #include <vector>
 #include <assert.h>
 
@@ -15,7 +16,7 @@ enum class Tile
 class Level
 {
 public:
-    Level( const std::string& filename );
+    Level( const std::string& filename, const Font& font );
     ~Level();
 
     void init();
@@ -30,6 +31,10 @@ public:
         return getTileType( getTileIdx( x, y ) );
     }
     Vec2 getTileCenter( const int tileIdx ) const;  /* return tile center in pixel coordinates */
+    Vec2 getTileCenter( const Vec2& tile ) const
+    {
+        return getTileCenter( ( int )tile.y * m_width + ( int )tile.x );
+    }
 
     void draw( Graphics& gfx, const bool drawGrid = false /* for debugging */ ) const;
 
@@ -62,6 +67,8 @@ public:
     }
 
 private:
+    const Font& m_font;
+
     bool m_bInitialized = false;
 
     /* level size in tiles */

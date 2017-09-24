@@ -27,7 +27,7 @@ Game::Game( MainWindow& wnd )
     gfx( wnd ),
     m_font( "..\\images\\Fixedsys16x28.bmp" ),
 #if _DEBUG
-    m_level( "..\\images\\testLvl1_debug.bmp" ),
+    m_level( "..\\images\\testLvl1_debug.bmp", m_font ),
 #else
     m_level( "..\\images\\testLvl1_800x600.bmp" ),
 #endif
@@ -194,6 +194,4 @@ void Game::ComposeFrame()
     }
 
     drawMouseCurser();
-
-    m_font.DrawText( "FUCK YOU BRO", { 100, 100 }, Colors::Blue, gfx ); 
 }

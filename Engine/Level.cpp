@@ -1,9 +1,11 @@
 #include "Level.h"
 #include <assert.h>
+#include <string>
 
-Level::Level( const std::string& filename )
+Level::Level( const std::string& filename, const Font& font )
     :
-    m_image( filename )
+    m_image( filename ),
+    m_font( font )
 {
     init();
 }
@@ -186,6 +188,12 @@ void Level::drawTileGrid( Graphics& gfx ) const
             {
                 gfx.DrawRectBorder( tile, 1, Colors::Red );
             }
+
+            //const int tileIdx = y * m_width + x;
+            //if( x == 0 || x == m_width / 2 )
+            //{
+            //    m_font.DrawText( std::to_string( tileIdx ), { tile.left, tile.top }, Colors::Gray, gfx );
+            //}
         }
     }
 }

@@ -76,8 +76,9 @@ public:
     };
 private:
     void handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed );
-    void calcDirection();   /* calculated direction depending on current and next tile while moving */
-
+    void calcDirection();           /* calculated direction depending on current and next tile while moving */
+    void calcSpriteDirection();     /* which sprite to choose depending on current direction */
+    void move( const float dt );
     /* position in level in pixel coordinates - for smooth movement and bounding box */
     Vec2 m_pos;
 

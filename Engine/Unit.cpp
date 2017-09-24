@@ -148,10 +148,19 @@ void Unit::update( const float dt )
     if( State::MOVING == m_state )
     {
         calcDirection();
+        calcSpriteDirection();
 
-        m_vel = m_dir * m_speed;
-        m_pos += m_vel * dt;
-        m_bb = RectF( m_pos - Vec2( ( float )m_halfSize, ( float )m_halfSize ), m_pos + Vec2( ( float )m_halfSize + 1, ( float )m_halfSize + 1 ) );
+        move( dt );
+    }
+    if( State::STANDING == m_state )
+    {
+        m_dir =  mp_level->getTileCenter( m_pos_tile ) - m_pos;
+        if( fabsf( m_dir.x ) > 1.5f || fabsf( m_dir.y ) > 1.5f )
+        {
+            m_dir.Normalize();
+            calcSpriteDirection();
+            move( dt );
+        }
     }
 }
 
@@ -239,35 +248,6 @@ void Unit::calcDirection()
     }
     else
     {
-        ///* check if tile is occupied by another unit */
-        //for( int i = 0; i < mp_level->getGroundUnitsPositions().size(); ++i )
-        //{
-        //    const int neighbourUnitIdx = mp_level->getGroundUnitsPositions()[ i ];
-        //    if( m_vPath[ m_pathIdx ] == neighbourUnitIdx )
-        //    {
-        //        if( m_pathIdx == m_vPath.size() - 1 )   /* target tile occupied, but end of path -> standing */
-        //        {
-        //            m_state = State::STANDING;
-        //            return;
-        //        }
-        //        else        /* find another path to target */
-        //        {
-        //            m_vPath = mp_pathFinder->getShortestPath( m_vPath[ m_pathIdx - 1 ], m_vPath[ m_vPath.size() - 1 ], neighbourUnitIdx );
-
-        //            if( !m_vPath.empty() )
-        //            {
-        //                m_pathIdx = 0;
-        //                return;
-        //            }
-        //            else
-        //            {
-        //                m_state = State::STANDING;
-        //                return;
-        //            }
-        //        }
-        //    }
-        //}
-
         const Vec2 nextTileCenter = mp_level->getTileCenter( m_vPath[ m_pathIdx ] );
 
         Vec2 dist = nextTileCenter - m_pos;
@@ -282,35 +262,6 @@ void Unit::calcDirection()
                 m_state = State::STANDING;
                 return;
             }
-
-            ///* check if tile is occupied by another unit */
-            //for( int i = 0; i < mp_level->getGroundUnitsPositions().size(); ++i )
-            //{
-            //    const int neighbourUnitIdx = mp_level->getGroundUnitsPositions()[ i ];
-            //    if( m_vPath[ m_pathIdx ] == neighbourUnitIdx )
-            //    {
-            //        if( m_pathIdx == m_vPath.size() - 1 )   /* target tile occupied, but end of path -> standing */
-            //        {
-            //            m_state = State::STANDING;
-            //            return;
-            //        }
-            //        else        /* find another path to target */
-            //        {
-            //            m_vPath = mp_pathFinder->getShortestPath( m_vPath[ m_pathIdx - 1 ], m_vPath[ m_vPath.size() - 1 ], neighbourUnitIdx );
-
-            //            if( !m_vPath.empty() )
-            //            {
-            //                m_pathIdx = 0;
-            //                return;
-            //            }
-            //            else
-            //            {
-            //                m_state = State::STANDING;
-            //                return;
-            //            }
-            //        }
-            //    }
-            //}
         }
 
         m_dir.x = nextTileCenter.x - m_pos.x;
@@ -318,7 +269,10 @@ void Unit::calcDirection()
     }
    
     m_dir.Normalize();
+}
 
+void Unit::calcSpriteDirection()
+{
     if( m_dir.x > 0.4f && m_dir.y > 0.4f )
     {
         m_spriteDirection = Direction::DOWN_RIGHT;
@@ -351,5 +305,12 @@ void Unit::calcDirection()
     {
         m_spriteDirection = Direction::DOWN;
     }
+}
+
+void Unit::move( const float dt )
+{
+    m_vel = m_dir * m_speed;
+    m_pos += m_vel * dt;
+    m_bb = RectF( m_pos - Vec2( ( float )m_halfSize, ( float )m_halfSize ), m_pos + Vec2( ( float )m_halfSize + 1, ( float )m_halfSize + 1 ) );
 }
 
