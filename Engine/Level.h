@@ -65,6 +65,7 @@ public:
 
         return RectI( { 0, 0 }, m_width * m_tileSize, m_height * m_tileSize );
     }
+    RectI getTileRect( const int tileIdx ) const;
 
 private:
     const Font& m_font;

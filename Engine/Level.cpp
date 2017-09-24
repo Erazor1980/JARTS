@@ -225,3 +225,11 @@ void Level::drawPath( Graphics& gfx, std::vector< int > vPath, const int currIdx
         gfx.DrawRectBorder( end, 2, Colors::Blue );
     }
 }
+
+RectI Level::getTileRect( const int tileIdx ) const
+{
+    const int x = tileIdx % m_width;
+    const int y = tileIdx / m_width;
+
+    return RectI( { x * m_tileSize, y * m_tileSize }, { ( x + 1 ) * m_tileSize - 1, ( y + 1 ) * m_tileSize - 1 } );
+}
