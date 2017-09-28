@@ -25,6 +25,7 @@
 #include "Graphics.h"
 #include "Sound.h"
 #include "Surface.h"
+#include "Font.h"
 #include "FrameTimer.h"
 #include "Vehicle.h"
 #include "Path.h"
@@ -50,5 +51,6 @@ private:
     Vehicle testVehicle;
     Path testPath;
     FrameTimer ft;
+    Font font;
 	/********************************/
 };

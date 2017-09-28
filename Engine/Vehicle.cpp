@@ -1,12 +1,13 @@
 #include "Vehicle.h"
+#include <algorithm>
 
 Vehicle::Vehicle( const float x, const float y )
 {
     m_location.x = x;
     m_location.y = y;
 
-    m_maxSpeed = 100;
-    m_maxForce = 0.2f;
+    m_maxSpeed = 200;
+    m_maxForce = 0.1f;
 }
 
 void Vehicle::update( const float dt )
@@ -42,6 +43,14 @@ void Vehicle::follow( const Vec2& start, const Vec2& end, const float radius, co
 
     // Step 2: Find the normal point along the path.
     Vec2 normalPoint = getNormalPoint( predictLoc, start, end );
+    
+    // test if normal point lies on the segment, if not use the end point of the segment
+    if( !isNormalPointValid( start, end, normalPoint ) )
+    {
+        normalPoint = end;
+    }
+
+    m_normal = normalPoint;
 
     // Step 3: Move a little further along the path and set a target.
     Vec2 dir = end - start;
@@ -49,6 +58,8 @@ void Vehicle::follow( const Vec2& start, const Vec2& end, const float radius, co
     dir *= 10;              /* 10 pixels away (maybe add parameter or dynamic value depending on speed etc later) */
     Vec2 target = normalPoint + dir;
     
+    m_target = target;
+
     // Step 4: If we are off the path, seek that target in order to stay on the path.
     float distance = ( normalPoint - predictLoc ).GetLength();
     if( distance > radius )
@@ -59,8 +70,7 @@ void Vehicle::follow( const Vec2& start, const Vec2& end, const float radius, co
     update( dt );
 }
 
-#if 0 // old version
-void Vehicle::followPath( const Path& path, const float dt )
+void Vehicle::followPathOld( const Path& path, const float dt )
 {
     Vec2 start, end;
 
@@ -79,10 +89,9 @@ void Vehicle::followPath( const Path& path, const float dt )
         Vec2 b = path.getWayPoints()[ i + 1 ];
         Vec2 normalPoint = getNormalPoint( predictLoc, a, b );
 
-        //TODO change here for all paths (not only left to right!)
-        if( normalPoint.x < a.x || normalPoint.x > b.x )
+        // test if normal point lies on the segment, if not use the end point of the segment
+        if( !isNormalPointValid( a, b, normalPoint ) )
         {
-            // Use the end point of the segment as our normal point if we can’t find one.
             normalPoint = b;
         }
 
@@ -90,7 +99,6 @@ void Vehicle::followPath( const Path& path, const float dt )
 
 
         //If we beat the record, then this should be our target!
-
         if( distance < worldRecord )
         {
             worldRecord = distance;
@@ -116,7 +124,6 @@ void Vehicle::followPath( const Path& path, const float dt )
 
     update( dt );
 }
-#endif
 
 void Vehicle::followPath( const Path& path, const float dt )
 {
@@ -152,6 +159,10 @@ void Vehicle::draw( Graphics& gfx )
     v *= 15;
 
     gfx.DrawLine( m_location, m_location + v, Colors::White );
+
+
+    gfx.DrawCircle( m_target, 3, Colors::Blue );
+    gfx.DrawCircle( m_normal, 3, Colors::Green );
 }
 
 void Vehicle::applyForce( const Vec2& force )
@@ -184,4 +195,23 @@ void Vehicle::seek( const Vec2& target, const float dt )
     }
 
     applyForce( steer );
+}
+
+bool Vehicle::isNormalPointValid( const Vec2 & start, const Vec2 & end, const Vec2& normalPoint )
+{
+    if( start.x != end.x )
+    {
+        if( normalPoint.x < std::min( start.x, end.x ) || normalPoint.x > std::max( start.x, end.x ) )
+        {
+            return false;
+        }
+    }
+    else
+    {
+        if( normalPoint.y < std::min( start.y, end.y ) || normalPoint.y > std::max( start.y, end.y ) )
+        {
+            return false;
+        }
+    }
+    return true;
 }
