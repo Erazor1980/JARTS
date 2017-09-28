@@ -28,7 +28,7 @@ Game::Game( MainWindow& wnd )
     testVehicle( 120, 120 ),
     font( "..\\images\\Fixedsys16x28.bmp" )
 {
-    std::vector< Vec2 > vPoints ={ { 50, 100 }, { 250, 140 }, { 390, 80 }, { 550, 230 }, { 600, 400 }, { 300, 300 } };
+    std::vector< Vec2 > vPoints = { { 50, 100 }, { 250, 140 }, { 390, 80 }, { 550, 230 }, { 600, 400 }, { 300, 300 }, { 50, 200 } };
     testPath = Path( vPoints, 10 );
 }
 
@@ -63,4 +63,7 @@ void Game::ComposeFrame()
     char text[ 100 ];
     sprintf_s( text, "path idx: %d", testVehicle.m_pathIdx );
     font.DrawText( text, { 20, gfx.ScreenHeight - 35 }, Colors::Green, gfx );
+
+    sprintf_s( text, "speed: %0.2f", testVehicle.m_velocity.GetLength() );
+    font.DrawText( text, { 230, gfx.ScreenHeight - 35 }, Colors::Green, gfx );
 }

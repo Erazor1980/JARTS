@@ -136,9 +136,15 @@ void Vehicle::followPath( const Path& path, const float dt )
     {
         seek( path.getWayPoints().back(), dt );
         update( dt );
+
+        //TODO test with non stop path (after last point reached, go to first again)
+        float d = ( path.getWayPoints().back() - m_location ).GetLength();
+        if( d < 10 )
+        {
+            m_pathIdx = 0;
+        }
         return;
     }
-
   
     Vec2 start = path.getWayPoints()[ m_pathIdx ];
     Vec2 end = path.getWayPoints()[ m_pathIdx + 1 ];

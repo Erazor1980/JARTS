@@ -22,7 +22,6 @@ private:
     bool isNormalPointValid( const Vec2& start, const Vec2& end, const Vec2& normalPoint );
 
     Vec2 m_location;
-    Vec2 m_velocity;
     Vec2 m_acceleration;
 
     float m_maxForce;
@@ -31,8 +30,9 @@ private:
     //TODO for debugging, make private later!
 public:
     int m_pathIdx = 0;
+    Vec2 m_velocity;
 
-    //TODO test, remove later!
+    //TODO test for debugging, remove later!
     Vec2 m_target;
     Vec2 m_normal;
 };
