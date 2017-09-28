@@ -25,7 +25,7 @@ Game::Game( MainWindow& wnd )
     :
     wnd( wnd ),
     gfx( wnd ),
-    testVehicle( 20, 20 ),
+    testVehicle( 120, 120 ),
     font( "..\\images\\Fixedsys16x28.bmp" )
 {
     std::vector< Vec2 > vPoints ={ { 50, 100 }, { 250, 140 }, { 390, 80 }, { 550, 230 }, { 600, 400 }, { 300, 300 } };

@@ -18,6 +18,12 @@ void Path::addPoint( const Vec2& newPoint )
 
 void Path::draw( Graphics& gfx ) const
 {
+    if( m_vWayPoints.empty() )
+    {
+        return;
+    }
+    
+    gfx.DrawCircle( m_vWayPoints.front(), ( int )m_radius, Colors::Gray );
     for( int i = 1; i < m_vWayPoints.size(); ++i )
     {
         gfx.DrawLine( m_vWayPoints[ i - 1 ], m_vWayPoints[ i ], Colors::Yellow );
