@@ -1,6 +1,24 @@
 #include "Vec2.h"
 #include <cmath>
 
+Vec2 getNormalPoint( const Vec2& p, const Vec2& a, const Vec2& b )
+{
+    //vector that points from a to p
+    Vec2 ap = p - a;
+
+    //vector that points from a to b
+    Vec2 ab = b - a;
+
+    // Using the dot product for scalar projection
+    ab.Normalize();
+    ab *= ap.DotProduct( ab );
+
+    // Finding the normal point along the line segment
+    Vec2 normalPoint = a + ab;
+
+    return normalPoint;
+}
+
 Vec2::Vec2( float x_in,float y_in )
 	:
 	x( x_in ),
@@ -46,6 +64,11 @@ float Vec2::GetLength() const
 float Vec2::GetLengthSq() const
 {
 	return x * x + y * y;
+}
+
+float Vec2::DotProduct( const Vec2& v )
+{
+        return x * v.x + y * v.y;
 }
 
 Vec2& Vec2::Normalize()

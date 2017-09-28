@@ -25,18 +25,10 @@ Game::Game( MainWindow& wnd )
     :
     wnd( wnd ),
     gfx( wnd ),
-    m_font( "..\\images\\Fixedsys16x28.bmp" ),
-#if _DEBUG
-    m_level( "..\\images\\testLvl1_debug.bmp", m_font ),
-#else
-    m_level( "..\\images\\testLvl1_800x600.bmp", m_font ),
-#endif
-    m_cursorSprite( "..\\images\\cursor.bmp" ),
-    m_pathFinder( m_level ),
-    m_pathControlling( m_level )
+    testVehicle( 20, 20 )
 {
-    resetLevel();
-    ShowCursor( false );
+    std::vector< Vec2 > vPoints ={ { 50, 100 }, { 250, 140 }, { 390, 80 }, { 550, 230 }, { 600, 400 } };
+    testPath = Path( vPoints, 10 );
 }
 
 void Game::Go()
@@ -47,190 +39,23 @@ void Game::Go()
 	gfx.EndFrame();
 }
 
-
-void Game::resetLevel()
-{
-    /* load images */
-    m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );
-    m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );   /* will be replaced by soldier sprite later */
-    m_vUnitSprites.push_back( Surface( "..\\images\\jet_40x40.bmp" ) );
-
-    /* load sounds */
-    m_vSelectionSounds.push_back( Sound( L"..\\sounds\\ready_for_duty.wav" ) );
-    m_vSelectionSounds.push_back( Sound( L"..\\sounds\\yes_sir.wav" ) );
-
-    m_vCommandSounds.push_back( Sound( L"..\\sounds\\move_tank.wav" ) );
-    m_vCommandSounds.push_back( Sound( L"..\\sounds\\move_jet.wav" ) );
-
-    /* create units */
-    m_vUnits.clear();
-    m_vUnits.push_back( Unit( { 1, 13 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
-    m_vUnits.push_back( Unit( { 1, 14 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
-    m_vUnits.push_back( Unit( { 3, 13 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
-    m_vUnits.push_back( Unit( { 11, 11 }, &m_level, &m_pathFinder, UnitType::JET, m_vUnitSprites, m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
-    m_vUnits.push_back( Unit( { 14, 14 }, &m_level, &m_pathFinder, UnitType::JET, m_vUnitSprites, m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
-}
-
 void Game::UpdateModel()
 {
     const float dt = ft.Mark();
-    
-    m_pathControlling.update( m_vUnits, dt );
+    //testVehicle.moveToTarget( wnd.mouse.GetPos(), dt );
 
-    /////////////////
-    ///// MOUSE /////
-    /////////////////
-    if( wnd.mouse.IsInWindow() && !wnd.mouse.IsEmpty() )
-    {
-        while( !wnd.mouse.IsEmpty() )
-        {
-            const Mouse::Event e = wnd.mouse.Read();
-            for( auto &u : m_vUnits )
-            {
-                u.update( e.GetType(), wnd.mouse.GetPos(), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
-            }
+    //testVehicle.follow( { 100, 100 }, { 100, 500 }, 10, dt );
+    testVehicle.followPath( testPath, dt );
 
-            /* multi selection rectangle */
-            if( e.GetType() == Mouse::Event::Type::LPress )
-            {
-                m_selection.left = wnd.mouse.GetPosX();
-                m_selection.top = wnd.mouse.GetPosY();
-            }
-            if( e.LeftIsPressed() )
-            {
-                m_bSelecting = true;
-                m_selection.right = wnd.mouse.GetPosX();
-                m_selection.bottom = wnd.mouse.GetPosY();
-
-                for( auto &u : m_vUnits )
-                {
-                    u.handleSelectionRect( m_selection );
-                }
-            }
-            if( e.GetType() == Mouse::Event::Type::LRelease && m_bSelecting )
-            {
-                m_bSelecting = false;
-                for( auto &u : m_vUnits )
-                {
-                    if( m_selection.Contains( u.getPosition() ) )
-                    {
-                        u.select();
-                    }
-                }
-            }
-        }
-    }
-    else
+    if( wnd.mouse.LeftIsPressed() )
     {
-        for( auto &u : m_vUnits )
-        {
-            u.update( dt );
-        }
-    }
-
-    if( !wnd.mouse.IsInWindow() )
-    {
-        m_bSelecting = false;
-    }
-
-    //////////////////
-    //// KEYBOARD ////
-    //////////////////
-    while( !wnd.kbd.KeyIsEmpty() )
-    {
-        const Keyboard::Event e = wnd.kbd.ReadKey();
-        if( e.IsRelease() )
-        {
-            if( e.GetCode() == VK_SPACE )
-            {
-                m_bDrawDebugStuff = !m_bDrawDebugStuff;
-            }
-            else if( e.GetCode() == VK_ESCAPE )
-            {
-                resetLevel();
-            }
-        }
-    }
-
-    /* Cursor */
-    if( m_bMouseOverUnit )
-    {
-        m_cursorBlinkTime += dt;
-        if( m_cursorBlinkTime >= m_cursorBlinkDelta )
-        {
-            m_bCursorBlinkShow = !m_bCursorBlinkShow;
-            m_cursorBlinkTime = 0;
-        }
-    }
-}
-
-void Game::drawMouseCurser()
-{
-    Vec2 mp = wnd.mouse.GetPos();
-    m_bMouseOverUnit = false;
-    for( const auto &u : m_vUnits )
-    {
-        RectF bb = u.getBoundigBox();
-        if( bb.Contains( mp ) )
-        {
-            if( m_bCursorBlinkShow )
-            {
-                gfx.DrawRectCorners( bb, Colors::White );
-            }
-            m_bMouseOverUnit = true;
-            break;
-        }
-    }
-    if( wnd.mouse.IsInWindow() && !m_bMouseOverUnit )
-    {
-        gfx.DrawSprite( ( int )mp.x, ( int )mp.y, m_cursorSprite, { 255, 242, 0 } );
-        m_cursorBlinkTime = 0;
-        m_bCursorBlinkShow = true;
+        testVehicle = Vehicle( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() );
     }
 }
 
 void Game::ComposeFrame()
 {
-    m_level.draw( gfx, m_bDrawDebugStuff );
+    testPath.draw( gfx );
 
-    for( int i = 0; i < m_vUnits.size() - 1; ++i )
-    {
-        m_vUnits[ i ].draw( gfx, m_bDrawDebugStuff );
-#if _DEBUG
-        m_font.DrawText( std::to_string( m_vUnits[ i ].getPosTileIdx() ), m_vUnits[ i ].getPositionInt() - Vei2( 10, 10 ), Colors::White, gfx );
-        m_font.DrawText( std::to_string( i ), m_vUnits[ i ].getPositionInt() - Vei2( 30, 10 ), Colors::Red, gfx );
-#endif
-    }
-
-    if( m_bSelecting )
-    {
-        gfx.DrawRectBorder( m_selection.getNormalized(), 1, Colors::White );
-    }
-
-#if _DEBUG  /* display waiting times */
-    int x = 100;
-    char text[ 50 ];
-    for( int i = 0; i < 3; ++i )
-    {
-        m_font.DrawText( std::to_string( i ), { x, 1 }, Colors::Cyan, gfx );
-
-        sprintf_s( text, "%0.3f", m_vUnits[ i ].getWaitingTime() );
-        m_font.DrawText( text, { x, 30 }, Colors::Cyan, gfx );
-        if( m_vUnits[ i ].getState() == Unit::State::WAITING )
-        {
-            m_font.DrawText( "Waiting", { x, 60 }, Colors::Cyan, gfx );
-        }
-        else if( m_vUnits[ i ].getState() == Unit::State::MOVING )
-        {
-            m_font.DrawText( "Moving", { x, 60 }, Colors::Cyan, gfx );
-        }
-        else if( m_vUnits[ i ].getState() == Unit::State::STANDING )
-        {
-            m_font.DrawText( "Standing", { x, 60 }, Colors::Cyan, gfx );
-        }
-        x += 150;
-    }
-#endif
-
-    drawMouseCurser();
+    testVehicle.draw( gfx );
 }

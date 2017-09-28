@@ -25,15 +25,9 @@
 #include "Graphics.h"
 #include "Sound.h"
 #include "Surface.h"
-#include "Animation.h"
 #include "FrameTimer.h"
-#include "Character.h"
-#include "Level.h"
-#include "Unit.h"
-#include "PathFinding.h"
-#include "PathControlling.h"
-#include "Defines.h"
-#include "Font.h"
+#include "Vehicle.h"
+#include "Path.h"
 
 class Game
 {
@@ -47,38 +41,14 @@ private:
 	void UpdateModel();
 	/********************************/
 	/*  User Functions              */
-    void drawMouseCurser();
-    void resetLevel();
 	/********************************/
 private:
 	MainWindow& wnd;
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
-    Font m_font;
-	FrameTimer ft;
-    Level m_level;
-    PathFinder m_pathFinder;
-
-    RectI m_selection;
-    bool m_bSelecting = false;
-
-    std::vector< Surface > m_vUnitSprites;
-    std::vector< Sound > m_vSelectionSounds;
-    std::vector< Sound > m_vCommandSounds;
-    std::vector< Unit > m_vUnits;
-
-    /* Cursor stuff */
-    Surface m_cursorSprite;
-    bool m_bMouseOverUnit = false;
-    bool m_bCursorBlinkShow = false;
-    float m_cursorBlinkDelta = 0.3f;     // time between blink off/on of cursor in seconds
-    float m_cursorBlinkTime = 0;        // current on/off time
-
-
-    bool m_bDrawDebugStuff = false;
-
-    /* Path Controlling */
-    PathControlling m_pathControlling;
+    Vehicle testVehicle;
+    Path testPath;
+    FrameTimer ft;
 	/********************************/
 };

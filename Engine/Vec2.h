@@ -15,6 +15,7 @@ public:
 	Vec2& operator-=( const Vec2& rhs );
 	float GetLength() const;
 	float GetLengthSq() const;
+    float DotProduct( const Vec2& v );
 	Vec2& Normalize();
 	Vec2 GetNormalized() const;
 	explicit operator Vei2() const;
@@ -22,3 +23,6 @@ public:
 	float x;
 	float y;
 };
+
+/* scalar projection. calculates the normal point from point p on the line a -> b */
+Vec2 getNormalPoint( const Vec2& p, const Vec2& a, const Vec2& b );

@@ -145,6 +145,7 @@
     <ClInclude Include="Defines.h" />
     <ClInclude Include="DXErr.h" />
     <ClInclude Include="Font.h" />
+    <ClInclude Include="Path.h" />
     <ClInclude Include="PathControlling.h" />
     <ClInclude Include="Unit.h" />
     <ClInclude Include="FrameTimer.h" />
@@ -162,6 +163,7 @@
     <ClInclude Include="SoundEffect.h" />
     <ClInclude Include="Surface.h" />
     <ClInclude Include="Vec2.h" />
+    <ClInclude Include="Vehicle.h" />
     <ClInclude Include="Vei2.h" />
   </ItemGroup>
   <ItemGroup>
@@ -170,6 +172,7 @@
     <ClCompile Include="COMInitializer.cpp" />
     <ClCompile Include="DXErr.cpp" />
     <ClCompile Include="Font.cpp" />
+    <ClCompile Include="Path.cpp" />
     <ClCompile Include="PathControlling.cpp" />
     <ClCompile Include="Unit.cpp" />
     <ClCompile Include="FrameTimer.cpp" />
@@ -186,6 +189,7 @@
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Surface.cpp" />
     <ClCompile Include="Vec2.cpp" />
+    <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="Vei2.cpp" />
   </ItemGroup>
   <ItemGroup>
