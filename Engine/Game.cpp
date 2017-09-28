@@ -48,6 +48,7 @@ void Game::UpdateModel()
     //testVehicle.follow( { 100, 100 }, { 100, 500 }, 10, dt );
     for( auto& v : vVehicles )
     {
+        v.separate( vVehicles, dt );
         v.followPath( testPath, dt );
     }
 

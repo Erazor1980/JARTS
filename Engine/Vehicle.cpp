@@ -6,7 +6,7 @@ Vehicle::Vehicle( const float x, const float y )
     m_location.x = x;
     m_location.y = y;
 
-    m_maxSpeed = 200;
+    m_maxSpeed = 100;
     m_maxForce = 0.2f;
 }
 
@@ -124,6 +124,48 @@ void Vehicle::followPathOld( const Path& path, const float dt )
 
     update( dt );
 }
+
+void Vehicle::separate( const std::vector< Vehicle >& vVehicles, const float dt )
+{
+    //TODO add the size of the vehicle here!
+    float r = 15;
+    float desiredseparation = r * 2;
+
+    Vec2 sum( 0, 0 );
+    int count = 0;
+    for( Vehicle other : vVehicles )
+    {
+        float d = ( m_location - other.m_location ).GetLength();
+        if( ( d > 0 ) && ( d < desiredseparation ) )
+        {
+            Vec2 diff = m_location - other.m_location;
+            diff.Normalize();
+
+            // What is the magnitude of the PVector pointing away from the other vehicle? The closer it is, the more we should flee.
+            // The farther, the less. So we divide by the distance to weight it appropriately.
+
+            diff *=  ( 1.0 / d );
+            sum += diff;
+            count++;
+        }
+    }
+    if( count > 0 )
+    {
+        sum *= ( 1.0f / count );
+        sum.Normalize();
+        sum *= m_maxSpeed * dt;
+        Vec2 steer = sum - m_velocity;
+        if( steer.GetLength() > m_maxForce )
+        {
+            steer.Normalize();
+            steer *= m_maxForce;
+        }
+
+        applyForce( steer );
+    }
+}
+
+
 
 void Vehicle::followPath( const Path& path, const float dt )
 {

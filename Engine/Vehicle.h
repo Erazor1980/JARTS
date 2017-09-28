@@ -11,6 +11,7 @@ public:
     void moveToTarget( const Vec2& target, const float dt );
     void follow( const Vec2& start, const Vec2& end, const float radius, const float dt );
 
+    void separate( const std::vector< Vehicle >& vVehicles, const float dt );
     void followPath( const Path& path, const float dt );
     void followPathOld( const Path& path, const float dt );
 
