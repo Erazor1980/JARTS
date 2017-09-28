@@ -24,4 +24,6 @@ private:
 
     float m_maxForce;
     float m_maxSpeed;
+
+    int m_pathIdx = 0;
 };

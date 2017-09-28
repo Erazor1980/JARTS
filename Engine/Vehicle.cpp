@@ -5,7 +5,7 @@ Vehicle::Vehicle( const float x, const float y )
     m_location.x = x;
     m_location.y = y;
 
-    m_maxSpeed = 200;
+    m_maxSpeed = 100;
     m_maxForce = 0.2f;
 }
 
@@ -19,7 +19,7 @@ void Vehicle::update( const float dt )
     }
 
     m_location += m_velocity;
-    m_acceleration ={ 0, 0 };
+    m_acceleration = { 0, 0 };
 }
 
 void Vehicle::moveToTarget( const Vec2& target, const float dt )
@@ -59,6 +59,7 @@ void Vehicle::follow( const Vec2& start, const Vec2& end, const float radius, co
     update( dt );
 }
 
+#if 0 // old version
 void Vehicle::followPath( const Path& path, const float dt )
 {
     Vec2 start, end;
@@ -115,7 +116,34 @@ void Vehicle::followPath( const Path& path, const float dt )
 
     update( dt );
 }
+#endif
 
+void Vehicle::followPath( const Path& path, const float dt )
+{
+    if( path.getWayPoints().empty() )
+    {
+        update( dt );
+        return;
+    }
+    else if( m_pathIdx == path.getWayPoints().size() - 1 )
+    {
+        seek( path.getWayPoints().back(), dt );
+        update( dt );
+        return;
+    }
+
+  
+    Vec2 start = path.getWayPoints()[ m_pathIdx ];
+    Vec2 end = path.getWayPoints()[ m_pathIdx + 1 ];
+
+    follow( start, end, path.getRadius(), dt );
+
+    float d = ( end - m_location ).GetLength();
+    if( d < 10 )
+    {
+        m_pathIdx++;
+    }
+}
 void Vehicle::draw( Graphics& gfx )
 {
     gfx.DrawCircle( m_location, 10, Colors::Green );
@@ -137,7 +165,7 @@ void Vehicle::seek( const Vec2& target, const float dt )
     float distToTarget = desired.GetLength();
     desired.Normalize();
     
-    const float startToBreak = 50;     /* 50 pixels to target */
+    const float startToBreak = 20;     /* pixels to target */
     if( distToTarget < startToBreak )
     {
         desired *= ( distToTarget / startToBreak ) * m_maxSpeed * dt;

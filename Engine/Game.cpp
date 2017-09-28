@@ -27,7 +27,7 @@ Game::Game( MainWindow& wnd )
     gfx( wnd ),
     testVehicle( 20, 20 )
 {
-    std::vector< Vec2 > vPoints ={ { 50, 100 }, { 250, 140 }, { 390, 80 }, { 550, 230 }, { 600, 400 } };
+    std::vector< Vec2 > vPoints ={ { 50, 100 }, { 250, 140 }, { 390, 80 }, { 550, 230 }, { 600, 400 }, { 300, 300 } };
     testPath = Path( vPoints, 10 );
 }
 
