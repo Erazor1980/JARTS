@@ -25,9 +25,9 @@ Game::Game( MainWindow& wnd )
     :
     wnd( wnd ),
     gfx( wnd ),
-    testVehicle( 120, 120 ),
     font( "..\\images\\Fixedsys16x28.bmp" )
 {
+    vVehicles.push_back( Vehicle( 120, 120 ) );
     std::vector< Vec2 > vPoints = { { 50, 100 }, { 250, 140 }, { 390, 80 }, { 550, 230 }, { 600, 400 }, { 300, 300 }, { 50, 200 } };
     testPath = Path( vPoints, 10 );
 }
@@ -46,11 +46,18 @@ void Game::UpdateModel()
     //testVehicle.moveToTarget( wnd.mouse.GetPos(), dt );
 
     //testVehicle.follow( { 100, 100 }, { 100, 500 }, 10, dt );
-    testVehicle.followPath( testPath, dt );
-
-    if( wnd.mouse.LeftIsPressed() )
+    for( auto& v : vVehicles )
     {
-        testVehicle = Vehicle( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() );
+        v.followPath( testPath, dt );
+    }
+
+    while( !wnd.mouse.IsEmpty() )
+    {
+        const Mouse::Event e = wnd.mouse.Read();
+        if( e.GetType() == Mouse::Event::Type::LPress )
+        {
+            vVehicles.push_back( Vehicle( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ) );
+        }
     }
 }
 
@@ -58,12 +65,15 @@ void Game::ComposeFrame()
 {
     testPath.draw( gfx );
 
-    testVehicle.draw( gfx );
+    for( auto& v : vVehicles )
+    {
+        v.draw( gfx );
+    }
 
     char text[ 100 ];
-    sprintf_s( text, "path idx: %d", testVehicle.m_pathIdx );
+    sprintf_s( text, "path idx: %d", vVehicles.front().m_pathIdx );
     font.DrawText( text, { 20, gfx.ScreenHeight - 35 }, Colors::Green, gfx );
 
-    sprintf_s( text, "speed: %0.2f", testVehicle.m_velocity.GetLength() );
+    sprintf_s( text, "speed: %0.2f", vVehicles.front().m_velocity.GetLength() );
     font.DrawText( text, { 230, gfx.ScreenHeight - 35 }, Colors::Green, gfx );
 }

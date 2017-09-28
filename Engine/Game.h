@@ -48,7 +48,7 @@ private:
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
-    Vehicle testVehicle;
+    std::vector< Vehicle > vVehicles;
     Path testPath;
     FrameTimer ft;
     Font font;
