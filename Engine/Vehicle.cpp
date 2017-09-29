@@ -7,7 +7,7 @@ Vehicle::Vehicle( const float x, const float y )
     m_location.y = y;
 
     m_maxSpeed = 200;
-    m_maxForce = 0.3f;
+    m_maxForce = 0.2f;
 
     m_velocity = { 1, 1 };
 
