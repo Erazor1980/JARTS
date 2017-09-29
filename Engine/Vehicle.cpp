@@ -9,7 +9,7 @@ Vehicle::Vehicle( const float x, const float y )
     m_maxSpeed = 200;
     m_maxForce = 0.2f;
 
-    m_velocity = { 1, 1 };
+    m_velocity = { 0, 0 };
 
 #if DRAW_TRACKS
     m_trackColor = Color( rand() % 255, rand() % 255, rand() % 255 );
@@ -37,11 +37,11 @@ void Vehicle::update( const float dt )
 #endif
 }
 
-void Vehicle::moveToTarget( const Vec2& target, const float dt )
+void Vehicle::moveToTarget( const std::vector< Vehicle >& vVehicles, const Vec2& target, const float dt )
 {
     if( target.GetLength() > 0 )
     {
-        seek( target, dt );
+        applyBehaviors( vVehicles, target, dt );
     }
 
     update( dt );
@@ -76,15 +76,17 @@ void Vehicle::follow( const Vec2& start, const Vec2& end, const float radius, co
 
     // Step 4: If we are off the path, seek that target in order to stay on the path.
     float distance = ( normalPoint - predictLoc ).GetLength();
+    Vec2 seekResult = { 0, 0 };
     if( distance > radius )
     {
-        seek( target, dt );
+        seekResult = seek( target, dt );
     }
 
+    applyForce( seekResult );
     update( dt );
 }
 
-void Vehicle::followPathOld( const Path& path, const float dt )
+void Vehicle::followPathOld( const std::vector< Vehicle >& vVehicles, const Path& path, const float dt )
 {
     Vec2 start, end;
 
@@ -139,10 +141,10 @@ void Vehicle::followPathOld( const Path& path, const float dt )
     update( dt );
 }
 
-void Vehicle::separate( const std::vector< Vehicle >& vVehicles, const float dt )
+Vec2 Vehicle::separate( const std::vector< Vehicle >& vVehicles, const float dt )
 {
     //TODO add the size of the vehicle here!
-    float r = 25;
+    float r = 15;
     float desiredseparation = r * 2;
 
     Vec2 sum( 0, 0 );
@@ -157,32 +159,48 @@ void Vehicle::separate( const std::vector< Vehicle >& vVehicles, const float dt 
 
             // What is the magnitude of the PVector pointing away from the other vehicle? The closer it is, the more we should flee.
             // The farther, the less. So we divide by the distance to weight it appropriately.
-
             diff *=  ( 1.0f / d );
             sum += diff;
             count++;
         }
     }
+
+    Vec2 steer = { 0, 0 };
     if( count > 0 )
     {
         sum *= ( 1.0f / count );
         sum.Normalize();
         sum *= m_maxSpeed * dt;
-        Vec2 steer = sum - m_velocity;
+        steer = sum - m_velocity;
         if( steer.GetLength() > m_maxForce )
         {
             steer.Normalize();
             steer *= m_maxForce;
         }
-
-        applyForce( steer );
     }
+
+    return steer;
 }
 
-
-
-void Vehicle::followPath( const Path& path, const float dt )
+void Vehicle::applyBehaviors( const std::vector< Vehicle >& vVehicles, const Vec2& target, const float dt )
 {
+    Vec2 separateResult = separate( vVehicles, dt );
+    Vec2 seekResult = seek( target, dt );
+
+    // These values can be whatever you want them to be!
+    // They can be variables that are customized for each vehicle, or they can change over time.
+    separateResult *= 1.5f;
+    seekResult *=  0.5f;
+
+    applyForce( separateResult );
+    applyForce( seekResult );
+}
+
+void Vehicle::followPath( const std::vector< Vehicle >& vVehicles, const Path& path, const float dt )
+{
+    Vec2 separateResult = separate( vVehicles, dt );
+    applyForce( separateResult );
+
     if( path.getWayPoints().empty() )
     {
         update( dt );
@@ -202,6 +220,8 @@ void Vehicle::followPath( const Path& path, const float dt )
         return;
     }
   
+
+
     Vec2 start = path.getWayPoints()[ m_pathIdx ];
     Vec2 end = path.getWayPoints()[ m_pathIdx + 1 ];
 
@@ -213,6 +233,7 @@ void Vehicle::followPath( const Path& path, const float dt )
         m_pathIdx++;
     }
 }
+
 void Vehicle::draw( Graphics& gfx )
 {
 #if DRAW_TRACKS
@@ -239,7 +260,7 @@ void Vehicle::applyForce( const Vec2& force )
     m_acceleration += force;
 }
 
-void Vehicle::seek( const Vec2& target, const float dt )
+Vec2 Vehicle::seek( const Vec2& target, const float dt )
 {
     Vec2 desired = target - m_location;
     float distToTarget = desired.GetLength();
@@ -263,7 +284,8 @@ void Vehicle::seek( const Vec2& target, const float dt )
         steer *= m_maxForce;
     }
 
-    applyForce( steer );
+    //applyForce( steer );
+    return steer;
 }
 
 bool Vehicle::isNormalPointValid( const Vec2 & start, const Vec2 & end, const Vec2& normalPoint )

@@ -47,14 +47,13 @@ void Game::UpdateModel()
     //testVehicle.follow( { 100, 100 }, { 100, 500 }, 10, dt );
     for( auto& v : vVehicles )
     {
-        v.separate( vVehicles, dt );
         if( bPathMode )
         {
-            v.followPath( testPath, dt );
+            v.followPath( vVehicles, testPath, dt );
         }
         else
         {
-            v.moveToTarget( wnd.mouse.GetPos(), dt );
+            v.moveToTarget( vVehicles, wnd.mouse.GetPos(), dt );
         }
     }
 
