@@ -6,8 +6,14 @@ Vehicle::Vehicle( const float x, const float y )
     m_location.x = x;
     m_location.y = y;
 
-    m_maxSpeed = 100;
-    m_maxForce = 0.2f;
+    m_maxSpeed = 200;
+    m_maxForce = 0.3f;
+
+    m_velocity = { 1, 1 };
+
+#if DRAW_TRACKS
+    m_trackColor = Color( rand() % 255, rand() % 255, rand() % 255 );
+#endif
 }
 
 void Vehicle::update( const float dt )
@@ -21,6 +27,14 @@ void Vehicle::update( const float dt )
 
     m_location += m_velocity;
     m_acceleration = { 0, 0 };
+
+#if DRAW_TRACKS
+    if( m_qTrack.size() > m_maxTrack )
+    {
+        m_qTrack.pop_front();
+    }
+    m_qTrack.push_back( m_location );
+#endif
 }
 
 void Vehicle::moveToTarget( const Vec2& target, const float dt )
@@ -128,7 +142,7 @@ void Vehicle::followPathOld( const Path& path, const float dt )
 void Vehicle::separate( const std::vector< Vehicle >& vVehicles, const float dt )
 {
     //TODO add the size of the vehicle here!
-    float r = 15;
+    float r = 25;
     float desiredseparation = r * 2;
 
     Vec2 sum( 0, 0 );
@@ -144,7 +158,7 @@ void Vehicle::separate( const std::vector< Vehicle >& vVehicles, const float dt 
             // What is the magnitude of the PVector pointing away from the other vehicle? The closer it is, the more we should flee.
             // The farther, the less. So we divide by the distance to weight it appropriately.
 
-            diff *=  ( 1.0 / d );
+            diff *=  ( 1.0f / d );
             sum += diff;
             count++;
         }
@@ -201,6 +215,13 @@ void Vehicle::followPath( const Path& path, const float dt )
 }
 void Vehicle::draw( Graphics& gfx )
 {
+#if DRAW_TRACKS
+    for( int i = 0; i < m_qTrack.size(); ++i )
+    {
+        gfx.DrawCircle( m_qTrack[ i ], 2, m_trackColor );
+    }
+#endif
+
     gfx.DrawCircle( m_location, 10, Colors::Green );
 
     Vec2 v = m_velocity.GetNormalized();

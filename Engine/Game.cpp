@@ -27,7 +27,7 @@ Game::Game( MainWindow& wnd )
     gfx( wnd ),
     font( "..\\images\\Fixedsys16x28.bmp" )
 {
-    vVehicles.push_back( Vehicle( 120, 120 ) );
+    vVehicles.push_back( Vehicle( 120.0f, 120.0f ) );
     std::vector< Vec2 > vPoints = { { 50, 100 }, { 250, 140 }, { 390, 80 }, { 550, 230 }, { 600, 400 }, { 300, 300 }, { 50, 200 } };
     testPath = Path( vPoints, 10 );
 }
@@ -49,7 +49,8 @@ void Game::UpdateModel()
     for( auto& v : vVehicles )
     {
         v.separate( vVehicles, dt );
-        v.followPath( testPath, dt );
+        v.moveToTarget( wnd.mouse.GetPos(), dt );
+        //v.followPath( testPath, dt );
     }
 
     while( !wnd.mouse.IsEmpty() )
@@ -77,4 +78,7 @@ void Game::ComposeFrame()
 
     sprintf_s( text, "speed: %0.2f", vVehicles.front().m_velocity.GetLength() );
     font.DrawText( text, { 230, gfx.ScreenHeight - 35 }, Colors::Green, gfx );
+
+    sprintf_s( text, "#: %d", vVehicles.size() );
+    font.DrawText( text, { 430, gfx.ScreenHeight - 35 }, Colors::Green, gfx );
 }

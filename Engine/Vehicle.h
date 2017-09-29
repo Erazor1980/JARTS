@@ -3,6 +3,10 @@
 #include "Graphics.h"
 #include "Path.h"
 
+#include <deque>
+
+#define DRAW_TRACKS 0
+
 class Vehicle
 {
 public:
@@ -36,4 +40,10 @@ public:
     //TODO test for debugging, remove later!
     Vec2 m_target;
     Vec2 m_normal;
+
+#if DRAW_TRACKS
+    std::deque< Vec2 > m_qTrack;
+    Color m_trackColor;
+    const int m_maxTrack = 200;
+#endif
 };
