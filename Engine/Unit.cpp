@@ -93,7 +93,9 @@ void Unit::handleSelectionRect( const RectI& selectionRect )
 void Unit::select()
 {
     m_bSelected = true;
+#if !_DEBUG
     m_soundSelect.Play();
+#endif
 }
 void Unit::deselect()
 {
@@ -150,8 +152,9 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
                 m_vPath.push_back( targetIdx );
                 m_state = State::MOVING;
                 m_pathIdx = 0;
-
+#if !_DEBUG
                 m_soundCommand.Play();
+#endif
             }
             else
             {
@@ -163,8 +166,9 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
                     {
                         m_state = State::MOVING;
                         m_pathIdx = 0;
-
+#if !_DEBUG
                         m_soundCommand.Play();
+#endif
                     }
                 }
             }
