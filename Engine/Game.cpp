@@ -43,14 +43,19 @@ void Game::Go()
 void Game::UpdateModel()
 {
     const float dt = ft.Mark();
-    //testVehicle.moveToTarget( wnd.mouse.GetPos(), dt );
 
     //testVehicle.follow( { 100, 100 }, { 100, 500 }, 10, dt );
     for( auto& v : vVehicles )
     {
         v.separate( vVehicles, dt );
-        v.moveToTarget( wnd.mouse.GetPos(), dt );
-        //v.followPath( testPath, dt );
+        if( bPathMode )
+        {
+            v.followPath( testPath, dt );
+        }
+        else
+        {
+            v.moveToTarget( wnd.mouse.GetPos(), dt );
+        }
     }
 
     while( !wnd.mouse.IsEmpty() )
@@ -59,6 +64,18 @@ void Game::UpdateModel()
         if( e.GetType() == Mouse::Event::Type::LPress )
         {
             vVehicles.push_back( Vehicle( ( float )wnd.mouse.GetPosX(), ( float )wnd.mouse.GetPosY() ) );
+        }
+    }
+
+    while( !wnd.kbd.KeyIsEmpty() )
+    {
+        const Keyboard::Event e = wnd.kbd.ReadKey();
+        if( e.IsRelease() )
+        {
+            if( e.GetCode() == VK_SPACE )
+            {
+                bPathMode = !bPathMode;
+            }
         }
     }
 }
@@ -79,6 +96,16 @@ void Game::ComposeFrame()
     sprintf_s( text, "speed: %0.2f", vVehicles.front().m_velocity.GetLength() );
     font.DrawText( text, { 230, gfx.ScreenHeight - 35 }, Colors::Green, gfx );
 
-    sprintf_s( text, "#: %d", vVehicles.size() );
+    sprintf_s( text, "#: %d", ( int )vVehicles.size() );
     font.DrawText( text, { 430, gfx.ScreenHeight - 35 }, Colors::Green, gfx );
+
+    if( bPathMode )
+    {
+        sprintf_s( text, "Path mode" );
+    }
+    else
+    {
+        sprintf_s( text, "Mouse mode" );
+    }
+    font.DrawText( text, { gfx.ScreenWidth / 2 - 60, 15 }, Colors::Red, gfx );
 }

@@ -52,5 +52,6 @@ private:
     Path testPath;
     FrameTimer ft;
     Font font;
+    bool bPathMode = true;      /* following path mode, otherwise moving towords mouse mode */
 	/********************************/
 };
