@@ -1,5 +1,6 @@
 #pragma once
 #include "Level.h"
+#include "Path.h"
 #include <vector>
 
 struct Node
@@ -29,11 +30,12 @@ public:
     PathFinder( const Level& lvl );
     ~PathFinder();
 
-    void init( const Level& lvl );
-
     std::vector< int > getShortestPath( const int start_idx, const int target_idx );
+    Path calcShortestPath( const int start_idx, const int target_idx, const float pathRadius = 5 );
 
 private:
+    void init();
+
     Node getAndRemoveLowestFcostNode( std::vector< Node >& vNodes );
 
     /* for following idx path after target is reached in A* */
@@ -50,6 +52,9 @@ private:
     /* dimensions of the current level/map in tiles */
     int m_width;
     int m_height;
+
+    /* reference to the current level (for some getter functions) */
+    const Level& m_level;
 
     /* for each cell all h values for the other cells will be precomputed and stored here */
     int* mp_all_H_values = nullptr;

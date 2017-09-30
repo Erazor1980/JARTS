@@ -2,8 +2,10 @@
 #include "PathFinding.h"
 
 PathFinder::PathFinder( const Level& lvl )
+    :
+    m_level( lvl )
 {
-    init( lvl );
+    init();
 }
 
 PathFinder::~PathFinder()
@@ -15,12 +17,12 @@ PathFinder::~PathFinder()
     mp_all_H_values = nullptr;
 }
 
-void PathFinder::init( const Level& lvl )
+void PathFinder::init()
 {
-    assert( lvl.m_width > 0 && lvl.m_height > 0 );
-    m_width     = lvl.m_width;
-    m_height    = lvl.m_height;
-    mp_mapContent = lvl.mp_content;
+    assert( m_level.m_width > 0 && m_level.m_height > 0 );
+    m_width     = m_level.m_width;
+    m_height    = m_level.m_height;
+    mp_mapContent = m_level.mp_content;
 
     if( mp_all_H_values )
     {
@@ -60,8 +62,7 @@ std::vector< int > PathFinder::getShortestPath( const int start_idx, const int t
     assert( start_idx != target_idx );
     assert( start_idx >= 0 && start_idx < m_width * m_height );
     assert( target_idx >= 0 && target_idx < m_width * m_height );
-
-
+    
     const int num_cells = m_width * m_height;
     std::vector< int > vPath;
     
@@ -136,6 +137,94 @@ std::vector< int > PathFinder::getShortestPath( const int start_idx, const int t
     }
 
     return vPath;
+}
+
+Path PathFinder::calcShortestPath( const int start_idx, const int target_idx, const float pathRadius )
+{
+    assert( start_idx != target_idx );
+    assert( start_idx >= 0 && start_idx < m_width * m_height );
+    assert( target_idx >= 0 && target_idx < m_width * m_height );
+
+
+    const int num_cells = m_width * m_height;
+    std::vector< int > vPath;
+
+    std::vector< Node > vOpenList;
+    std::vector< Node > vClosedList;
+
+    /* pointer to h values for the current target */
+    int* current_H_values = &mp_all_H_values[ target_idx * num_cells ];
+
+    Node startNode( start_idx, current_H_values[ start_idx ], 0 );
+    vOpenList.push_back( startNode );
+
+    ////////////////////////
+    //// A* PATHFINDING ////
+    ////////////////////////
+    while( !vOpenList.empty() )
+    {
+        Node currNode = getAndRemoveLowestFcostNode( vOpenList );
+
+        vClosedList.push_back( currNode );
+
+        /* target reached! get path indeces */
+        if( target_idx == currNode.m_idx )
+        {
+            vPath.push_back( target_idx );
+
+            int parentIdx = currNode.m_parentIdx;
+
+            while( parentIdx != start_idx )
+            {
+                vPath.push_back( parentIdx );
+                parentIdx = getParentIdxAndRemoveNodeFromList( vClosedList, parentIdx );
+            }
+
+            std::reverse( vPath.begin(), vPath.end() );
+            break;
+        }
+
+        std::vector< int > vNeighbours = getNeighbourIndices( currNode.m_idx );
+
+        for( int n = 0; n < vNeighbours.size(); ++n )
+        {
+            const int idx = vNeighbours[ n ];
+            int neighbourNodeIdx;   /* idx in the vOpenList of the node! not its map idx! */
+
+            if( listContainsIdxNode( vClosedList, idx, neighbourNodeIdx ) )
+            {
+                continue;   // skip if node is in closed list
+            }
+
+            /* calculate g cost: currNode g + 10 (vertical/horizontal move) or + 14 (diagonal move) */
+            const int g = currNode.m_G + getMoveCosts( currNode.m_idx, idx );
+
+
+            if( !listContainsIdxNode( vOpenList, idx, neighbourNodeIdx ) )
+            {
+                Node node( idx, current_H_values[ idx ], g, currNode.m_idx );
+
+                vOpenList.push_back( node );
+            }
+            else
+            {
+                /* check if new path to neighbour is shorter */
+                if( g < vOpenList[ neighbourNodeIdx ].m_G )
+                {
+                    vOpenList[ neighbourNodeIdx ].m_G = g;
+                    vOpenList[ neighbourNodeIdx ].m_F = g + vOpenList[ neighbourNodeIdx ].m_H;
+                    vOpenList[ neighbourNodeIdx ].m_parentIdx = currNode.m_idx;
+                }
+            }
+        }
+    }
+
+    Path path( pathRadius );
+    for( int i = 0; i < vPath.size(); ++i )
+    {
+        path.addPoint( m_level.getTileCenter( vPath[ i ] ) );
+    }
+    return path;
 }
 
 Node PathFinder::getAndRemoveLowestFcostNode( std::vector<Node>& vNodes )
