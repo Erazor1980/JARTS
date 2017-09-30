@@ -48,6 +48,11 @@ float Vec2::GetLengthSq() const
 	return x * x + y * y;
 }
 
+float Vec2::DotProduct( const Vec2& v ) const
+{
+    return x * v.x + y * v.y;
+}
+
 Vec2& Vec2::Normalize()
 {
 	return *this = GetNormalized();

@@ -15,6 +15,7 @@ public:
 	Vec2& operator-=( const Vec2& rhs );
 	float GetLength() const;
 	float GetLengthSq() const;
+    float DotProduct( const Vec2& v ) const;
 	Vec2& Normalize();
 	Vec2 GetNormalized() const;
 	explicit operator Vei2() const;
