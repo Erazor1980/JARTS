@@ -69,11 +69,7 @@ public:
     };
 private:
     void handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed );
-    //void calcDirection();           /* calculated direction depending on current and next tile while moving */
     void calcSpriteDirection();     /* which sprite to choose depending on current direction */
-
-    /* position in level in pixel coordinates - for smooth movement and bounding box */
-    //Vec2 m_pos;
 
     /* position in level in tiles - for path planning */
     Vec2 m_pos_tile;
@@ -103,11 +99,6 @@ private:
     PathFinder* const mp_pathFinder;
     std::vector< int > m_vPath;
     int m_pathIdx = -1;                 /* current idx from path */
-
-    /* Movement */
-    //Vec2 m_vel = { 0.0f, 0.0f };
-    //float m_speed = 110.0f;
-    //Vec2 m_dir = { 0.0f, 0.0f };
 
     /* Attributes */
     UnitType m_type;

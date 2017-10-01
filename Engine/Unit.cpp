@@ -30,12 +30,18 @@ Unit::Unit( const Vec2 pos_tile,
         m_vSpriteRects.emplace_back( i * m_size, ( i + 1 ) * m_size, 0, m_size );
     }
     
-    //m_pos.x     = pos_tile.x * m_size + m_size / 2 - 1;
-    //m_pos.y     = pos_tile.y * m_size + m_size / 2 - 1;
     m_location.x    = pos_tile.x * m_size + m_size / 2 - 1;
     m_location.y    = pos_tile.y * m_size + m_size / 2 - 1;
-    m_maxSpeed = 200;
-    m_maxForce = 0.2f;
+    if( UnitType::TANK == type )
+    {
+        m_maxSpeed = 100;
+        m_maxForce = 0.3f;
+    }
+    else if( UnitType::JET == type )
+    {
+        m_maxSpeed = 250;
+        m_maxForce = 0.2f;
+    }
     m_velocity = { 0, 0 };
     m_acceleration = { 0, 0 };
 
@@ -114,15 +120,6 @@ void Unit::deselect()
 
 void Unit::update( const std::vector< Unit >& vUnits, const float dt )
 {
-    /*if( State::MOVING == m_state )
-    {
-        calcDirection();
-
-        m_vel = m_dir * m_speed;
-        m_pos += m_vel * dt;
-        m_bb = RectF( m_pos - Vec2( ( float )m_halfSize, ( float )m_halfSize ), m_pos + Vec2( ( float )m_halfSize + 1, ( float )m_halfSize + 1 ) );
-    }*/
-
     if( State::MOVING == m_state )
     {
         followPath( vUnits, m_path, dt );
@@ -143,7 +140,6 @@ void Unit::update( const std::vector< Unit >& vUnits, const float dt )
     }
 }
 
-#if 0 // old
 void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed )
 {
     if( type == Mouse::Event::Type::LPress )
@@ -169,7 +165,7 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
         if( m_bSelected )
         {
             Tile targetTile = mp_level->getTileType( ( int )mouse_pos.x, ( int )mouse_pos.y );
-            const int startIdx = ( int )m_pos_tile.y * mp_level->getWidth() + ( int )m_pos_tile.x;
+            const int startIdx = mp_level->getTileIdx( m_location );
             const int targetIdx = mp_level->getTileIdx( ( int )mouse_pos.x, ( int )mouse_pos.y );
 
             if( startIdx == targetIdx )
@@ -178,70 +174,6 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
             }
             if( m_type == UnitType::JET )
             {
-                m_vPath.clear();
-                m_vPath.push_back( targetIdx );
-                m_state = State::MOVING;
-                m_pathIdx = 0;
-#if !_DEBUG
-                m_soundCommand.Play();
-#endif
-            }
-            else
-            {
-                if( Tile::EMPTY == targetTile )
-                {
-                    m_vPath = mp_pathFinder->getShortestPath( startIdx, targetIdx );
-
-                    if( !m_vPath.empty() )
-                    {
-                        m_state = State::MOVING;
-                        m_pathIdx = 0;
-#if !_DEBUG
-                        m_soundCommand.Play();
-#endif
-                    }
-                }
-            }
-        }
-    }
-}
-#endif
-void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed )
-{
-    if( type == Mouse::Event::Type::LPress )
-    {
-        if( !m_bSelected )
-        {
-            /* check if we click inside the bounding box */
-            if( m_bb.IsOverlappingWith( RectF( mouse_pos, 1, 1 ) ) )
-            {
-                select();
-            }
-        }
-        else
-        {
-            if( !shift_pressed )
-            {
-                deselect();
-            }
-        }
-    }
-    else if( type == Mouse::Event::Type::RPress )
-    {
-        if( m_bSelected )
-        {
-            Tile targetTile = mp_level->getTileType( ( int )mouse_pos.x, ( int )mouse_pos.y );
-            const int startIdx = mp_level->getTileIdx( m_location ); //( int )m_pos_tile.y * mp_level->getWidth() + ( int )m_pos_tile.x;
-            const int targetIdx = mp_level->getTileIdx( ( int )mouse_pos.x, ( int )mouse_pos.y );
-
-            if( startIdx == targetIdx )
-            {
-                return;
-            }
-            if( m_type == UnitType::JET )
-            {
-                /*m_vPath.clear();
-                m_vPath.push_back( targetIdx );*/
                 std::vector< Vec2 > vPoints = { m_location, mp_level->getTileCenter( targetIdx ) };
                 m_path = Path( vPoints );
                 m_state = State::MOVING;
@@ -254,94 +186,18 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
             {
                 if( Tile::EMPTY == targetTile )
                 {
-                    //m_vPath = mp_pathFinder->getShortestPath( startIdx, targetIdx );
-
                     m_path = mp_pathFinder->calcShortestPath( startIdx, targetIdx );
 
-                    //if( !m_vPath.empty() )
-                    //{
-                        m_state = State::MOVING;
-                        m_pathIdx = 0;
+                    m_state = State::MOVING;
+                    m_pathIdx = 0;
 #if !_DEBUG
-                        m_soundCommand.Play();
+                    m_soundCommand.Play();
 #endif
-                    //}
                 }
             }
         }
     }
 }
-
-#if 0
-void Unit::calcDirection()
-{
-    if( m_type == UnitType::JET )
-    {
-        const Vec2 targetTileCenter = mp_level->getTileCenter( m_vPath[ m_vPath.size() - 1 ] );
-        
-        m_dir = targetTileCenter - m_pos;
-        if( fabsf( m_dir.x ) < 1.5f && fabsf( m_dir.y ) < 1.5f )
-        {
-            m_pathIdx = ( int )m_vPath.size();
-        }
-    }
-    else
-    {
-        const Vec2 nextTileCenter = mp_level->getTileCenter( m_vPath[ m_pathIdx ] );
-
-        Vec2 dist = nextTileCenter - m_pos;
-        if( fabsf( dist.x ) < 1.5f && fabsf( dist.y ) < 1.5f )
-        {
-            m_pos_tile.x = ( float )( m_vPath[ m_pathIdx ] % mp_level->getWidth() );
-            m_pos_tile.y = ( float )( m_vPath[ m_pathIdx ] / mp_level->getWidth() );
-            m_pathIdx++;
-        }
-
-        m_dir.x = nextTileCenter.x - m_pos.x;
-        m_dir.y = nextTileCenter.y - m_pos.y;
-    }
-    
-    if( m_pathIdx == m_vPath.size() )
-    {
-        m_state = State::STANDING;
-    }
-    
-    m_dir.Normalize();
-
-    if( m_dir.x > 0.4f && m_dir.y > 0.4f )
-    {
-        m_spriteDirection = Direction::DOWN_RIGHT;
-    }
-    else if( m_dir.x > 0.4f && m_dir.y < -0.4f )
-    {
-        m_spriteDirection = Direction::UP_RIGHT;
-    }
-    else if( m_dir.x > 0.4f && fabsf( m_dir.y ) < 0.4f )
-    {
-        m_spriteDirection = Direction::RIGHT;
-    }
-    else if( m_dir.x < -0.4f && m_dir.y < -0.4f )
-    {
-        m_spriteDirection = Direction::UP_LEFT;
-    }
-    else if( m_dir.x < -0.4f && m_dir.y > 0.4f )
-    {
-        m_spriteDirection = Direction::DOWN_LEFT;
-    }
-    else if( m_dir.x < -0.4f && fabsf( m_dir.y ) < 0.4f )
-    {
-        m_spriteDirection = Direction::LEFT;
-    }
-    else if( fabsf( m_dir.x ) < 0.4f && m_dir.y < -0.4f )
-    {
-        m_spriteDirection = Direction::UP;
-    }
-    else if( fabsf( m_dir.x ) < 0.4f && m_dir.y > 0.4f )
-    {
-        m_spriteDirection = Direction::DOWN;
-    }
-}
-#endif
 
 void Unit::calcSpriteDirection()
 {
@@ -444,7 +300,7 @@ Vec2 Unit::separateFromOtherUnits( const std::vector< Unit >& vUnits, const floa
 {
     //TODO add the size of the vehicle here!
     //float r;
-    float desiredseparation = m_size; // r * 2;
+    float desiredseparation = ( float )m_size; // r * 2;
 
     Vec2 sum( 0, 0 );
     int count = 0;
