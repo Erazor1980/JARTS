@@ -1,7 +1,7 @@
 #include "Unit.h"
 #include <assert.h>
 
-Unit::Unit( const Vec2 pos_tile,
+Unit::Unit( const Vei2 pos_tile,
             const Level* const pLevel,
             PathFinder* const pPathFinder,
             const UnitType type,
@@ -22,7 +22,6 @@ Unit::Unit( const Vec2 pos_tile,
 
     m_type      = type;
     m_size      = m_vUnitSprites[ ( int )m_type ].GetHeight();
-    m_pos_tile  = pos_tile;
 
     /* calculating rectangles for unit sprite steps (directions) */
     for( int i = 0; i < 8; ++i )
@@ -30,8 +29,9 @@ Unit::Unit( const Vec2 pos_tile,
         m_vSpriteRects.emplace_back( i * m_size, ( i + 1 ) * m_size, 0, m_size );
     }
     
-    m_location.x    = pos_tile.x * m_size + m_size / 2 - 1;
-    m_location.y    = pos_tile.y * m_size + m_size / 2 - 1;
+    m_location.x    = pos_tile.x * m_size + m_size / 2.0f - 1;
+    m_location.y    = pos_tile.y * m_size + m_size / 2.0f - 1;
+    m_tileIdx       = mp_level->getTileIdx( m_location.x, m_location.y );
     if( UnitType::TANK == type )
     {
         m_maxSpeed = 100;
@@ -40,7 +40,7 @@ Unit::Unit( const Vec2 pos_tile,
     else if( UnitType::JET == type )
     {
         m_maxSpeed = 250;
-        m_maxForce = 0.2f;
+        m_maxForce = 0.15f;
     }
     m_velocity = { 0, 0 };
     m_acceleration = { 0, 0 };
@@ -48,8 +48,8 @@ Unit::Unit( const Vec2 pos_tile,
     m_halfSize = m_size / 2;
     m_bb = RectF( m_location - Vec2( ( float )m_halfSize, ( float )m_halfSize ), m_location + Vec2( ( float )m_halfSize + 1, ( float )m_halfSize + 1 ) );
 
-    m_velocity.x = ( float )1 + rand() % 10;
-    m_velocity.y = ( float )1 + rand() % 10;
+    m_velocity.x = 1.0f + rand() % 10;
+    m_velocity.y = 1.0f + rand() % 10;
     m_velocity.Normalize();
     calcSpriteDirection();
 }
@@ -80,52 +80,18 @@ void Unit::draw( Graphics& gfx, const bool drawPath ) const
 #endif
 }
 
-void Unit::update( const std::vector< Unit >& vUnits, 
-                   const Mouse::Event::Type& type,
-                   const Vec2& mouse_pos,
-                   const bool shift_pressed,
-                   const float dt )
-{
-    if( mp_level->getLevelRect().Contains( mouse_pos ) )
-    {
-        handleMouse( type, mouse_pos, shift_pressed );
-    }
-
-    update( vUnits, dt );
-}
-
-void Unit::handleSelectionRect( const RectI& selectionRect )
-{
-    RectI r = selectionRect.getNormalized();
-    if( r.Contains( m_location ) )
-    {
-        m_bInsideSelectionRect = true;
-    }
-    else
-    {
-        m_bInsideSelectionRect = false;
-    }
-}
-
-void Unit::select()
-{
-    m_bSelected = true;
-#if !_DEBUG
-    m_soundSelect.Play();
-#endif
-}
-void Unit::deselect()
-{
-    m_bSelected = false;
-}
-
 void Unit::update( const std::vector< Unit >& vUnits, const float dt )
 {
     if( State::MOVING == m_state )
     {
         if( UnitType::JET == m_type )
         {
-            applyForce( seek( m_path.getWayPoints().front(), dt ) );
+            applyForce( seek( m_path.getWayPoints().front(), dt, true ) );
+            float d = ( m_location - m_path.getWayPoints().front() ).GetLength();
+            if( d < m_distToTile / 2 )
+            {
+                m_state = State::STANDING;
+            }
         }
         else
         {
@@ -144,7 +110,23 @@ void Unit::update( const std::vector< Unit >& vUnits, const float dt )
         m_bb = RectF( m_location - Vec2( ( float )m_halfSize, ( float )m_halfSize ),
                       m_location + Vec2( ( float )m_halfSize + 1, ( float )m_halfSize + 1 ) );
         m_acceleration = { 0, 0 };
+
+        m_tileIdx = mp_level->getTileIdx( m_location );
     }
+}
+
+void Unit::update( const std::vector< Unit >& vUnits, 
+                   const Mouse::Event::Type& type,
+                   const Vec2& mouse_pos,
+                   const bool shift_pressed,
+                   const float dt )
+{
+    if( mp_level->getLevelRect().Contains( mouse_pos ) )
+    {
+        handleMouse( type, mouse_pos, shift_pressed );
+    }
+
+    update( vUnits, dt );
 }
 
 void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed )
@@ -259,7 +241,7 @@ void Unit::followPath( const std::vector< Unit >& vUnits, const Path& path, cons
         seek( path.getWayPoints().back(), dt );
 
         float d = ( path.getWayPoints().back() - m_location ).GetLength();
-        if( d < 10 )
+        if( d < m_distToTile )
         {
             m_pathIdx = 0;
             m_state = State::STANDING;
@@ -267,19 +249,23 @@ void Unit::followPath( const std::vector< Unit >& vUnits, const Path& path, cons
         return;
     }
     
+#if 1   // test with next tile center as target (not line segment point)
+    Vec2 end = path.getWayPoints()[ m_pathIdx + 1 ];
+    applyForce( seek( end, dt ) );
+#else
     Vec2 start = path.getWayPoints()[ m_pathIdx ];
     Vec2 end = path.getWayPoints()[ m_pathIdx + 1 ];
-
     followLineSegment( start, end, path.getRadius(), dt );
+#endif
 
     float d = ( end - m_location ).GetLength();
-    if( d < 10 )
+    if( d < m_distToTile )
     {
         m_pathIdx++;
     }
 }
 
-Vec2 Unit::seek( const Vec2& target, const float dt )
+Vec2 Unit::seek( const Vec2& target, const float dt, const bool enableBreaking )
 {
     Vec2 desired = target - m_location;
     float distToTarget = desired.GetLength();
@@ -291,7 +277,7 @@ Vec2 Unit::seek( const Vec2& target, const float dt )
         startToBreak = m_maxSpeed / 5;
     }
 
-    if( distToTarget < startToBreak )
+    if( enableBreaking && distToTarget < startToBreak )
     {
         desired *= ( distToTarget / startToBreak ) * m_maxSpeed * dt;
     }
@@ -378,14 +364,13 @@ void Unit::followLineSegment( const Vec2& start, const Vec2& end, const float ra
 
     // Step 4: If we are off the path, seek that target in order to stay on the path.
     float distance = ( normalPoint - predictLoc ).GetLength();
-    Vec2 seekResult ={ 0, 0 };
+    Vec2 seekResult = { 0, 0 };
     if( distance > radius )
     {
         seekResult = seek( target, dt );
     }
 
     applyForce( seekResult );
-    //update( dt );
 }
 bool Unit::isNormalPointValid( const Vec2 & start, const Vec2 & end, const Vec2& normalPoint )
 {
@@ -425,4 +410,29 @@ Vec2 Unit::getNormalPoint( const Vec2& p, const Vec2& a, const Vec2& b )
     Vec2 normalPoint = a + ab;
 
     return normalPoint;
+}
+
+void Unit::handleSelectionRect( const RectI& selectionRect )
+{
+    RectI r = selectionRect.getNormalized();
+    if( r.Contains( m_location ) )
+    {
+        m_bInsideSelectionRect = true;
+    }
+    else
+    {
+        m_bInsideSelectionRect = false;
+    }
+}
+
+void Unit::select()
+{
+    m_bSelected = true;
+#if !_DEBUG
+    m_soundSelect.Play();
+#endif
+}
+void Unit::deselect()
+{
+    m_bSelected = false;
 }

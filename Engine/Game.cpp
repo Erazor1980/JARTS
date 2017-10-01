@@ -25,6 +25,7 @@ Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
 	gfx( wnd ),
+    m_font( "..\\images\\Fixedsys16x28.bmp" ),
 #if _DEBUG
     m_level( "..\\images\\testLvl1_debug.bmp" ),
 #else
@@ -35,7 +36,7 @@ Game::Game( MainWindow& wnd )
 {
     /* load images */
     m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );
-    m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );   /* will be replaced by soldier sprite later */
+    m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );   //TODO replace by soldier sprite later
     m_vUnitSprites.push_back( Surface( "..\\images\\jet_40x40.bmp" ) );
     
     /* load sounds */
@@ -177,15 +178,41 @@ void Game::ComposeFrame()
 {
     m_level.draw( gfx, m_bDrawDebugStuff );
 
-    for( const auto& u : m_vUnits )
+    for( int i = 0; i < m_vUnits.size(); ++i )
     {
-        u.draw( gfx, m_bDrawDebugStuff );
+        m_vUnits[ i ].draw( gfx, m_bDrawDebugStuff );
+
+#if _DEBUG
+        m_font.DrawText( std::to_string( m_vUnits[ i ].getTileIdx() ), m_vUnits[ i ].getLocationInt() - Vei2( 10, 10 ), Colors::White, gfx );
+        m_font.DrawText( std::to_string( i ), m_vUnits[ i ].getLocationInt() - Vei2( 30, 10 ), Colors::Red, gfx );
+#endif
     }
 
     if( m_bSelecting )
     {
         gfx.DrawRectBorder( m_selection.getNormalized(), 1, Colors::White );
     }
+
+#if _DEBUG  /* display additional unit infos */
+    int x = 100;
+    char text[ 50 ];
+    for( int i = 0; i < m_vUnits.size(); ++i )
+    {
+        m_font.DrawText( std::to_string( i ), { x, 1 }, Colors::Cyan, gfx );
+
+        sprintf_s( text, "%0.3f", m_vUnits[ i ].getVelocity().GetLength() );
+        m_font.DrawText( text, { x, 30 }, Colors::Cyan, gfx );
+        if( m_vUnits[ i ].getState() == Unit::State::MOVING )
+        {
+            m_font.DrawText( "Moving", { x, 60 }, Colors::Cyan, gfx );
+        }
+        else if( m_vUnits[ i ].getState() == Unit::State::STANDING )
+        {
+            m_font.DrawText( "Standing", { x, 60 }, Colors::Cyan, gfx );
+        }
+        x += 150;
+    }
+#endif
 
     drawMouseCurser();
 }

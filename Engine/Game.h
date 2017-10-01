@@ -31,7 +31,7 @@
 #include "Level.h"
 #include "Unit.h"
 #include "PathFinding.h"
-
+#include "Font.h"
 #include "Defines.h"
 
 class Game
@@ -54,6 +54,7 @@ private:
 	/********************************/
 	/*  User Variables              */
 	FrameTimer ft;
+    Font m_font;
     Level m_level;
     PathFinder m_pathFinder;
 

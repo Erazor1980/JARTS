@@ -17,7 +17,26 @@ enum class UnitType
 class Unit
 {
 public:
-    Unit( const Vec2 pos_tile, 
+    enum class State
+    {
+        STANDING,
+        MOVING,
+        ATTACKING
+    };
+
+    enum class Direction    /* for the 8 sprite directions */
+    {
+        UP = 0,
+        UP_RIGHT,
+        RIGHT,
+        DOWN_RIGHT,
+        DOWN,
+        DOWN_LEFT,
+        LEFT,
+        UP_LEFT
+    };
+public:
+    Unit( const Vei2 pos_tile, 
           const Level* const pLevel, 
           PathFinder* const pPathFinder, 
           const UnitType type,
@@ -40,39 +59,32 @@ public:
     {
         return m_location;
     }
-    //Vec2 getPosition() const
-    //{
-    //    return m_pos;
-    //}
+    Vei2 getLocationInt() const
+    {
+        return Vei2( ( int )m_location.x, ( int )m_location.y );
+    }
+    Vec2 getVelocity() const
+    {
+        return m_velocity;
+    }
     RectF getBoundigBox() const
     {
         return m_bb;
     }
-
-    enum class State
+    State getState() const
     {
-        STANDING,
-        MOVING,
-        ATTACKING
-    };
-
-    enum class Direction    /* for the 8 sprite directions */
+        return m_state;
+    }
+    int getTileIdx() const
     {
-        UP = 0,
-        UP_RIGHT,
-        RIGHT,
-        DOWN_RIGHT,
-        DOWN,
-        DOWN_LEFT,
-        LEFT,
-        UP_LEFT
-    };
+        return m_tileIdx;
+    }
 private:
     void handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed );
     void calcSpriteDirection();     /* which sprite to choose depending on current direction */
 
     /* position in level in tiles - for path planning */
-    Vec2 m_pos_tile;
+    int m_tileIdx;
 
     /* bounding box (for selection in first place) */
     RectF m_bb;
@@ -98,7 +110,8 @@ private:
     /* path planning */
     PathFinder* const mp_pathFinder;
     std::vector< int > m_vPath;
-    int m_pathIdx = -1;                 /* current idx from path */
+    int m_pathIdx = -1;                             /* current idx from path */
+    static constexpr float m_distToTile = 10.0f;    /* tile reached if unit's distance to tile's center is lower */
 
     /* Attributes */
     UnitType m_type;
@@ -118,7 +131,7 @@ private:
 
     void followPath( const std::vector< Unit >& vUnits, const Path& path, const float dt );
     void followLineSegment( const Vec2& start, const Vec2& end, const float radius, const float dt );
-    Vec2 seek( const Vec2& target, const float dt );
+    Vec2 seek( const Vec2& target, const float dt, const bool enableBreaking = false );
     Vec2 separateFromOtherUnits( const std::vector< Unit >& vUnits, const float dt );
     void applyForce( const Vec2& force );
     bool isNormalPointValid( const Vec2 & start, const Vec2 & end, const Vec2& normalPoint );
