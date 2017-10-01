@@ -123,7 +123,14 @@ void Unit::update( const std::vector< Unit >& vUnits, const float dt )
 {
     if( State::MOVING == m_state )
     {
-        followPath( vUnits, m_path, dt );
+        if( UnitType::JET == m_type )
+        {
+            applyForce( seek( m_path.getWayPoints().front(), dt ) );
+        }
+        else
+        {
+            followPath( vUnits, m_path, dt );
+        }
 
         m_velocity += m_acceleration;
         calcSpriteDirection();
@@ -174,7 +181,8 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
             }
             if( m_type == UnitType::JET )
             {
-                std::vector< Vec2 > vPoints = { m_location, mp_level->getTileCenter( targetIdx ) };
+                /* for jets adding only targetIdx to path -> they are targeting directly this tile (not the path segment) */
+                std::vector< Vec2 > vPoints = { mp_level->getTileCenter( targetIdx ) };
                 m_path = Path( vPoints );
                 m_state = State::MOVING;
                 m_pathIdx = 0;
@@ -244,13 +252,11 @@ void Unit::followPath( const std::vector< Unit >& vUnits, const Path& path, cons
 
     if( path.getWayPoints().empty() )
     {
-        //update( dt );
         return;
     }
     else if( m_pathIdx == path.getWayPoints().size() - 1 )
     {
         seek( path.getWayPoints().back(), dt );
-        //update( dt );
 
         float d = ( path.getWayPoints().back() - m_location ).GetLength();
         if( d < 10 )
@@ -279,7 +285,12 @@ Vec2 Unit::seek( const Vec2& target, const float dt )
     float distToTarget = desired.GetLength();
     desired.Normalize();
 
-    const float startToBreak = 20;     /* pixels to target */
+    float startToBreak = 20;     /* pixels to target */
+    if( UnitType::JET == m_type )
+    {
+        startToBreak = m_maxSpeed / 5;
+    }
+
     if( distToTarget < startToBreak )
     {
         desired *= ( distToTarget / startToBreak ) * m_maxSpeed * dt;
