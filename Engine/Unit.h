@@ -4,7 +4,7 @@
 #include "Mouse.h"
 #include "Level.h"
 #include "PathFinding.h"
-
+#include "Path.h"
 #include "Defines.h"
 
 enum class UnitType
@@ -27,15 +27,23 @@ public:
 
     void draw( Graphics& gfx, const bool drawPath = false ) const;
 
-    void update( const float dt );
-    void update( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed, const float dt );
+    void update( const std::vector< Unit >& vUnits, const float dt );
+    void update( const std::vector< Unit >& vUnits, 
+                 const Mouse::Event::Type& type,
+                 const Vec2& mouse_pos,
+                 const bool shift_pressed,
+                 const float dt );
     void handleSelectionRect( const RectI& selectionRect );
     void select();
     void deselect();
-    Vec2 getPosition() const
+    Vec2 getLocation() const
     {
-        return m_pos;
+        return m_location;
     }
+    //Vec2 getPosition() const
+    //{
+    //    return m_pos;
+    //}
     RectF getBoundigBox() const
     {
         return m_bb;
@@ -61,10 +69,11 @@ public:
     };
 private:
     void handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed );
-    void calcDirection();   /* calculated direction depending on current and next tile while moving */
+    //void calcDirection();           /* calculated direction depending on current and next tile while moving */
+    void calcSpriteDirection();     /* which sprite to choose depending on current direction */
 
     /* position in level in pixel coordinates - for smooth movement and bounding box */
-    Vec2 m_pos;
+    //Vec2 m_pos;
 
     /* position in level in tiles - for path planning */
     Vec2 m_pos_tile;
@@ -96,11 +105,31 @@ private:
     int m_pathIdx = -1;                 /* current idx from path */
 
     /* Movement */
-    Vec2 m_vel = { 0.0f, 0.0f };
-    float m_speed = 110.0f;
-    Vec2 m_dir = { 0.0f, 0.0f };
+    //Vec2 m_vel = { 0.0f, 0.0f };
+    //float m_speed = 110.0f;
+    //Vec2 m_dir = { 0.0f, 0.0f };
 
     /* Attributes */
     UnitType m_type;
     int m_life;
+
+
+    /* NEW PATH FOLLOWING */
+    Vec2 m_location;
+    Vec2 m_acceleration;
+    Vec2 m_velocity;
+
+    float m_maxForce;
+    float m_maxSpeed;
+    //int m_pathIdx = 0;
+
+    Path m_path;
+
+    void followPath( const std::vector< Unit >& vUnits, const Path& path, const float dt );
+    void followLineSegment( const Vec2& start, const Vec2& end, const float radius, const float dt );
+    Vec2 seek( const Vec2& target, const float dt );
+    Vec2 separateFromOtherUnits( const std::vector< Unit >& vUnits, const float dt );
+    void applyForce( const Vec2& force );
+    bool isNormalPointValid( const Vec2 & start, const Vec2 & end, const Vec2& normalPoint );
+    Vec2 getNormalPoint( const Vec2& p, const Vec2& a, const Vec2& b );
 };

@@ -75,7 +75,7 @@ void Game::UpdateModel()
             const Mouse::Event e = wnd.mouse.Read();
             for( auto &u : m_vUnits )
             {
-                u.update( e.GetType(), wnd.mouse.GetPos(), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
+                u.update( m_vUnits, e.GetType(), wnd.mouse.GetPos(), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
             }
 
             /* multi selection rectangle */
@@ -100,7 +100,7 @@ void Game::UpdateModel()
                 m_bSelecting = false;
                 for( auto &u : m_vUnits )
                 {
-                    if( m_selection.Contains( u.getPosition() ) )
+                    if( m_selection.Contains( u.getLocation() ) )
                     {
                         u.select();
                     }
@@ -112,7 +112,7 @@ void Game::UpdateModel()
     {
         for( auto &u : m_vUnits )
         {
-            u.update( dt );
+            u.update( m_vUnits, dt );
         }
     }
 
