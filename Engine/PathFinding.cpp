@@ -220,6 +220,7 @@ Path PathFinder::calcShortestPath( const int start_idx, const int target_idx, co
     }
 
     Path path( pathRadius );
+    path.addPoint( m_level.getTileCenter( start_idx ) );   // add current unit tile as start point to path
     for( int i = 0; i < vPath.size(); ++i )
     {
         path.addPoint( m_level.getTileCenter( vPath[ i ] ) );

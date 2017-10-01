@@ -48,7 +48,10 @@ Unit::Unit( const Vec2 pos_tile,
     m_halfSize = m_size / 2;
     m_bb = RectF( m_location - Vec2( ( float )m_halfSize, ( float )m_halfSize ), m_location + Vec2( ( float )m_halfSize + 1, ( float )m_halfSize + 1 ) );
 
-    m_spriteDirection = ( Direction )( rand() % 8 );
+    m_velocity.x = ( float )1 + rand() % 10;
+    m_velocity.y = ( float )1 + rand() % 10;
+    m_velocity.Normalize();
+    calcSpriteDirection();
 }
 
 void Unit::draw( Graphics& gfx, const bool drawPath ) const
@@ -56,7 +59,6 @@ void Unit::draw( Graphics& gfx, const bool drawPath ) const
     /* drawing current (remaining) path when selected */
     if( drawPath && m_bSelected && State::MOVING == m_state )
     {
-        //mp_level->drawPath( gfx, m_vPath, m_pathIdx );
         m_path.draw( gfx );
     }
 
@@ -71,7 +73,6 @@ void Unit::draw( Graphics& gfx, const bool drawPath ) const
 
     gfx.DrawSprite( ( int )m_location.x - m_halfSize, ( int )m_location.y - m_halfSize, m_vSpriteRects[ ( int )m_spriteDirection ],
                     m_vUnitSprites[ ( int )m_type ], Colors::White );
-
 
 #if DEBUG_INFOS
     /* draw bounding box */
@@ -124,9 +125,8 @@ void Unit::update( const std::vector< Unit >& vUnits, const float dt )
     {
         followPath( vUnits, m_path, dt );
 
-        calcSpriteDirection();
-
         m_velocity += m_acceleration;
+        calcSpriteDirection();
         if( m_velocity.GetLength() > m_maxSpeed * dt )
         {
             m_velocity.Normalize();
@@ -201,35 +201,37 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
 
 void Unit::calcSpriteDirection()
 {
-    if( m_velocity.x > 0.4f && m_velocity.y > 0.4f )
+    Vec2 velNorm = m_velocity.GetNormalized();
+
+    if( velNorm.x > 0.4f && velNorm.y > 0.4f )
     {
         m_spriteDirection = Direction::DOWN_RIGHT;
     }
-    else if( m_velocity.x > 0.4f && m_velocity.y < -0.4f )
+    else if( velNorm.x > 0.4f && velNorm.y < -0.4f )
     {
         m_spriteDirection = Direction::UP_RIGHT;
     }
-    else if( m_velocity.x > 0.4f && fabsf( m_velocity.y ) < 0.4f )
+    else if( velNorm.x > 0.4f && fabsf( velNorm.y ) < 0.4f )
     {
         m_spriteDirection = Direction::RIGHT;
     }
-    else if( m_velocity.x < -0.4f && m_velocity.y < -0.4f )
+    else if( velNorm.x < -0.4f && velNorm.y < -0.4f )
     {
         m_spriteDirection = Direction::UP_LEFT;
     }
-    else if( m_velocity.x < -0.4f && m_velocity.y > 0.4f )
+    else if( velNorm.x < -0.4f && velNorm.y > 0.4f )
     {
         m_spriteDirection = Direction::DOWN_LEFT;
     }
-    else if( m_velocity.x < -0.4f && fabsf( m_velocity.y ) < 0.4f )
+    else if( velNorm.x < -0.4f && fabsf( velNorm.y ) < 0.4f )
     {
         m_spriteDirection = Direction::LEFT;
     }
-    else if( fabsf( m_velocity.x ) < 0.4f && m_velocity.y < -0.4f )
+    else if( fabsf( velNorm.x ) < 0.4f && velNorm.y < -0.4f )
     {
         m_spriteDirection = Direction::UP;
     }
-    else if( fabsf( m_velocity.x ) < 0.4f && m_velocity.y > 0.4f )
+    else if( fabsf( velNorm.x ) < 0.4f && velNorm.y > 0.4f )
     {
         m_spriteDirection = Direction::DOWN;
     }
@@ -271,7 +273,7 @@ void Unit::followPath( const std::vector< Unit >& vUnits, const Path& path, cons
     }
 }
 
-Vec2 Unit::seek( const Vec2 & target, const float dt )
+Vec2 Unit::seek( const Vec2& target, const float dt )
 {
     Vec2 desired = target - m_location;
     float distToTarget = desired.GetLength();
@@ -281,7 +283,6 @@ Vec2 Unit::seek( const Vec2 & target, const float dt )
     if( distToTarget < startToBreak )
     {
         desired *= ( distToTarget / startToBreak ) * m_maxSpeed * dt;
-
     }
     else
     {
