@@ -140,14 +140,6 @@ void Level::init()
     m_bInitialized = true;
 }
 
-int Level::getTileIdx( const int x, const int y ) const
-{
-    int xTile = int( x / m_tileSize );
-    int yTile = int( y / m_tileSize );
-
-    return yTile * m_width + xTile;
-}
-
 Vec2 Level::getTileCenter( const int tileIdx ) const
 {
     const int xTile = tileIdx % m_width;

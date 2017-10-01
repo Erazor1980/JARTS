@@ -19,7 +19,18 @@ public:
     ~Level();
 
     void init();
-    int getTileIdx( const int x, const int y ) const;
+    int getTileIdx( const int x, const int y ) const
+    {
+        int xTile = int( x / m_tileSize );
+        int yTile = int( y / m_tileSize );
+
+        return yTile * m_width + xTile;
+    }
+    int getTileIdx( const Vec2& pixPos ) const
+    {
+        return getTileIdx( ( int )pixPos.x, ( int )pixPos.y );
+    }
+
     Tile getTileType( const int tileIdx ) const
     {
         assert( tileIdx >= 0 && tileIdx < m_width * m_height );
