@@ -31,7 +31,9 @@ Unit::Unit( const Vei2 pos_tile,
     
     m_location.x    = pos_tile.x * m_size + m_size / 2.0f - 1;
     m_location.y    = pos_tile.y * m_size + m_size / 2.0f - 1;
-    m_tileIdx       = mp_level->getTileIdx( m_location.x, m_location.y );
+    m_tileIdx       = mp_level->getTileIdx( m_location );
+    m_bIsGroundUnit = true;
+
     if( UnitType::TANK == type )
     {
         m_maxSpeed = 100;
@@ -41,6 +43,12 @@ Unit::Unit( const Vei2 pos_tile,
     {
         m_maxSpeed = 250;
         m_maxForce = 0.15f;
+        m_bIsGroundUnit = false;
+    }
+    else if( UnitType::SOLDIER == type )
+    {
+        m_maxSpeed = 45;
+        m_maxForce = 0.5;
     }
     m_velocity = { 0, 0 };
     m_acceleration = { 0, 0 };
@@ -56,7 +64,7 @@ Unit::Unit( const Vei2 pos_tile,
 
 void Unit::draw( Graphics& gfx, const bool drawPath ) const
 {
-    /* drawing current (remaining) path when selected */
+    /* drawing current path when selected */
     if( drawPath && m_bSelected && State::MOVING == m_state )
     {
         m_path.draw( gfx );
@@ -298,14 +306,17 @@ Vec2 Unit::separateFromOtherUnits( const std::vector< Unit >& vUnits, const floa
 {
     //TODO add the size of the vehicle here!
     //float r;
-    float desiredseparation = ( float )m_size; // r * 2;
+    float desiredseparation = ( float )m_halfSize; // r * 2;
 
     Vec2 sum( 0, 0 );
     int count = 0;
 
-    //TODO separate between land and air units!
     for( auto other : vUnits )
     {
+        if( other.isGroundUnit() != m_bIsGroundUnit )
+        {
+            continue;
+        }
         float d = ( m_location - other.getLocation() ).GetLength();
         if( ( d > 0 ) && ( d < desiredseparation ) )
         {
@@ -320,7 +331,7 @@ Vec2 Unit::separateFromOtherUnits( const std::vector< Unit >& vUnits, const floa
         }
     }
 
-    Vec2 steer ={ 0, 0 };
+    Vec2 steer = { 0, 0 };
     if( count > 0 )
     {
         sum *= ( 1.0f / count );

@@ -55,6 +55,10 @@ public:
     void handleSelectionRect( const RectI& selectionRect );
     void select();
     void deselect();
+    bool isGroundUnit() const
+    {
+        return m_bIsGroundUnit;
+    }
     Vec2 getLocation() const
     {
         return m_location;
@@ -115,6 +119,7 @@ private:
 
     /* Attributes */
     UnitType m_type;
+    bool m_bIsGroundUnit;
     int m_life;
 
 
