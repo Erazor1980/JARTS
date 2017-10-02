@@ -36,29 +36,34 @@ Unit::Unit( const Vei2 pos_tile,
 
     if( UnitType::TANK == type )
     {
-        m_maxSpeed = 100;
-        m_maxForce = 0.3f;
+        m_maxSpeed  = 100;
+        m_maxForce  = 0.3f;
+        m_life      = 200;
     }
     else if( UnitType::JET == type )
     {
-        m_maxSpeed = 250;
-        m_maxForce = 0.15f;
+        m_maxSpeed      = 250;
+        m_maxForce      = 0.15f;
         m_bIsGroundUnit = false;
+        m_life          = 100;
     }
     else if( UnitType::SOLDIER == type )
     {
-        m_maxSpeed = 45;
-        m_maxForce = 0.5f;
+        m_maxSpeed  = 45;
+        m_maxForce  = 0.5f;
+        m_life      = 50;
     }
-    m_velocity = { 0, 0 };
-    m_acceleration = { 0, 0 };
+    m_maxLife           = m_life;
+    m_oneThirdMaxLife   = m_maxLife / 3.0f;
 
     m_halfSize = m_size / 2;
     m_bb = RectF( m_location - Vec2( ( float )m_halfSize, ( float )m_halfSize ), m_location + Vec2( ( float )m_halfSize + 1, ( float )m_halfSize + 1 ) );
 
-    m_velocity.x = 0;
-    m_velocity.y = 0;
-    m_spriteDirection = ( Unit::Direction )( rand() % 8 );
+    m_velocity          = { 0, 0 };
+    m_acceleration      = { 0, 0 };
+    m_velocity.x        = 0;
+    m_velocity.y        = 0;
+    m_spriteDirection   = ( Unit::Direction )( rand() % 8 );
 }
 
 void Unit::draw( Graphics& gfx, const bool drawPath ) const
@@ -72,6 +77,8 @@ void Unit::draw( Graphics& gfx, const bool drawPath ) const
     if( m_bSelected )
     {
         gfx.DrawRectCorners( m_bb, Colors::Green );
+
+        drawLifeBar( gfx );
     }
     else if( m_bInsideSelectionRect )
     {
@@ -250,6 +257,39 @@ void Unit::calcSpriteDirection()
     {
         m_spriteDirection = Direction::DOWN;
     }
+}
+void Unit::drawLifeBar( Graphics& gfx ) const
+{
+    Color lifebarColor;
+    const int x = ( int )m_location.x;
+    const int y = ( int )m_location.y;
+
+    float lifeMaxLifeRatio = ( float )m_life / m_maxLife;
+
+    if( m_life >= m_oneThirdMaxLife + m_oneThirdMaxLife )
+    {
+        lifebarColor = Colors::Green;
+    }
+    else
+    {
+        if( m_life >= m_oneThirdMaxLife )
+        {
+            lifebarColor = Colors::Yellow;
+        }
+        else
+        {
+            lifebarColor = Colors::Red;
+        }
+    }
+
+    int barPosY = y - 1.5f * m_halfSize;
+    gfx.DrawLine( x - m_halfSize + ( 1 - lifeMaxLifeRatio ) * m_size, barPosY + 1, x + m_halfSize, barPosY + 1, lifebarColor );
+    gfx.DrawLine( x - m_halfSize + ( 1 - lifeMaxLifeRatio ) * m_size, barPosY, x + m_halfSize, barPosY, lifebarColor );
+    gfx.DrawLine( x - m_halfSize + ( 1 - lifeMaxLifeRatio ) * m_size, barPosY - 1, x + m_halfSize, barPosY - 1, lifebarColor );
+    gfx.DrawLine( x - m_halfSize, barPosY - 2, x + m_halfSize, barPosY - 2, Colors::White );		// top border   -----
+    gfx.DrawLine( x - m_halfSize, barPosY - 2, x - m_halfSize, barPosY + 2, Colors::White );		// left border  |_____
+    gfx.DrawLine( x + m_halfSize, barPosY - 2, x + m_halfSize, barPosY + 2, Colors::White );		// right border _____|
+    gfx.DrawLine( x - m_halfSize, barPosY + 2, x + m_halfSize, barPosY + 2, Colors::White );		// bottom border _____
 }
 void Unit::stop()
 {

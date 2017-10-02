@@ -102,7 +102,15 @@ public:
 private:
     void handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed, const std::vector< Unit >& vUnits );
     void calcSpriteDirection();     /* which sprite to choose depending on current direction */
+    void drawLifeBar( Graphics& gfx ) const;
     void stop();
+
+    /* Attributes */
+    UnitType m_type;
+    bool m_bIsGroundUnit;
+    int m_life;
+    int m_maxLife;
+    float m_oneThirdMaxLife;
 
     /* current and target position in level in tiles - for path planning */
     int m_tileIdx;
@@ -128,12 +136,6 @@ private:
 
     /* pointer to the current level */
     const Level* const mp_level;
-
-
-    /* Attributes */
-    UnitType m_type;
-    bool m_bIsGroundUnit;
-    int m_life;
 
     /* PATH PLANNING AND MOVEMENTS */
     PathFinder* const mp_pathFinder;
