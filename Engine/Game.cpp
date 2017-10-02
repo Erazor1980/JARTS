@@ -34,6 +34,8 @@ Game::Game( MainWindow& wnd )
     m_cursorSprite( "..\\images\\cursor.bmp" ),
     m_pathFinder( m_level )
 {
+    srand( ( unsigned int )time( NULL ) );
+
     /* load images */
     m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );
     m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );   //TODO replace by soldier sprite later
@@ -50,8 +52,9 @@ Game::Game( MainWindow& wnd )
     m_vUnits.push_back( Unit( { 2, 7 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
     m_vUnits.push_back( Unit( { 5, 7 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
     m_vUnits.push_back( Unit( { 2, 8 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
-    m_vUnits.push_back( Unit( { 5, 6 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
-    //m_vUnits.push_back( Unit( { 13, 13 }, &m_level, &m_pathFinder, UnitType::JET, m_vUnitSprites, m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
+    //m_vUnits.push_back( Unit( { 5, 6 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
+    m_vUnits.push_back( Unit( { 13, 13 }, &m_level, &m_pathFinder, UnitType::JET, m_vUnitSprites, m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
+    m_vUnits.push_back( Unit( { 10, 13 }, &m_level, &m_pathFinder, UnitType::JET, m_vUnitSprites, m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
 
     ShowCursor( false );
 }

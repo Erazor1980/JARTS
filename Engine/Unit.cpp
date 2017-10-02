@@ -56,10 +56,8 @@ Unit::Unit( const Vei2 pos_tile,
     m_halfSize = m_size / 2;
     m_bb = RectF( m_location - Vec2( ( float )m_halfSize, ( float )m_halfSize ), m_location + Vec2( ( float )m_halfSize + 1, ( float )m_halfSize + 1 ) );
 
-    m_velocity.x = 0;// 1.0f + rand() % 10;
-    m_velocity.y = 0;// 1.0f + rand() % 10;
-    m_velocity.Normalize();
-    //calcSpriteDirection();
+    m_velocity.x = 0;
+    m_velocity.y = 0;
     m_spriteDirection = ( Unit::Direction )( rand() % 8 );
 }
 
@@ -95,11 +93,23 @@ void Unit::update( const std::vector< Unit >& vUnits, const float dt )
     {
         if( UnitType::JET == m_type )
         {
-            applyForce( seek( m_path.getWayPoints().front(), dt, true ) );
-            float d = ( m_location - m_path.getWayPoints().front() ).GetLength();
+            applyForce( separateFromOtherUnits( vUnits, dt ) * 1.5f );
+            applyForce( seek( m_path.getWayPoints().back(), dt, true ) );
+            float d = ( m_location - m_path.getWayPoints().back() ).GetLength();
             if( d < m_distToTile / 2 )
             {
-                m_state = State::STANDING;
+                stop();
+            }
+            else if( d < m_distToTile && isTileOccupied( m_targetIdx, vUnits ) )
+            {
+                int nextFreeTile = findNextFreeTile( m_targetIdx, vUnits );
+
+                if( nextFreeTile >= 0 )
+                {
+                    m_targetIdx = nextFreeTile;
+                    std::vector< Vec2 > vPoints = { mp_level->getTileCenter( m_targetIdx ) };
+                    m_path = Path( vPoints );
+                }
             }
         }
         else
@@ -147,12 +157,12 @@ void Unit::update( const std::vector< Unit >& vUnits,
 {
     if( mp_level->getLevelRect().Contains( mouse_pos ) )
     {
-        handleMouse( type, mouse_pos, shift_pressed );
+        handleMouse( type, mouse_pos, shift_pressed, vUnits );
     }
     update( vUnits, dt );
 }
 
-void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed )
+void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed, const std::vector< Unit >& vUnits )
 {
     if( type == Mouse::Event::Type::LPress )
     {
@@ -186,9 +196,12 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
             }
             if( m_type == UnitType::JET )
             {
-                /* for jets adding only targetIdx to path -> they are targeting directly this tile (not the path segment) */
-                
-                std::vector< Vec2 > vPoints = { mp_level->getTileCenter( m_targetIdx ) };
+                /* for jets adding only startIdx and targetIdx to path -> they are targeting directly this tile (not the path segment) */
+                if( isTileOccupied( m_targetIdx, vUnits ) )
+                {
+                    m_targetIdx = findNextFreeTile( m_targetIdx, vUnits );
+                }
+                std::vector< Vec2 > vPoints = { m_location, mp_level->getTileCenter( m_targetIdx ) };
                 m_path = Path( vPoints );
                 m_state = State::MOVING;
                 m_pathIdx = 0;
@@ -259,8 +272,8 @@ void Unit::stop()
 }
 void Unit::followPath( const std::vector< Unit >& vUnits, const float dt )
 {
-    Vec2 separateResult = separateFromOtherUnits( vUnits, dt );
-    applyForce( separateResult * 1.5f );
+    //Vec2 separateResult = separateFromOtherUnits( vUnits, dt );
+    //applyForce( separateResult * 1.5f );
 
     if( m_path.getWayPoints().empty() )
     {
@@ -279,7 +292,7 @@ void Unit::followPath( const std::vector< Unit >& vUnits, const float dt )
     }
     else if( m_pathIdx == m_path.getWayPoints().size() - 2 )
     {
-        if( checkTile( getNextTileIdx(), vUnits ) )     /* move back to own tile center if next one is occupied */
+        if( isTileOccupied( getNextTileIdx(), vUnits ) )     /* move back to own tile center if next one is occupied */
         {
             seek( mp_level->getTileCenter( m_tileIdx ), dt );
             float d = ( mp_level->getTileCenter( m_tileIdx ) - m_location ).GetLength();
@@ -293,7 +306,7 @@ void Unit::followPath( const std::vector< Unit >& vUnits, const float dt )
     }
     else
     {
-        if( checkTile( getNextTileIdx(), vUnits ) )
+        if( isTileOccupied( getNextTileIdx(), vUnits ) )
         {
             if( !recalculatePath( vUnits ) )
             {
@@ -537,10 +550,72 @@ std::vector< int > Unit::checkNeighbourhood( const std::vector< Unit >& vUnits )
 
     return vOccupiedNeighbourTiles;
 }
-bool Unit::checkTile( const int idx, const std::vector< Unit >& vUnits )
+int Unit::findNextFreeTile( const int targetIdx, const std::vector< Unit >& vUnits )
+{
+    std::vector< int > vFreeNeighbourTiles;
+    const int width     = mp_level->getWidth();
+    const int height    = mp_level->getHeight();
+
+    const int currX     = targetIdx % width;
+    const int currY     = targetIdx / width;
+
+    for( int x = -1; x < 2; ++x )
+    {
+        for( int y = -1; y < 2; ++y )
+        {
+            if( x == 0 && y == 0 )
+            {
+                continue;   // center idx itself
+            }
+            int tmpX = currX + x;
+            int tmpY = currY + y;
+
+            if( tmpX >= 0 && tmpX < width && tmpY >= 0 && tmpY < height )
+            {
+                int idx = tmpY * width + tmpX;
+                if( m_bIsGroundUnit && Tile::OBSTACLE == mp_level->getTileType( idx ) )     /* skip obstacle tiles if unit is ground unit */
+                {
+                    continue;
+                }
+                bool occupied = false;
+                for( const auto& u : vUnits )
+                {
+                    if( u.isGroundUnit() != m_bIsGroundUnit )
+                    {
+                        continue;
+                    }
+                    if( idx == u.getTileIdx() || idx == u.getNextTileIdx() )
+                    {
+                        occupied = true;
+                        break;
+                    }
+                }
+                if( !occupied )
+                {
+                    vFreeNeighbourTiles.push_back( idx );
+                }
+            }
+        }
+    }
+
+    const int nFreeTiles = ( int )vFreeNeighbourTiles.size();
+    if( vFreeNeighbourTiles.empty() )
+    {
+        return -1;
+    }
+    else
+    {
+        return vFreeNeighbourTiles[ rand() % nFreeTiles ];
+    }
+}
+bool Unit::isTileOccupied( const int idx, const std::vector< Unit >& vUnits )
 {
     for( const auto& u : vUnits )
     {
+        if( u.isGroundUnit() != m_bIsGroundUnit )
+        {
+            continue;
+        }
         float d = ( u.getLocation() - m_location ).GetLengthSq();   /* to test if we are not comparing with ourselves */
         if( d > 0 )
         {
