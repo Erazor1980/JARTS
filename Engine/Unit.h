@@ -83,9 +83,21 @@ public:
     {
         return m_tileIdx;
     }
+    int getNextTileIdx() const
+    {
+        if( State::MOVING == m_state )
+        {
+            if( m_pathIdx + 1 < m_path.getWayPoints().size() )
+            {
+                return mp_level->getTileIdx( m_path.getWayPoints()[ m_pathIdx + 1 ] );
+            }
+        }
+        return -1;
+    }
 private:
     void handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed );
     void calcSpriteDirection();     /* which sprite to choose depending on current direction */
+    void stop();
 
     /* position in level in tiles - for path planning */
     int m_tileIdx;
@@ -113,7 +125,7 @@ private:
 
     /* path planning */
     PathFinder* const mp_pathFinder;
-    std::vector< int > m_vPath;
+    //std::vector< int > m_vPath;
     int m_pathIdx = -1;                             /* current idx from path */
     static constexpr float m_distToTile = 10.0f;    /* tile reached if unit's distance to tile's center is lower */
 
@@ -134,10 +146,13 @@ private:
 
     Path m_path;
 
+    std::vector< int > checkNeighbourhood( const std::vector< Unit >& vUnits );     /* returns indeces of occupied tiles (other units or their next targets) */
+    bool checkTile( const int idx, const std::vector< Unit >& vUnits );             /* check if a tile is occupied by other units or their next targets */
     void followPath( const std::vector< Unit >& vUnits, const Path& path, const float dt );
     void followLineSegment( const Vec2& start, const Vec2& end, const float radius, const float dt );
     Vec2 seek( const Vec2& target, const float dt, const bool enableBreaking = false );
     Vec2 separateFromOtherUnits( const std::vector< Unit >& vUnits, const float dt );
+    void separateFromOtherUnitsNew( const std::vector< Unit >& vUnits, const float dt );
     void applyForce( const Vec2& force );
     bool isNormalPointValid( const Vec2 & start, const Vec2 & end, const Vec2& normalPoint );
     Vec2 getNormalPoint( const Vec2& p, const Vec2& a, const Vec2& b );

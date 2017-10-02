@@ -56,10 +56,11 @@ Unit::Unit( const Vei2 pos_tile,
     m_halfSize = m_size / 2;
     m_bb = RectF( m_location - Vec2( ( float )m_halfSize, ( float )m_halfSize ), m_location + Vec2( ( float )m_halfSize + 1, ( float )m_halfSize + 1 ) );
 
-    m_velocity.x = 1.0f + rand() % 10;
-    m_velocity.y = 1.0f + rand() % 10;
+    m_velocity.x = 0;// 1.0f + rand() % 10;
+    m_velocity.y = 0;// 1.0f + rand() % 10;
     m_velocity.Normalize();
-    calcSpriteDirection();
+    //calcSpriteDirection();
+    m_spriteDirection = ( Unit::Direction )( rand() % 8 );
 }
 
 void Unit::draw( Graphics& gfx, const bool drawPath ) const
@@ -133,7 +134,6 @@ void Unit::update( const std::vector< Unit >& vUnits,
     {
         handleMouse( type, mouse_pos, shift_pressed );
     }
-
     update( vUnits, dt );
 }
 
@@ -235,6 +235,14 @@ void Unit::calcSpriteDirection()
     }
 }
 
+void Unit::stop()
+{
+    m_state         = State::STANDING;
+    m_acceleration  = { 0, 0 };
+    m_velocity      = { 0, 0 };
+    m_pathIdx       = 0;
+}
+
 void Unit::followPath( const std::vector< Unit >& vUnits, const Path& path, const float dt )
 {
     Vec2 separateResult = separateFromOtherUnits( vUnits, dt );
@@ -247,14 +255,27 @@ void Unit::followPath( const std::vector< Unit >& vUnits, const Path& path, cons
     else if( m_pathIdx == path.getWayPoints().size() - 1 )
     {
         seek( path.getWayPoints().back(), dt );
-
         float d = ( path.getWayPoints().back() - m_location ).GetLength();
+
         if( d < m_distToTile )
         {
-            m_pathIdx = 0;
-            m_state = State::STANDING;
+            stop();
         }
         return;
+    }
+    else if( m_pathIdx == path.getWayPoints().size() - 2 )
+    {
+        if( checkTile( getNextTileIdx(), vUnits ) )     /* move back to own tile center if next one is occupied */
+        {
+            seek( mp_level->getTileCenter( m_tileIdx ), dt );
+            float d = ( mp_level->getTileCenter( m_tileIdx ) - m_location ).GetLength();
+
+            if( d < m_distToTile )
+            {
+                stop();
+            }
+            return;
+        }
     }
     
 #if 1   // test with next tile center as target (not line segment point)
@@ -306,7 +327,7 @@ Vec2 Unit::separateFromOtherUnits( const std::vector< Unit >& vUnits, const floa
 {
     //TODO add the size of the vehicle here!
     //float r;
-    float desiredseparation = ( float )m_halfSize; // r * 2;
+    float desiredSeparation = ( float )m_halfSize; // r * 2;
 
     Vec2 sum( 0, 0 );
     int count = 0;
@@ -318,7 +339,7 @@ Vec2 Unit::separateFromOtherUnits( const std::vector< Unit >& vUnits, const floa
             continue;
         }
         float d = ( m_location - other.getLocation() ).GetLength();
-        if( ( d > 0 ) && ( d < desiredseparation ) )
+        if( ( d > 0 ) && ( d < desiredSeparation ) )
         {
             Vec2 diff = m_location - other.getLocation();
             diff.Normalize();
@@ -345,6 +366,10 @@ Vec2 Unit::separateFromOtherUnits( const std::vector< Unit >& vUnits, const floa
         }
     }
     return steer;
+}
+void Unit::separateFromOtherUnitsNew( const std::vector< Unit >& vUnits, const float dt )
+{
+    
 }
 void Unit::followLineSegment( const Vec2& start, const Vec2& end, const float radius, const float dt )
 {
@@ -422,7 +447,6 @@ Vec2 Unit::getNormalPoint( const Vec2& p, const Vec2& a, const Vec2& b )
 
     return normalPoint;
 }
-
 void Unit::handleSelectionRect( const RectI& selectionRect )
 {
     RectI r = selectionRect.getNormalized();
@@ -435,7 +459,6 @@ void Unit::handleSelectionRect( const RectI& selectionRect )
         m_bInsideSelectionRect = false;
     }
 }
-
 void Unit::select()
 {
     m_bSelected = true;
@@ -446,4 +469,59 @@ void Unit::select()
 void Unit::deselect()
 {
     m_bSelected = false;
+}
+std::vector< int > Unit::checkNeighbourhood( const std::vector< Unit >& vUnits )
+{
+    std::vector< int > vOccupiedNeighbourTiles;
+    const int width     = mp_level->getWidth();
+    const int height    = mp_level->getHeight();
+
+    const int currX     = m_tileIdx % width;
+    const int currY     = m_tileIdx / width;
+
+    for( int x = -1; x < 2; ++x )
+    {
+        for( int y = -1; y < 2; ++y )
+        {
+            if( x == 0 && y == 0 )
+            {
+                continue;   // center idx itself
+            }
+            int tmpX = currX + x;
+            int tmpY = currY + y;
+
+            if( tmpX >= 0 && tmpX < width && tmpY >= 0 && tmpY < height )
+            {
+                int idx = tmpY * width + tmpX;
+                for( const auto& u : vUnits )
+                {
+                    if( u.isGroundUnit() != m_bIsGroundUnit )
+                    {
+                        continue;
+                    }
+                    if( idx == u.getTileIdx() || idx == u.getNextTileIdx() )
+                    {
+                        vOccupiedNeighbourTiles.push_back( idx );
+                    }
+                }
+            }
+        }
+    }
+
+    return vOccupiedNeighbourTiles;
+}
+bool Unit::checkTile( const int idx, const std::vector< Unit >& vUnits )
+{
+    for( const auto& u : vUnits )
+    {
+        float d = ( u.getLocation() - m_location ).GetLengthSq();   /* to test if we are not comparing with ourselves */
+        if( d > 0 )
+        {
+            if( u.getTileIdx() == idx || u.getNextTileIdx() == idx )
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }
