@@ -57,6 +57,7 @@ void PathFinder::init()
     }
 }
 
+#if 0 // old
 std::vector< int > PathFinder::getShortestPath( const int start_idx, const int target_idx )
 {
     assert( start_idx != target_idx );
@@ -138,8 +139,9 @@ std::vector< int > PathFinder::getShortestPath( const int start_idx, const int t
 
     return vPath;
 }
+#endif
 
-Path PathFinder::calcShortestPath( const int start_idx, const int target_idx, const float pathRadius )
+Path PathFinder::calcShortestPath( const int start_idx, const int target_idx, const std::vector< int >& vOccupiedNeighbourTiles, const float pathRadius )
 {
     assert( start_idx != target_idx );
     assert( start_idx >= 0 && start_idx < m_width * m_height );
@@ -184,7 +186,7 @@ Path PathFinder::calcShortestPath( const int start_idx, const int target_idx, co
             break;
         }
 
-        std::vector< int > vNeighbours = getNeighbourIndices( currNode.m_idx );
+        std::vector< int > vNeighbours = getNeighbourIndices( currNode.m_idx, vOccupiedNeighbourTiles );
 
         for( int n = 0; n < vNeighbours.size(); ++n )
         {
@@ -333,7 +335,7 @@ int PathFinder::getMoveCosts( const int idx1, const int idx2 )
     return 0;
 }
 
-std::vector< int > PathFinder::getNeighbourIndices( const int curr_idx )
+std::vector< int > PathFinder::getNeighbourIndices( const int curr_idx, const std::vector< int >& vOccupiedNeighbourTiles )
 {
     std::vector< int > vNeighbours;
 
@@ -356,7 +358,19 @@ std::vector< int > PathFinder::getNeighbourIndices( const int curr_idx )
                 int idx = tmpY * m_width + tmpX;
                 if( mp_mapContent[ idx ] == Tile::EMPTY )
                 {
-                    vNeighbours.push_back( idx );
+                    bool bNotOccupiedByUnit = true;
+                    for( const auto& nt : vOccupiedNeighbourTiles )
+                    {
+                        if( nt == idx )
+                        {
+                            bNotOccupiedByUnit = false;
+                            break;
+                        }
+                    }
+                    if( bNotOccupiedByUnit )
+                    {
+                        vNeighbours.push_back( idx );
+                    }
                 }
             }
         }

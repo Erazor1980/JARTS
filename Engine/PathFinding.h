@@ -30,8 +30,8 @@ public:
     PathFinder( const Level& lvl );
     ~PathFinder();
 
-    std::vector< int > getShortestPath( const int start_idx, const int target_idx );
-    Path calcShortestPath( const int start_idx, const int target_idx, const float pathRadius = 5 );
+    //std::vector< int > getShortestPath( const int start_idx, const int target_idx );
+    Path calcShortestPath( const int start_idx, const int target_idx, const std::vector< int >& vOccupiedNeighbourTiles, const float pathRadius = 5 );
 
 private:
     void init();
@@ -46,8 +46,8 @@ private:
     /* g calculation for a neighbour */
     int getMoveCosts( const int idx1, const int idx2 );
 
-    /* return a vector with all valid (non obstacles!) indices of the current index (i.e. tile/node) */
-    std::vector< int > getNeighbourIndices( const int curr_idx );
+    /* return a vector with all valid (non obstacles / non neighbour units!) indices of the current index (i.e. tile/node) */
+    std::vector< int > getNeighbourIndices( const int curr_idx, const std::vector< int >& vOccupiedNeighbourTiles );
 
     /* dimensions of the current level/map in tiles */
     int m_width;

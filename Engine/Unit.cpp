@@ -184,7 +184,7 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
             {
                 if( Tile::EMPTY == targetTile )
                 {
-                    m_path = mp_pathFinder->calcShortestPath( startIdx, targetIdx );
+                    m_path = mp_pathFinder->calcShortestPath( startIdx, targetIdx, std::vector< int >() );
 
                     m_state = State::MOVING;
                     m_pathIdx = 0;
@@ -277,21 +277,34 @@ void Unit::followPath( const std::vector< Unit >& vUnits, const Path& path, cons
             return;
         }
     }
-    
+    else
+    {
+        if( checkTile( getNextTileIdx(), vUnits ) )
+        {
+            std::vector< int > vOccupiedIdx = checkNeighbourhood( vUnits );
+            int targetIdx = mp_level->getTileIdx( path.getWayPoints().back() );
+            m_path = mp_pathFinder->calcShortestPath( m_tileIdx, targetIdx, vOccupiedIdx );
+            m_pathIdx = 0;
+        }
+    }
+
 #if 1   // test with next tile center as target (not line segment point)
-    Vec2 end = path.getWayPoints()[ m_pathIdx + 1 ];
-    applyForce( seek( end, dt ) );
+    if( path.getWayPoints().size() > m_pathIdx + 1 )
+    {
+        Vec2 end = path.getWayPoints()[ m_pathIdx + 1 ];
+        applyForce( seek( end, dt ) );
+
+        float d = ( end - m_location ).GetLength();
+        if( d < m_distToTile )
+        {
+            m_pathIdx++;
+        }
+    }
 #else
     Vec2 start = path.getWayPoints()[ m_pathIdx ];
     Vec2 end = path.getWayPoints()[ m_pathIdx + 1 ];
     followLineSegment( start, end, path.getRadius(), dt );
 #endif
-
-    float d = ( end - m_location ).GetLength();
-    if( d < m_distToTile )
-    {
-        m_pathIdx++;
-    }
 }
 
 Vec2 Unit::seek( const Vec2& target, const float dt, const bool enableBreaking )
@@ -327,7 +340,7 @@ Vec2 Unit::separateFromOtherUnits( const std::vector< Unit >& vUnits, const floa
 {
     //TODO add the size of the vehicle here!
     //float r;
-    float desiredSeparation = ( float )m_halfSize; // r * 2;
+    float desiredSeparation = ( float )m_halfSize * 1.5f; // r * 2;
 
     Vec2 sum( 0, 0 );
     int count = 0;
