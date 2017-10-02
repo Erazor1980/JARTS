@@ -47,9 +47,11 @@ Game::Game( MainWindow& wnd )
     m_vCommandSounds.push_back( Sound( L"..\\sounds\\move_jet.wav" ) );
 
     /* create units */
-    m_vUnits.push_back( Unit( { 3, 3 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
-    m_vUnits.push_back( Unit( { 17, 2 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
-    m_vUnits.push_back( Unit( { 13, 13 }, &m_level, &m_pathFinder, UnitType::JET, m_vUnitSprites, m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
+    m_vUnits.push_back( Unit( { 2, 7 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
+    m_vUnits.push_back( Unit( { 5, 7 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
+    m_vUnits.push_back( Unit( { 2, 8 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
+    m_vUnits.push_back( Unit( { 5, 6 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
+    //m_vUnits.push_back( Unit( { 13, 13 }, &m_level, &m_pathFinder, UnitType::JET, m_vUnitSprites, m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
 
     ShowCursor( false );
 }
@@ -210,6 +212,13 @@ void Game::ComposeFrame()
         {
             m_font.DrawText( "Standing", { x, 60 }, Colors::Cyan, gfx );
         }
+        else if( m_vUnits[ i ].getState() == Unit::State::WAITING )
+        {
+            m_font.DrawText( "Waiting", { x, 60 }, Colors::Cyan, gfx );
+        }
+        sprintf_s( text, "%0.3f", m_vUnits[ i ].getWaitingTime() );
+        m_font.DrawText( text, { x, 90 }, Colors::Cyan, gfx );
+
         x += 150;
     }
 #endif

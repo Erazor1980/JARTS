@@ -104,7 +104,7 @@ void Unit::update( const std::vector< Unit >& vUnits, const float dt )
         }
         else
         {
-            followPath( vUnits, m_path, dt );
+            followPath( vUnits, dt );
         }
 
         m_velocity += m_acceleration;
@@ -121,6 +121,21 @@ void Unit::update( const std::vector< Unit >& vUnits, const float dt )
         m_acceleration = { 0, 0 };
 
         m_tileIdx = mp_level->getTileIdx( m_location );
+    }
+    else if( State::WAITING == m_state )
+    {
+        if( m_currWaitingTime < m_waitingTimeMAX )
+        {
+            if( !recalculatePath( vUnits ) )
+            {
+                m_currWaitingTime += dt;
+                m_state = State::WAITING;
+            }
+        }
+        else
+        {
+            stop();
+        }
     }
 }
 
@@ -162,17 +177,18 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
         if( m_bSelected )
         {
             Tile targetTile = mp_level->getTileType( ( int )mouse_pos.x, ( int )mouse_pos.y );
-            const int startIdx = mp_level->getTileIdx( m_location );
-            const int targetIdx = mp_level->getTileIdx( ( int )mouse_pos.x, ( int )mouse_pos.y );
+            const int startIdx  = mp_level->getTileIdx( m_location );
+            m_targetIdx         = mp_level->getTileIdx( ( int )mouse_pos.x, ( int )mouse_pos.y );
 
-            if( startIdx == targetIdx )
+            if( startIdx == m_targetIdx )
             {
                 return;
             }
             if( m_type == UnitType::JET )
             {
                 /* for jets adding only targetIdx to path -> they are targeting directly this tile (not the path segment) */
-                std::vector< Vec2 > vPoints = { mp_level->getTileCenter( targetIdx ) };
+                
+                std::vector< Vec2 > vPoints = { mp_level->getTileCenter( m_targetIdx ) };
                 m_path = Path( vPoints );
                 m_state = State::MOVING;
                 m_pathIdx = 0;
@@ -184,7 +200,7 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
             {
                 if( Tile::EMPTY == targetTile )
                 {
-                    m_path = mp_pathFinder->calcShortestPath( startIdx, targetIdx, std::vector< int >() );
+                    m_path = mp_pathFinder->calcShortestPath( startIdx, m_targetIdx, std::vector< int >() );
 
                     m_state = State::MOVING;
                     m_pathIdx = 0;
@@ -196,7 +212,6 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
         }
     }
 }
-
 void Unit::calcSpriteDirection()
 {
     Vec2 velNorm = m_velocity.GetNormalized();
@@ -234,28 +249,27 @@ void Unit::calcSpriteDirection()
         m_spriteDirection = Direction::DOWN;
     }
 }
-
 void Unit::stop()
 {
-    m_state         = State::STANDING;
-    m_acceleration  = { 0, 0 };
-    m_velocity      = { 0, 0 };
-    m_pathIdx       = 0;
+    m_state             = State::STANDING;
+    m_acceleration      = { 0, 0 };
+    m_velocity          = { 0, 0 };
+    m_pathIdx           = 0;
+    m_currWaitingTime   = 0;
 }
-
-void Unit::followPath( const std::vector< Unit >& vUnits, const Path& path, const float dt )
+void Unit::followPath( const std::vector< Unit >& vUnits, const float dt )
 {
     Vec2 separateResult = separateFromOtherUnits( vUnits, dt );
     applyForce( separateResult * 1.5f );
 
-    if( path.getWayPoints().empty() )
+    if( m_path.getWayPoints().empty() )
     {
         return;
     }
-    else if( m_pathIdx == path.getWayPoints().size() - 1 )
+    else if( m_pathIdx == m_path.getWayPoints().size() - 1 )
     {
-        seek( path.getWayPoints().back(), dt );
-        float d = ( path.getWayPoints().back() - m_location ).GetLength();
+        seek( m_path.getWayPoints().back(), dt );
+        float d = ( m_path.getWayPoints().back() - m_location ).GetLength();
 
         if( d < m_distToTile )
         {
@@ -263,7 +277,7 @@ void Unit::followPath( const std::vector< Unit >& vUnits, const Path& path, cons
         }
         return;
     }
-    else if( m_pathIdx == path.getWayPoints().size() - 2 )
+    else if( m_pathIdx == m_path.getWayPoints().size() - 2 )
     {
         if( checkTile( getNextTileIdx(), vUnits ) )     /* move back to own tile center if next one is occupied */
         {
@@ -281,17 +295,17 @@ void Unit::followPath( const std::vector< Unit >& vUnits, const Path& path, cons
     {
         if( checkTile( getNextTileIdx(), vUnits ) )
         {
-            std::vector< int > vOccupiedIdx = checkNeighbourhood( vUnits );
-            int targetIdx = mp_level->getTileIdx( path.getWayPoints().back() );
-            m_path = mp_pathFinder->calcShortestPath( m_tileIdx, targetIdx, vOccupiedIdx );
-            m_pathIdx = 0;
+            if( !recalculatePath( vUnits ) )
+            {
+                return;
+            }
         }
     }
 
 #if 1   // test with next tile center as target (not line segment point)
-    if( path.getWayPoints().size() > m_pathIdx + 1 )
+    if( m_path.getWayPoints().size() > m_pathIdx + 1 )
     {
-        Vec2 end = path.getWayPoints()[ m_pathIdx + 1 ];
+        Vec2 end = m_path.getWayPoints()[ m_pathIdx + 1 ];
         applyForce( seek( end, dt ) );
 
         float d = ( end - m_location ).GetLength();
@@ -301,9 +315,9 @@ void Unit::followPath( const std::vector< Unit >& vUnits, const Path& path, cons
         }
     }
 #else
-    Vec2 start = path.getWayPoints()[ m_pathIdx ];
-    Vec2 end = path.getWayPoints()[ m_pathIdx + 1 ];
-    followLineSegment( start, end, path.getRadius(), dt );
+    Vec2 start = m_path.getWayPoints()[ m_pathIdx ];
+    Vec2 end = m_path.getWayPoints()[ m_pathIdx + 1 ];
+    followLineSegment( start, end, m_path.getRadius(), dt );
 #endif
 }
 
@@ -537,4 +551,22 @@ bool Unit::checkTile( const int idx, const std::vector< Unit >& vUnits )
         }
     }
     return false;
+}
+bool Unit::recalculatePath( const std::vector< Unit >& vUnits )
+{
+    std::vector< int > vOccupiedIdx = checkNeighbourhood( vUnits );
+    //int targetIdx                   = mp_level->getTileIdx( m_path.getWayPoints().back() );
+    m_path                          = mp_pathFinder->calcShortestPath( m_tileIdx, m_targetIdx, vOccupiedIdx );
+    m_pathIdx                       = 0;
+
+    if( m_path.getWayPoints().size() == 1 )
+    {
+        m_state = State::WAITING;
+        return false;
+    }
+    else
+    {
+        m_state = State::MOVING;
+    }
+    return true;
 }
