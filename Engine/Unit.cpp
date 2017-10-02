@@ -282,10 +282,10 @@ void Unit::drawLifeBar( Graphics& gfx ) const
         }
     }
 
-    int barPosY = y - 1.5f * m_halfSize;
-    gfx.DrawLine( x - m_halfSize + ( 1 - lifeMaxLifeRatio ) * m_size, barPosY + 1, x + m_halfSize, barPosY + 1, lifebarColor );
-    gfx.DrawLine( x - m_halfSize + ( 1 - lifeMaxLifeRatio ) * m_size, barPosY, x + m_halfSize, barPosY, lifebarColor );
-    gfx.DrawLine( x - m_halfSize + ( 1 - lifeMaxLifeRatio ) * m_size, barPosY - 1, x + m_halfSize, barPosY - 1, lifebarColor );
+    int barPosY = y - ( int )( 1.5f * m_halfSize );
+    gfx.DrawLine( x - m_halfSize + ( int )( 1 - lifeMaxLifeRatio ) * m_size, barPosY + 1, x + m_halfSize, barPosY + 1, lifebarColor );
+    gfx.DrawLine( x - m_halfSize + ( int )( 1 - lifeMaxLifeRatio ) * m_size, barPosY, x + m_halfSize, barPosY, lifebarColor );
+    gfx.DrawLine( x - m_halfSize + ( int )( 1 - lifeMaxLifeRatio ) * m_size, barPosY - 1, x + m_halfSize, barPosY - 1, lifebarColor );
     gfx.DrawLine( x - m_halfSize, barPosY - 2, x + m_halfSize, barPosY - 2, Colors::White );		// top border   -----
     gfx.DrawLine( x - m_halfSize, barPosY - 2, x - m_halfSize, barPosY + 2, Colors::White );		// left border  |_____
     gfx.DrawLine( x + m_halfSize, barPosY - 2, x + m_halfSize, barPosY + 2, Colors::White );		// right border _____|
