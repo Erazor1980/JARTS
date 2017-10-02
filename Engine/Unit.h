@@ -104,13 +104,13 @@ private:
     void calcSpriteDirection();     /* which sprite to choose depending on current direction */
     void stop();
 
-    /* position in level in tiles - for path planning */
+    /* current and target position in level in tiles - for path planning */
     int m_tileIdx;
     int m_targetIdx = -1;
 
     /* bounding box (for selection in first place) */
     RectF m_bb;
-    int m_size; // width/height of bb in pixels
+    int m_size;                                     /* width/height of bb in pixels */
     int m_halfSize;
 
     /* true when selected by the player and ready for receiving commands */
@@ -139,7 +139,7 @@ private:
     PathFinder* const mp_pathFinder;
     int m_pathIdx = -1;                             /* current idx from path */
     static constexpr float m_distToTile = 10.0f;    /* tile reached if unit's distance to tile's center is lower */
-    const float m_waitingTimeMAX = 1.0f;            /* how long to wait to find a free path in seconds */
+    const float m_waitingTimeMAX = 2.0f;            /* how long to wait to find a free path in seconds */
     float m_currWaitingTime = 0.0f;                 /* curran waiting time in seconds */
 
     Vec2 m_location;
@@ -158,7 +158,6 @@ private:
     void followLineSegment( const Vec2& start, const Vec2& end, const float radius, const float dt );
     Vec2 seek( const Vec2& target, const float dt, const bool enableBreaking = false );
     Vec2 separateFromOtherUnits( const std::vector< Unit >& vUnits, const float dt );
-    void separateFromOtherUnitsNew( const std::vector< Unit >& vUnits, const float dt );
     void applyForce( const Vec2& force );
     bool isNormalPointValid( const Vec2 & start, const Vec2 & end, const Vec2& normalPoint );
     Vec2 getNormalPoint( const Vec2& p, const Vec2& a, const Vec2& b );    

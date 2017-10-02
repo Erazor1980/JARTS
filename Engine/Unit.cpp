@@ -48,7 +48,7 @@ Unit::Unit( const Vei2 pos_tile,
     else if( UnitType::SOLDIER == type )
     {
         m_maxSpeed = 45;
-        m_maxForce = 0.5;
+        m_maxForce = 0.5f;
     }
     m_velocity = { 0, 0 };
     m_acceleration = { 0, 0 };
@@ -99,17 +99,6 @@ void Unit::update( const std::vector< Unit >& vUnits, const float dt )
             if( d < m_distToTile / 2 )
             {
                 stop();
-            }
-            else if( d < m_distToTile && isTileOccupied( m_targetIdx, vUnits ) )
-            {
-                int nextFreeTile = findNextFreeTile( m_targetIdx, vUnits );
-
-                if( nextFreeTile >= 0 )
-                {
-                    m_targetIdx = nextFreeTile;
-                    std::vector< Vec2 > vPoints = { mp_level->getTileCenter( m_targetIdx ) };
-                    m_path = Path( vPoints );
-                }
             }
         }
         else
@@ -365,9 +354,7 @@ Vec2 Unit::seek( const Vec2& target, const float dt, const bool enableBreaking )
 }
 Vec2 Unit::separateFromOtherUnits( const std::vector< Unit >& vUnits, const float dt )
 {
-    //TODO add the size of the vehicle here!
-    //float r;
-    float desiredSeparation = ( float )m_halfSize * 1.5f; // r * 2;
+    float desiredSeparation = ( float )m_halfSize * 1.5f;
 
     Vec2 sum( 0, 0 );
     int count = 0;
@@ -406,10 +393,6 @@ Vec2 Unit::separateFromOtherUnits( const std::vector< Unit >& vUnits, const floa
         }
     }
     return steer;
-}
-void Unit::separateFromOtherUnitsNew( const std::vector< Unit >& vUnits, const float dt )
-{
-    
 }
 void Unit::followLineSegment( const Vec2& start, const Vec2& end, const float radius, const float dt )
 {
@@ -630,7 +613,6 @@ bool Unit::isTileOccupied( const int idx, const std::vector< Unit >& vUnits )
 bool Unit::recalculatePath( const std::vector< Unit >& vUnits )
 {
     std::vector< int > vOccupiedIdx = checkNeighbourhood( vUnits );
-    //int targetIdx                   = mp_level->getTileIdx( m_path.getWayPoints().back() );
     m_path                          = mp_pathFinder->calcShortestPath( m_tileIdx, m_targetIdx, vOccupiedIdx );
     m_pathIdx                       = 0;
 
