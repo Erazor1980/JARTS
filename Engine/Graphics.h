@@ -91,6 +91,11 @@ public:
     {
         DrawCircle( ( int )pos.x, ( int )pos.y, radius, c );
     }
+    void DrawCircleBorder( int x, int y, int radius, Color c );
+    void DrawCircleBorder( const Vec2 pos, int radius, Color c )
+    {
+        DrawCircleBorder( ( int )pos.x, ( int )pos.y, radius, c );
+    }
  	void DrawSpriteNonChroma( int x,int y,const Surface& s );
 	void DrawSpriteNonChroma( int x,int y,const RectI& srcRect,const Surface& s );
 	void DrawSpriteNonChroma( int x,int y,RectI srcRect,const RectI& clip,const Surface& s );

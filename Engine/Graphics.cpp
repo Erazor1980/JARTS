@@ -460,6 +460,24 @@ void Graphics::DrawCircle( int x, int y, int radius, Color c )
     }
 }
 
+void Graphics::DrawCircleBorder( int centerX, int centerY, int radius, Color c )
+{    
+    int rSquared = radius * radius;
+    int xPivot = ( int )( radius * 0.707107f + 0.5f );
+    for( int x = 0; x <= xPivot; x++ )
+    {
+        int y = ( int )( sqrt( ( float )( rSquared - x*x ) ) + 0.5f );
+        PutPixel( centerX + x, centerY + y, c );
+        PutPixel( centerX - x, centerY + y, c );
+        PutPixel( centerX + x, centerY - y, c );
+        PutPixel( centerX - x, centerY - y, c );
+        PutPixel( centerX + y, centerY + x, c );
+        PutPixel( centerX - y, centerY + x, c );
+        PutPixel( centerX + y, centerY - x, c );
+        PutPixel( centerX - y, centerY - x, c );
+    }
+}
+
 void Graphics::DrawSpriteNonChroma( int x,int y,const Surface& s )
 {
 	DrawSpriteNonChroma( x,y,s.GetRect(),s );
