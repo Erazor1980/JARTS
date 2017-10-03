@@ -56,6 +56,11 @@ public:
     void handleSelectionRect( const RectI& selectionRect );
     void select();
     void deselect();
+
+    bool isSelected() const
+    {
+        return m_bSelected;
+    }
     bool isGroundUnit() const
     {
         return m_bIsGroundUnit;

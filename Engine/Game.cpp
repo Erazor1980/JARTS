@@ -27,20 +27,20 @@ Game::Game( MainWindow& wnd )
 	gfx( wnd ),
     m_font( "..\\images\\Fixedsys16x28.bmp" ),
 #if _DEBUG
-    m_level( "..\\images\\testLvl1_debug.bmp" ),
+    m_level( "..\\images\\maps\\testLvl1_debug.bmp" ),
 #else
-    m_level( "..\\images\\testLvl1_800x600.bmp" ),
+    m_level( "..\\images\\maps\\testLvl1_800x600.bmp" ),
 #endif
-    m_cursorSprite( "..\\images\\cursor.bmp" ),
-    m_pathFinder( m_level )
+    m_pathFinder( m_level ),
+    m_cursor( gfx, wnd.mouse, m_vUnits, m_vEnemies, m_level )
 {
     srand( ( unsigned int )time( NULL ) );
 
     /* load images */
-    m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );
-    m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_blue.bmp" ) );   //TODO replace by soldier sprite later
-    m_vUnitSprites.push_back( Surface( "..\\images\\jet_40x40.bmp" ) );
-    m_vUnitSprites.push_back( Surface( "..\\images\\tank_40x40_red.bmp" ) );
+    m_vUnitSprites.push_back( Surface( "..\\images\\units\\tank_40x40_blue.bmp" ) );
+    m_vUnitSprites.push_back( Surface( "..\\images\\units\\tank_40x40_blue.bmp" ) );   //TODO replace by soldier sprite later
+    m_vUnitSprites.push_back( Surface( "..\\images\\units\\jet_40x40.bmp" ) );
+    m_vUnitSprites.push_back( Surface( "..\\images\\units\\tank_40x40_red.bmp" ) );
     
     /* load sounds */
     m_vSelectionSounds.push_back( Sound( L"..\\sounds\\ready_for_duty.wav" ) );
@@ -60,6 +60,7 @@ Game::Game( MainWindow& wnd )
     /* create enemies */
     m_vEnemies.push_back( Unit( { 10, 8 }, &m_level, &m_pathFinder, UnitType::TANK, m_vUnitSprites[ 3 ], m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
 
+    /* disable windows standard cursor (we want to use our own) */
     ShowCursor( false );
 }
 
@@ -147,40 +148,7 @@ void Game::UpdateModel()
     }
 
     /* Cursor */
-    if( m_bMouseOverUnit )
-    {
-        m_cursorBlinkTime += dt;
-        if( m_cursorBlinkTime >= m_cursorBlinkDelta )
-        {
-            m_bCursorBlinkShow = !m_bCursorBlinkShow;
-            m_cursorBlinkTime = 0;
-        }
-    }
-}
-
-void Game::drawMouseCurser()
-{
-    Vec2 mp = wnd.mouse.GetPos();
-    m_bMouseOverUnit = false;
-    for( const auto &u : m_vUnits )
-    {
-        RectF bb = u.getBoundigBox();
-        if( bb.Contains( mp ) )
-        {
-            if( m_bCursorBlinkShow )
-            {
-                gfx.DrawRectCorners( bb, Colors::White );
-            }
-            m_bMouseOverUnit = true;
-            break;
-        }
-    }
-    if( wnd.mouse.IsInWindow() && !m_bMouseOverUnit )
-    {
-        gfx.DrawSprite( ( int )mp.x, ( int )mp.y, m_cursorSprite, { 255, 242, 0 } );
-        m_cursorBlinkTime = 0;
-        m_bCursorBlinkShow = true;
-    }
+    m_cursor.update( dt );
 }
 
 void Game::ComposeFrame()
@@ -236,6 +204,5 @@ void Game::ComposeFrame()
         x += 150;
     }
 #endif
-
-    drawMouseCurser();
+    m_cursor.draw();
 }
