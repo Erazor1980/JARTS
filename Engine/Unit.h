@@ -38,8 +38,8 @@ public:
     };
 public:
     Unit( const Vei2 pos_tile, 
-          const Level* const pLevel, 
-          PathFinder* const pPathFinder, 
+          const Level& level, 
+          PathFinder& pPathFinder, 
           const UnitType type,
           const Surface& unitSprite,
           Sound& soundSelect,
@@ -95,7 +95,7 @@ public:
         {
             if( m_pathIdx + 1 < m_path.getWayPoints().size() )
             {
-                return mp_level->getTileIdx( m_path.getWayPoints()[ m_pathIdx + 1 ] );
+                return m_level.getTileIdx( m_path.getWayPoints()[ m_pathIdx + 1 ] );
             }
         }
         return -1;
@@ -139,11 +139,12 @@ private:
     Sound& m_soundCommand;
     bool m_bInsideSelectionRect = false;
 
-    /* pointer to the current level */
-    const Level* const mp_level;
+    /* current Level and PathFinder references */
+    const Level& m_level;
+    PathFinder& m_pathFinder;
 
     /* PATH PLANNING AND MOVEMENTS */
-    PathFinder* const mp_pathFinder;
+    
     int m_pathIdx = -1;                             /* current idx from path */
     static constexpr float m_distToTile = 10.0f;    /* tile reached if unit's distance to tile's center is lower */
     const float m_waitingTimeMAX = 2.0f;            /* how long to wait to find a free path in seconds */

@@ -2,22 +2,22 @@
 #include <assert.h>
 
 Unit::Unit( const Vei2 pos_tile,
-            const Level* const pLevel,
-            PathFinder* const pPathFinder,
+            const Level& level,
+            PathFinder& pathFinder,
             const UnitType type,
             const Surface& unitSprite,
             Sound& soundSelect,
             Sound& soundCommand )
     :
-    mp_level( pLevel ),
-    mp_pathFinder( pPathFinder ),
+    m_level( level ),
+    m_pathFinder( pathFinder ),
     m_unitSprite( unitSprite ),
     m_soundSelect( soundSelect ),
     m_soundCommand( soundCommand )
 {
-    assert( pLevel->isInitialized() );
-    assert( pos_tile.x >= 0 && pos_tile.x < pLevel->getWidth()
-            && pos_tile.y >= 0 && pos_tile.y < pLevel->getHeight() );
+    assert( level.isInitialized() );
+    assert( pos_tile.x >= 0 && pos_tile.x < level.getWidth()
+            && pos_tile.y >= 0 && pos_tile.y < level.getHeight() );
 
     m_type      = type;
     m_size      = unitSprite.GetHeight();
@@ -30,7 +30,7 @@ Unit::Unit( const Vei2 pos_tile,
     
     m_location.x    = pos_tile.x * m_size + m_size / 2.0f - 1;
     m_location.y    = pos_tile.y * m_size + m_size / 2.0f - 1;
-    m_tileIdx       = mp_level->getTileIdx( m_location );
+    m_tileIdx       = m_level.getTileIdx( m_location );
     m_bIsGroundUnit = true;
 
     if( UnitType::TANK == type )
@@ -125,7 +125,7 @@ void Unit::update( const std::vector< Unit >& vUnits, const float dt )
                       m_location + Vec2( ( float )m_halfSize + 1, ( float )m_halfSize + 1 ) );
         m_acceleration = { 0, 0 };
 
-        m_tileIdx = mp_level->getTileIdx( m_location );
+        m_tileIdx = m_level.getTileIdx( m_location );
     }
     else if( State::WAITING == m_state )
     {
@@ -150,7 +150,7 @@ void Unit::update( const std::vector< Unit >& vUnits,
                    const bool shift_pressed,
                    const float dt )
 {
-    if( mp_level->getLevelRect().Contains( mouse_pos ) )
+    if( m_level.getLevelRect().Contains( mouse_pos ) )
     {
         handleMouse( type, mouse_pos, shift_pressed, vUnits );
     }
@@ -181,9 +181,9 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
     {
         if( m_bSelected )
         {
-            Tile targetTile = mp_level->getTileType( ( int )mouse_pos.x, ( int )mouse_pos.y );
-            const int startIdx  = mp_level->getTileIdx( m_location );
-            m_targetIdx         = mp_level->getTileIdx( ( int )mouse_pos.x, ( int )mouse_pos.y );
+            Tile targetTile     = m_level.getTileType( ( int )mouse_pos.x, ( int )mouse_pos.y );
+            const int startIdx  = m_level.getTileIdx( m_location );
+            m_targetIdx         = m_level.getTileIdx( ( int )mouse_pos.x, ( int )mouse_pos.y );
 
             if( startIdx == m_targetIdx )
             {
@@ -196,7 +196,7 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
                 {
                     m_targetIdx = findNextFreeTile( m_targetIdx, vUnits );
                 }
-                std::vector< Vec2 > vPoints = { m_location, mp_level->getTileCenter( m_targetIdx ) };
+                std::vector< Vec2 > vPoints = { m_location, m_level.getTileCenter( m_targetIdx ) };
                 m_path = Path( vPoints );
                 m_state = State::MOVING;
                 m_pathIdx = 0;
@@ -208,7 +208,7 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
             {
                 if( Tile::EMPTY == targetTile )
                 {
-                    m_path = mp_pathFinder->calcShortestPath( startIdx, m_targetIdx, std::vector< int >() );
+                    m_path = m_pathFinder.calcShortestPath( startIdx, m_targetIdx, std::vector< int >() );
 
                     m_state = State::MOVING;
                     m_pathIdx = 0;
@@ -322,8 +322,8 @@ void Unit::followPath( const std::vector< Unit >& vUnits, const float dt )
     {
         if( isTileOccupied( getNextTileIdx(), vUnits ) )     /* move back to own tile center if next one is occupied */
         {
-            seek( mp_level->getTileCenter( m_tileIdx ), dt );
-            float d = ( mp_level->getTileCenter( m_tileIdx ) - m_location ).GetLength();
+            seek( m_level.getTileCenter( m_tileIdx ), dt );
+            float d = ( m_level.getTileCenter( m_tileIdx ) - m_location ).GetLength();
 
             if( d < m_distToTile )
             {
@@ -535,8 +535,8 @@ void Unit::deselect()
 std::vector< int > Unit::checkNeighbourhood( const std::vector< Unit >& vUnits )
 {
     std::vector< int > vOccupiedNeighbourTiles;
-    const int width     = mp_level->getWidth();
-    const int height    = mp_level->getHeight();
+    const int width     = m_level.getWidth();
+    const int height    = m_level.getHeight();
 
     const int currX     = m_tileIdx % width;
     const int currY     = m_tileIdx / width;
@@ -575,8 +575,8 @@ std::vector< int > Unit::checkNeighbourhood( const std::vector< Unit >& vUnits )
 int Unit::findNextFreeTile( const int targetIdx, const std::vector< Unit >& vUnits )
 {
     std::vector< int > vFreeNeighbourTiles;
-    const int width     = mp_level->getWidth();
-    const int height    = mp_level->getHeight();
+    const int width     = m_level.getWidth();
+    const int height    = m_level.getHeight();
 
     const int currX     = targetIdx % width;
     const int currY     = targetIdx / width;
@@ -595,7 +595,7 @@ int Unit::findNextFreeTile( const int targetIdx, const std::vector< Unit >& vUni
             if( tmpX >= 0 && tmpX < width && tmpY >= 0 && tmpY < height )
             {
                 int idx = tmpY * width + tmpX;
-                if( m_bIsGroundUnit && Tile::OBSTACLE == mp_level->getTileType( idx ) )     /* skip obstacle tiles if unit is ground unit */
+                if( m_bIsGroundUnit && Tile::OBSTACLE == m_level.getTileType( idx ) )     /* skip obstacle tiles if unit is ground unit */
                 {
                     continue;
                 }
@@ -652,7 +652,7 @@ bool Unit::isTileOccupied( const int idx, const std::vector< Unit >& vUnits )
 bool Unit::recalculatePath( const std::vector< Unit >& vUnits )
 {
     std::vector< int > vOccupiedIdx = checkNeighbourhood( vUnits );
-    m_path                          = mp_pathFinder->calcShortestPath( m_tileIdx, m_targetIdx, vOccupiedIdx );
+    m_path                          = m_pathFinder.calcShortestPath( m_tileIdx, m_targetIdx, vOccupiedIdx );
     m_pathIdx                       = 0;
 
     if( m_path.getWayPoints().size() == 1 )
