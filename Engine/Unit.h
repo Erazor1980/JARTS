@@ -15,6 +15,13 @@ enum class UnitType
     SOLDIER,
     JET
 };
+enum class Team         /* in which team is the current unit */
+{
+    _A = 0,
+    _B,
+    _C,
+    _D
+};
 
 class Unit
 {
@@ -45,7 +52,8 @@ public:
     };
 public:
     Unit() = default;
-    Unit( const Vei2 pos_tile, 
+    Unit( const Vei2 pos_tile,
+          const Team team,
           const Level& level, 
           PathFinder& pPathFinder,
           std::vector< Unit* >& vpEnemies,
@@ -66,6 +74,10 @@ public:
     void deselect();
     void takeDamage( const int damage, const UnitType EnemyType );
 
+    bool isDestroyed() const
+    {
+        return m_life == 0;
+    }
     bool isSelected() const
     {
         return m_bSelected;
@@ -135,6 +147,7 @@ private:
     //////////////////
     //// FIGHTING ////
     //////////////////
+    Team m_team;
     void shoot();
     int m_attackDamage;
     std::vector< Unit* >& m_vpEnemies;

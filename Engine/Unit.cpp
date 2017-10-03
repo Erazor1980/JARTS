@@ -4,6 +4,7 @@
 #include <math.h>
 
 Unit::Unit( const Vei2 pos_tile,
+            const Team team,
             const Level& level,
             PathFinder& pathFinder,
             std::vector< Unit* >& vpEnemies,
@@ -33,8 +34,9 @@ Unit::Unit( const Vei2 pos_tile,
     m_location.x    = pos_tile.x * m_size + m_size / 2.0f - 1;
     m_location.y    = pos_tile.y * m_size + m_size / 2.0f - 1;
     m_tileIdx       = m_level.getTileIdx( m_location );
-    m_bIsGroundUnit = true;
+    m_team          = team;
 
+    m_bIsGroundUnit = true;
     if( UnitType::TANK == type )
     {
         m_maxSpeed              = 100;
@@ -107,17 +109,6 @@ void Unit::draw( Graphics& gfx, const bool drawExtraInfos ) const
     if( m_bSelected )
     {
         gfx.DrawRectCorners( m_bb, Colors::Green );
-
-#if _DEBUG
-        if( m_state == State::ATTACKING )
-        {
-            gfx.DrawCircleBorder( m_location, ( int )m_attackRadius, Colors::Red );
-        }
-        else
-        {
-            gfx.DrawCircleBorder( m_location, ( int )m_attackRadius, Colors::Gray );
-        }
-#endif
     }
     else if( m_bInsideSelectionRect )
     {
@@ -156,6 +147,11 @@ void Unit::update( const std::vector< Unit >& vUnits, const float dt )
         {
             Vec2 dir = mp_currentEnemy->getLocation() - m_location;
             m_cannonOrientation = atan2( dir.y, dir.x );
+        }
+
+        if( mp_currentEnemy->isDestroyed() )
+        {
+            m_state = State::STANDING;
         }
     }
 
@@ -245,13 +241,13 @@ void Unit::update( const std::vector< Unit >& vUnits,
     }
     update( vUnits, dt );
 }
-
 void Unit::shoot()
 {
+#if !_DEBUG
     m_vSoundEffects[ ( int )SoundOrder::ATTACK ].Play();
+#endif
     mp_currentEnemy->takeDamage( m_attackDamage, m_type );
 }
-
 void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed, const std::vector< Unit >& vUnits )
 {
     if( type == Mouse::Event::Type::LPress )
@@ -361,14 +357,19 @@ void Unit::calcSpriteDirection()
 {
     if( UnitType::TANK == m_type && m_velocity.GetLength() )
     {
-        if( mp_currentEnemy )
+        if( mp_currentEnemy )                   /* cannon direction to the target enemy */
         {
             Vec2 dir = mp_currentEnemy->getLocation() - m_location;
             m_cannonOrientation = atan2( dir.y, dir.x );
         }
+        else if( State::MOVING == m_state )     /* cannon direction to the target tile */
+        {
+            Vec2 dir = m_level.getTileCenter( m_targetIdx ) - m_location;
+            m_cannonOrientation = atan2( dir.y, dir.x );
+        }
         else
         {
-            m_cannonOrientation = ( float )( atan2( m_velocity.y, m_velocity.x ) );
+            m_cannonOrientation = atan2( m_velocity.y, m_velocity.x );
         }
     }
 

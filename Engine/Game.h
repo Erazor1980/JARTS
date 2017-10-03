@@ -49,6 +49,7 @@ private:
 	/********************************/
 	/*  User Functions              */
     void drawAllUnits();
+    void checkForDestroyedUnits();
 	/********************************/
 private:
 	MainWindow& wnd;
