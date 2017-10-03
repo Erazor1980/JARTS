@@ -151,26 +151,57 @@ void Game::UpdateModel()
     m_cursor.update( dt );
 }
 
-void Game::ComposeFrame()
+void Game::drawAllUnits()
 {
-    m_level.draw( gfx, m_bDrawDebugStuff );
-
-    /* draw own units */
+    /* draw all ground units first */
     for( int i = 0; i < m_vUnits.size(); ++i )
     {
-        m_vUnits[ i ].draw( gfx, m_bDrawDebugStuff );
+        if( m_vUnits[ i ].isGroundUnit() )
+        {
+            m_vUnits[ i ].draw( gfx, m_bDrawDebugStuff );
+        }
 
 #if _DEBUG
         m_font.DrawText( std::to_string( m_vUnits[ i ].getTileIdx() ), m_vUnits[ i ].getLocationInt() - Vei2( 10, 10 ), Colors::White, gfx );
         m_font.DrawText( std::to_string( i ), m_vUnits[ i ].getLocationInt() - Vei2( 30, 10 ), Colors::Red, gfx );
 #endif
     }
-    
-    /* draw enemies */
     for( int i = 0; i < m_vEnemies.size(); ++i )
     {
-        m_vEnemies[ i ].draw( gfx );
+        if( m_vEnemies[ i ].isGroundUnit() )
+        {
+            m_vEnemies[ i ].draw( gfx );
+        }
     }
+    
+
+    /* draw all air units */
+    for( int i = 0; i < m_vUnits.size(); ++i )
+    {
+        if( !m_vUnits[ i ].isGroundUnit() )
+        {
+            m_vUnits[ i ].draw( gfx, m_bDrawDebugStuff );
+        }
+
+#if _DEBUG
+        m_font.DrawText( std::to_string( m_vUnits[ i ].getTileIdx() ), m_vUnits[ i ].getLocationInt() - Vei2( 10, 10 ), Colors::White, gfx );
+        m_font.DrawText( std::to_string( i ), m_vUnits[ i ].getLocationInt() - Vei2( 30, 10 ), Colors::Red, gfx );
+#endif
+    }
+    for( int i = 0; i < m_vEnemies.size(); ++i )
+    {
+        if( !m_vEnemies[ i ].isGroundUnit() )
+        {
+            m_vEnemies[ i ].draw( gfx );
+        }
+    }
+}
+
+void Game::ComposeFrame()
+{
+    m_level.draw( gfx, m_bDrawDebugStuff );
+    
+    drawAllUnits();
 
     if( m_bSelecting )
     {

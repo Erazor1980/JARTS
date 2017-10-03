@@ -47,6 +47,7 @@ private:
 	void UpdateModel();
 	/********************************/
 	/*  User Functions              */
+    void drawAllUnits();
 	/********************************/
 private:
 	MainWindow& wnd;

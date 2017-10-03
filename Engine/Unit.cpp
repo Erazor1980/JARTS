@@ -201,7 +201,7 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
                 m_state = State::MOVING;
                 m_pathIdx = 0;
 #if !_DEBUG
-                m_soundCommand.Play();
+                m_soundCommand.Play( 1, 0.8f );
 #endif
             }
             else
@@ -213,7 +213,7 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
                     m_state = State::MOVING;
                     m_pathIdx = 0;
 #if !_DEBUG
-                    m_soundCommand.Play();
+                    m_soundCommand.Play( 1, 0.3f );
 #endif
                 }
             }
@@ -281,7 +281,7 @@ void Unit::drawLifeBar( Graphics& gfx ) const
         }
     }
 
-    int barPosY = y - ( int )( 1.5f * m_halfSize );
+    int barPosY = y - ( int )( 1.3f * m_halfSize );
     gfx.DrawLine( x - m_halfSize + ( int )( 1 - lifeMaxLifeRatio ) * m_size, barPosY + 1, x + m_halfSize, barPosY + 1, lifebarColor );
     gfx.DrawLine( x - m_halfSize + ( int )( 1 - lifeMaxLifeRatio ) * m_size, barPosY, x + m_halfSize, barPosY, lifebarColor );
     gfx.DrawLine( x - m_halfSize + ( int )( 1 - lifeMaxLifeRatio ) * m_size, barPosY - 1, x + m_halfSize, barPosY - 1, lifebarColor );
