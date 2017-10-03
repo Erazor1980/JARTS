@@ -90,71 +90,21 @@ void Game::UpdateModel()
     /////////////////
     ///// MOUSE /////
     /////////////////
-    if( wnd.mouse.IsInWindow() && !wnd.mouse.IsEmpty() )
+    handleMouse();
+    
+    ///////////////
+    //// UNITS ////
+    ///////////////
+    for( auto &u : m_vUnits )
     {
-        while( !wnd.mouse.IsEmpty() )
-        {
-            const Mouse::Event e = wnd.mouse.Read();
-            for( auto &u : m_vUnits )
-            {
-                u.update( m_vUnits, e.GetType(), wnd.mouse.GetPos(), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
-            }
-
-#if _DEBUG  /* in debug mode we can select and give commands to enemies */
-            for( auto &u : m_vpEnemies )
-            {
-                u->update( m_vUnits, e.GetType(), wnd.mouse.GetPos(), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
-            }
-#endif
-
-            /* multi selection rectangle */
-            if( e.GetType() == Mouse::Event::Type::LPress )
-            {
-                m_selection.left = wnd.mouse.GetPosX();
-                m_selection.top = wnd.mouse.GetPosY();
-            }
-            if( e.LeftIsPressed() )
-            {
-                m_bSelecting = true;
-                m_selection.right = wnd.mouse.GetPosX();
-                m_selection.bottom = wnd.mouse.GetPosY();
-
-                for( auto &u : m_vUnits )
-                {
-                    u.handleSelectionRect( m_selection );
-                }
-            }
-            if( e.GetType() == Mouse::Event::Type::LRelease && m_bSelecting )
-            {
-                m_bSelecting = false;
-                for( auto &u : m_vUnits )
-                {
-                    if( m_selection.Contains( u.getLocation() ) )
-                    {
-                        u.select();
-                    }
-                }
-            }
-        }
-    }
-    else
-    {
-        for( auto &u : m_vUnits )
-        {
-            u.update( m_vUnits, dt );
-        }
-
-        for( auto &u : m_vpEnemies )
-        {
-            u->update( m_vUnits, dt );
-        }
+        u.update( m_vUnits, dt );
     }
 
-    if( !wnd.mouse.IsInWindow() )
+    for( auto &u : m_vpEnemies )
     {
-        m_bSelecting = false;
+        u->update( m_vUnits, dt );
     }
-
+    
     //////////////////
     //// KEYBOARD ////
     //////////////////
@@ -170,7 +120,9 @@ void Game::UpdateModel()
         }
     }
 
-    /* Cursor */
+    ////////////////
+    //// CURSOR ////
+    ////////////////
     m_cursor.update( dt );
 }
 
@@ -243,6 +195,62 @@ void Game::checkForDestroyedUnits()
         {
             e++;
         }
+    }
+}
+
+void Game::handleMouse()
+{
+    if( wnd.mouse.IsInWindow() && !wnd.mouse.IsEmpty() )
+    {
+        while( !wnd.mouse.IsEmpty() )
+        {
+            const Mouse::Event e = wnd.mouse.Read();
+            for( auto &u : m_vUnits )
+            {
+                u.handleMouse( e.GetType(), wnd.mouse.GetPos(), wnd.kbd.KeyIsPressed( VK_SHIFT ), m_vUnits );
+            }
+
+#if _DEBUG  /* in debug mode we can select and give commands to enemies */
+            for( auto &u : m_vpEnemies )
+            {
+                u->handleMouse( e.GetType(), wnd.mouse.GetPos(), wnd.kbd.KeyIsPressed( VK_SHIFT ), m_vUnits );
+            }
+#endif
+
+            /* multi selection rectangle */
+            if( e.GetType() == Mouse::Event::Type::LPress )
+            {
+                m_selection.left = wnd.mouse.GetPosX();
+                m_selection.top = wnd.mouse.GetPosY();
+            }
+            if( e.LeftIsPressed() )
+            {
+                m_bSelecting = true;
+                m_selection.right = wnd.mouse.GetPosX();
+                m_selection.bottom = wnd.mouse.GetPosY();
+
+                for( auto &u : m_vUnits )
+                {
+                    u.handleSelectionRect( m_selection );
+                }
+            }
+            if( e.GetType() == Mouse::Event::Type::LRelease && m_bSelecting )
+            {
+                m_bSelecting = false;
+                for( auto &u : m_vUnits )
+                {
+                    if( m_selection.Contains( u.getLocation() ) )
+                    {
+                        u.select();
+                    }
+                }
+            }
+        }
+    }
+
+    if( !wnd.mouse.IsInWindow() )
+    {
+        m_bSelecting = false;
     }
 }
 

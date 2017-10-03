@@ -229,18 +229,7 @@ void Unit::update( const std::vector< Unit >& vUnits, const float dt )
         }
     }
 }
-void Unit::update( const std::vector< Unit >& vUnits, 
-                   const Mouse::Event::Type& type,
-                   const Vec2& mouse_pos,
-                   const bool shift_pressed,
-                   const float dt )
-{
-    if( m_level.getLevelRect().Contains( mouse_pos ) )
-    {
-        handleMouse( type, mouse_pos, shift_pressed, vUnits );
-    }
-    update( vUnits, dt );
-}
+
 void Unit::shoot()
 {
 #if !_DEBUG

@@ -50,6 +50,7 @@ private:
 	/*  User Functions              */
     void drawAllUnits();
     void checkForDestroyedUnits();
+    void handleMouse();
 	/********************************/
 private:
 	MainWindow& wnd;

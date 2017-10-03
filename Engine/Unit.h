@@ -64,11 +64,8 @@ public:
     void draw( Graphics& gfx, const bool drawExtraInfos = false ) const;
 
     void update( const std::vector< Unit >& vUnits, const float dt );
-    void update( const std::vector< Unit >& vUnits, 
-                 const Mouse::Event::Type& type,
-                 const Vec2& mouse_pos,
-                 const bool shift_pressed,
-                 const float dt );
+
+    void handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed, const std::vector< Unit >& vUnits );
     void handleSelectionRect( const RectI& selectionRect );
     void select();
     void deselect();
@@ -160,7 +157,6 @@ private:
     ///////////////////////////
     //// SELECTION & MOUSE ////
     ///////////////////////////
-    void handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed, const std::vector< Unit >& vUnits );
     RectF m_bb;                                     /* bounding box (for selection in first place) */
     int m_size;                                     /* width/height of bb in pixels */
     int m_halfSize;
