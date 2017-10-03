@@ -39,7 +39,8 @@ public:
 public:
     Unit( const Vei2 pos_tile, 
           const Level& level, 
-          PathFinder& pPathFinder, 
+          PathFinder& pPathFinder,
+          std::vector< Unit >& vEnemies,
           const UnitType type,
           const Surface& unitSprite,
           Sound& soundSelect,
@@ -104,11 +105,17 @@ public:
     {
         return m_currWaitingTime;
     }
-private:
-    void handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed, const std::vector< Unit >& vUnits );
-    void calcSpriteDirection();     /* which sprite to choose depending on current direction */
-    void drawLifeBar( Graphics& gfx ) const;
+private:    
     void stop();
+
+    /////////////////
+    //// GENERAL ////
+    /////////////////
+    /* current Level and PathFinder references */
+    const Level& m_level;
+    PathFinder& m_pathFinder;
+
+    State m_state = State::STANDING;
 
     /* Attributes */
     UnitType m_type;
@@ -117,21 +124,26 @@ private:
     int m_maxLife;
     float m_oneThirdMaxLife;
 
-    /* current and target position in level in tiles - for path planning */
-    int m_tileIdx;
-    int m_targetIdx = -1;
+    //////////////////
+    //// FIGHTING ////
+    //////////////////
+    std::vector< Unit >& m_vEnemies;
 
-    /* bounding box (for selection in first place) */
-    RectF m_bb;
+    ///////////////////////////
+    //// SELECTION & MOUSE ////
+    ///////////////////////////
+    void handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed, const std::vector< Unit >& vUnits );
+    RectF m_bb;                                     /* bounding box (for selection in first place) */
     int m_size;                                     /* width/height of bb in pixels */
     int m_halfSize;
+    bool m_bSelected = false;                       /* true when selected by the player and ready for receiving commands */
 
-    /* true when selected by the player and ready for receiving commands */
-    bool m_bSelected = false;
+    ///////////////////////////
+    //// GRAPHICS & SOUNDS ////
+    ///////////////////////////
+    void calcSpriteDirection();                     /* which sprite to choose depending on current direction */
+    void drawLifeBar( Graphics& gfx ) const;
 
-    State m_state = State::STANDING;
-
-    /* graphics & sounds */
     const Surface& m_unitSprite;                    /* unit sprite tiles */
     std::vector< RectI > m_vSpriteRects;            /* rectangles for single steps (direction) of a unit sprite set */
     Direction m_spriteDirection;
@@ -139,16 +151,16 @@ private:
     Sound& m_soundCommand;
     bool m_bInsideSelectionRect = false;
 
-    /* current Level and PathFinder references */
-    const Level& m_level;
-    PathFinder& m_pathFinder;
-
-    /* PATH PLANNING AND MOVEMENTS */
-    
+    /////////////////////////////////////
+    //// PATH PLANNING AND MOVEMENTS ////
+    /////////////////////////////////////
     int m_pathIdx = -1;                             /* current idx from path */
     static constexpr float m_distToTile = 10.0f;    /* tile reached if unit's distance to tile's center is lower */
     const float m_waitingTimeMAX = 2.0f;            /* how long to wait to find a free path in seconds */
     float m_currWaitingTime = 0.0f;                 /* curran waiting time in seconds */
+
+    int m_tileIdx;
+    int m_targetIdx = -1;
 
     Vec2 m_location;
     Vec2 m_acceleration;
