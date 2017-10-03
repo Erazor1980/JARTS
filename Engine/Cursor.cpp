@@ -1,13 +1,13 @@
 #include "Cursor.h"
 
-Cursor::Cursor( Graphics& gfx, const Mouse& mouse, const std::vector< Unit >& vUnits, const std::vector< Unit >& vEnemies, const Level& level )
+Cursor::Cursor( Graphics& gfx, const Mouse& mouse, const std::vector< Unit >& vUnits, const std::vector< Unit* >& vpEnemies, const Level& level )
     :
     m_mainSprite( "..\\images\\cursor\\cursor.bmp" ),
     m_forbiddenSprite( "..\\images\\cursor\\forbidden.bmp" ),
     m_gfx( gfx ),
     m_mouse( mouse ),
     m_vUnits( vUnits ),
-    m_vEnemies( vEnemies),
+    m_vpEnemies( vpEnemies ),
     m_level (level )
 {
 }
@@ -42,9 +42,9 @@ void Cursor::update( const float dt )
     m_bMouseOverEnemy = false;
     if( !m_bMouseOverUnit ) /* check enemy units */
     {
-        for( const auto &u : m_vEnemies )
+        for( const auto &u : m_vpEnemies )
         {
-            m_rectFromUnit = u.getBoundigBox();
+            m_rectFromUnit = u->getBoundigBox();
             if( m_rectFromUnit.Contains( mp ) )
             {
                 m_bMouseOverUnit = true;

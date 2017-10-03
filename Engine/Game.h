@@ -39,6 +39,7 @@ class Game
 {
 public:
 	Game( class MainWindow& wnd );
+    ~Game();
 	Game( const Game& ) = delete;
 	Game& operator=( const Game& ) = delete;
 	void Go();
@@ -66,7 +67,7 @@ private:
     std::vector< Sound > m_vSelectionSounds;
     std::vector< Sound > m_vCommandSounds;
     std::vector< Unit > m_vUnits;
-    std::vector< Unit > m_vEnemies;
+    std::vector< Unit* > m_vpEnemies;
 
     /* Cursor stuff */
     Cursor m_cursor;

@@ -4,7 +4,7 @@
 Unit::Unit( const Vei2 pos_tile,
             const Level& level,
             PathFinder& pathFinder,
-            std::vector< Unit >& vEnemies,
+            std::vector< Unit* > vpEnemies,
             const UnitType type,
             const Surface& unitSprite,
             Sound& soundSelect,
@@ -12,7 +12,7 @@ Unit::Unit( const Vei2 pos_tile,
     :
     m_level( level ),
     m_pathFinder( pathFinder ),
-    m_vEnemies( vEnemies ),
+    m_vpEnemies( vpEnemies ),
     m_unitSprite( unitSprite ),
     m_soundSelect( soundSelect ),
     m_soundCommand( soundCommand )

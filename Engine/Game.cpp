@@ -32,7 +32,7 @@ Game::Game( MainWindow& wnd )
     m_level( "..\\images\\maps\\testLvl1_800x600.bmp" ),
 #endif
     m_pathFinder( m_level ),
-    m_cursor( gfx, wnd.mouse, m_vUnits, m_vEnemies, m_level )
+    m_cursor( gfx, wnd.mouse, m_vUnits, m_vpEnemies, m_level )
 {
     srand( ( unsigned int )time( NULL ) );
 
@@ -50,18 +50,27 @@ Game::Game( MainWindow& wnd )
     m_vCommandSounds.push_back( Sound( L"..\\sounds\\move_jet.wav" ) );
 
     /* create units */
-    m_vUnits.push_back( Unit( { 2, 7 }, m_level, m_pathFinder, m_vEnemies, UnitType::TANK, m_vUnitSprites[ 0 ], m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
-    m_vUnits.push_back( Unit( { 5, 7 }, m_level, m_pathFinder, m_vEnemies, UnitType::TANK, m_vUnitSprites[ 0 ], m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
-    m_vUnits.push_back( Unit( { 2, 8 }, m_level, m_pathFinder, m_vEnemies, UnitType::TANK, m_vUnitSprites[ 0 ], m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
+    m_vUnits.push_back( Unit( { 2, 7 }, m_level, m_pathFinder, m_vpEnemies, UnitType::TANK, m_vUnitSprites[ 0 ], m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
+    m_vUnits.push_back( Unit( { 5, 7 }, m_level, m_pathFinder, m_vpEnemies, UnitType::TANK, m_vUnitSprites[ 0 ], m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
+    m_vUnits.push_back( Unit( { 2, 8 }, m_level, m_pathFinder, m_vpEnemies, UnitType::TANK, m_vUnitSprites[ 0 ], m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
     //m_vUnits.push_back( Unit( { 5, 6 }, m_level, m_pathFinder, m_vEnemies, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
-    m_vUnits.push_back( Unit( { 13, 13 }, m_level, m_pathFinder, m_vEnemies, UnitType::JET, m_vUnitSprites[ 2 ], m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
-    m_vUnits.push_back( Unit( { 10, 13 }, m_level, m_pathFinder, m_vEnemies, UnitType::JET, m_vUnitSprites[ 2 ], m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
+    m_vUnits.push_back( Unit( { 13, 13 }, m_level, m_pathFinder, m_vpEnemies, UnitType::JET, m_vUnitSprites[ 2 ], m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
+    m_vUnits.push_back( Unit( { 10, 13 }, m_level, m_pathFinder, m_vpEnemies, UnitType::JET, m_vUnitSprites[ 2 ], m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
 
     /* create enemies */
-    m_vEnemies.push_back( Unit( { 10, 8 }, m_level, m_pathFinder, m_vEnemies, UnitType::TANK, m_vUnitSprites[ 3 ], m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
+    m_vpEnemies.push_back( new Unit( { 10, 8 }, m_level, m_pathFinder, m_vpEnemies, UnitType::TANK, m_vUnitSprites[ 3 ], m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
 
     /* disable windows standard cursor (we want to use our own) */
     ShowCursor( false );
+}
+
+Game::~Game()
+{
+    for( int i = 0; i < m_vpEnemies.size(); ++i )
+    {
+        delete m_vpEnemies[ i ];
+    }
+    m_vpEnemies.clear();
 }
 
 void Game::Go()
@@ -166,11 +175,11 @@ void Game::drawAllUnits()
         m_font.DrawText( std::to_string( i ), m_vUnits[ i ].getLocationInt() - Vei2( 30, 10 ), Colors::Red, gfx );
 #endif
     }
-    for( int i = 0; i < m_vEnemies.size(); ++i )
+    for( int i = 0; i < m_vpEnemies.size(); ++i )
     {
-        if( m_vEnemies[ i ].isGroundUnit() )
+        if( m_vpEnemies[ i ]->isGroundUnit() )
         {
-            m_vEnemies[ i ].draw( gfx );
+            m_vpEnemies[ i ]->draw( gfx );
         }
     }
     
@@ -188,11 +197,11 @@ void Game::drawAllUnits()
         m_font.DrawText( std::to_string( i ), m_vUnits[ i ].getLocationInt() - Vei2( 30, 10 ), Colors::Red, gfx );
 #endif
     }
-    for( int i = 0; i < m_vEnemies.size(); ++i )
+    for( int i = 0; i < m_vpEnemies.size(); ++i )
     {
-        if( !m_vEnemies[ i ].isGroundUnit() )
+        if( !m_vpEnemies[ i ]->isGroundUnit() )
         {
-            m_vEnemies[ i ].draw( gfx );
+            m_vpEnemies[ i ]->draw( gfx );
         }
     }
 }
