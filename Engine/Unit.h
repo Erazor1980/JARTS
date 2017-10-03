@@ -17,7 +17,7 @@ enum class UnitType
 };
 enum class Team         /* in which team is the current unit */
 {
-    _A = 0,
+    _A = 0,     /* always hero's team! */
     _B,
     _C,
     _D
@@ -56,21 +56,25 @@ public:
           const Team team,
           const Level& level, 
           PathFinder& pPathFinder,
-          std::vector< Unit* >& vpEnemies,
+          std::vector< Unit* >& vpUnits,
           const UnitType type,
           const Surface& unitSprite,
           std::vector< Sound >& vSoundEffects );
 
     void draw( Graphics& gfx, const bool drawExtraInfos = false ) const;
 
-    void update( const std::vector< Unit >& vUnits, const float dt );
+    void update( const float dt );
 
-    void handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed, const std::vector< Unit >& vUnits );
+    void handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed );
     void handleSelectionRect( const RectI& selectionRect );
     void select();
     void deselect();
     void takeDamage( const int damage, const UnitType EnemyType );
 
+    Team getTeam() const
+    {
+        return m_team;
+    }
     bool isDestroyed() const
     {
         return m_life == 0;
@@ -147,7 +151,7 @@ private:
     Team m_team;
     void shoot();
     int m_attackDamage;
-    std::vector< Unit* >& m_vpEnemies;
+    std::vector< Unit* >& m_vpUnits;
     Unit* mp_currentEnemy = nullptr;
     float m_attackRadius;
     float m_timeBetweenAttacks;                     /* in milliseconds */
@@ -195,14 +199,14 @@ private:
     float m_maxSpeed;
     Path m_path;
 
-    std::vector< int > checkNeighbourhood( const std::vector< Unit >& vUnits );     /* returns indeces of occupied tiles (other units or their next targets) */
-    int findNextFreeTile( const int targetIdx, const std::vector< Unit >& vUnits ); /* returns index of next free tile (considering units and obstacles) */
-    bool isTileOccupied( const int idx, const std::vector< Unit >& vUnits );        /* check if a tile is occupied by other units or their next targets */
-    bool recalculatePath( const std::vector< Unit >& vUnits );                      /* returns false if path is temporary blocked */
-    void followPath( const std::vector< Unit >& vUnits, const float dt );
+    std::vector< int > checkNeighbourhood();            /* returns indeces of occupied tiles (other units or their next targets) */
+    int findNextFreeTile( const int targetIdx );        /* returns index of next free tile (considering units and obstacles) */
+    bool isTileOccupied( const int idx );               /* check if a tile is occupied by other units or their next targets */
+    bool recalculatePath();                             /* returns false if path is temporary blocked */
+    void followPath( const float dt );
     void followLineSegment( const Vec2& start, const Vec2& end, const float radius, const float dt );
     Vec2 seek( const Vec2& target, const float dt, const bool enableBreaking = false );
-    Vec2 separateFromOtherUnits( const std::vector< Unit >& vUnits, const float dt );
+    Vec2 separateFromOtherUnits( const float dt );
     void applyForce( const Vec2& force );
     bool isNormalPointValid( const Vec2 & start, const Vec2 & end, const Vec2& normalPoint );
     Vec2 getNormalPoint( const Vec2& p, const Vec2& a, const Vec2& b );    

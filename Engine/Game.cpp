@@ -32,7 +32,7 @@ Game::Game( MainWindow& wnd )
     m_level( "..\\images\\maps\\testLvl1_800x600.bmp" ),
 #endif
     m_pathFinder( m_level ),
-    m_cursor( gfx, wnd.mouse, m_vUnits, m_vpEnemies, m_level )
+    m_cursor( gfx, wnd.mouse, m_vpUnits, m_level )
 {
     srand( ( unsigned int )time( NULL ) );
 
@@ -52,14 +52,14 @@ Game::Game( MainWindow& wnd )
     m_vJetSounds.push_back( Sound( L"..\\sounds\\jet_firing.wav" ) );
 
     /* create units */
-    m_vUnits.push_back( Unit( { 2, 7 }, Team::_A, m_level, m_pathFinder, m_vpEnemies, UnitType::TANK, m_vUnitSprites[ 0 ], m_vTankSounds ) );
-    m_vUnits.push_back( Unit( { 5, 7 }, Team::_A, m_level, m_pathFinder, m_vpEnemies, UnitType::TANK, m_vUnitSprites[ 0 ], m_vTankSounds ) );
-    m_vUnits.push_back( Unit( { 2, 8 }, Team::_A, m_level, m_pathFinder, m_vpEnemies, UnitType::TANK, m_vUnitSprites[ 0 ], m_vTankSounds ) );
-    m_vUnits.push_back( Unit( { 13, 13 }, Team::_A, m_level, m_pathFinder, m_vpEnemies, UnitType::JET, m_vUnitSprites[ 2 ], m_vJetSounds ) );
-    m_vUnits.push_back( Unit( { 10, 13 }, Team::_A, m_level, m_pathFinder, m_vpEnemies, UnitType::JET, m_vUnitSprites[ 2 ], m_vJetSounds ) );
+    m_vpUnits.push_back( new Unit( { 2, 7 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vUnitSprites[ 0 ], m_vTankSounds ) );
+    m_vpUnits.push_back( new Unit( { 5, 7 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vUnitSprites[ 0 ], m_vTankSounds ) );
+    m_vpUnits.push_back( new Unit( { 2, 8 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vUnitSprites[ 0 ], m_vTankSounds ) );
+    m_vpUnits.push_back( new Unit( { 13, 13 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vUnitSprites[ 2 ], m_vJetSounds ) );
+    m_vpUnits.push_back( new Unit( { 10, 13 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vUnitSprites[ 2 ], m_vJetSounds ) );
 
     /* create enemies */
-    m_vpEnemies.push_back( new Unit( { 10, 8 }, Team::_B, m_level, m_pathFinder, m_vpEnemies, UnitType::TANK, m_vUnitSprites[ 3 ], m_vTankSounds ) );
+    m_vpUnits.push_back( new Unit( { 10, 8 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vUnitSprites[ 3 ], m_vTankSounds ) );
 
     /* disable windows standard cursor (we want to use our own) */
     ShowCursor( false );
@@ -67,11 +67,11 @@ Game::Game( MainWindow& wnd )
 
 Game::~Game()
 {
-    for( int i = 0; i < m_vpEnemies.size(); ++i )
+    for( int i = 0; i < m_vpUnits.size(); ++i )
     {
-        delete m_vpEnemies[ i ];
+        delete m_vpUnits[ i ];
     }
-    m_vpEnemies.clear();
+    m_vpUnits.clear();
 }
 
 void Game::Go()
@@ -95,15 +95,15 @@ void Game::UpdateModel()
     ///////////////
     //// UNITS ////
     ///////////////
-    for( auto &u : m_vUnits )
+    for( auto &u : m_vpUnits )
     {
-        u.update( m_vUnits, dt );
+        u->update( dt );
     }
 
-    for( auto &u : m_vpEnemies )
+    /*for( auto &u : m_vpEnemies )
     {
-        u->update( m_vUnits, dt );
-    }
+        u->update( dt );
+    }*/
     
     //////////////////
     //// KEYBOARD ////
@@ -129,71 +129,44 @@ void Game::UpdateModel()
 void Game::drawAllUnits()
 {
     /* draw all ground units first */
-    for( int i = 0; i < m_vUnits.size(); ++i )
+    for( int i = 0; i < m_vpUnits.size(); ++i )
     {
-        if( m_vUnits[ i ].isGroundUnit() )
+        if( m_vpUnits[ i ]->isGroundUnit() )
         {
-            m_vUnits[ i ].draw( gfx, m_bDrawDebugStuff );
+            m_vpUnits[ i ]->draw( gfx, m_bDrawDebugStuff );
 #if _DEBUG
             //m_font.DrawText( std::to_string( m_vUnits[ i ].getTileIdx() ), m_vUnits[ i ].getLocationInt() - Vei2( 10, 10 ), Colors::White, gfx );
-            m_font.DrawText( std::to_string( i ), m_vUnits[ i ].getLocationInt() - Vei2( 30, 10 ), Colors::Red, gfx );
+            m_font.DrawText( std::to_string( i ), m_vpUnits[ i ]->getLocationInt() - Vei2( 30, 10 ), Colors::Red, gfx );
 #endif
         }
     }
-    for( int i = 0; i < m_vpEnemies.size(); ++i )
-    {
-        if( m_vpEnemies[ i ]->isGroundUnit() )
-        {
-            m_vpEnemies[ i ]->draw( gfx );
-        }
-    }    
 
     /* draw all air units */
-    for( int i = 0; i < m_vUnits.size(); ++i )
+    for( int i = 0; i < m_vpUnits.size(); ++i )
     {
-        if( !m_vUnits[ i ].isGroundUnit() )
+        if( !m_vpUnits[ i ]->isGroundUnit() )
         {
-            m_vUnits[ i ].draw( gfx, m_bDrawDebugStuff );
+            m_vpUnits[ i ]->draw( gfx, m_bDrawDebugStuff );
 #if _DEBUG
             //m_font.DrawText( std::to_string( m_vUnits[ i ].getTileIdx() ), m_vUnits[ i ].getLocationInt() - Vei2( 10, 10 ), Colors::White, gfx );
-            m_font.DrawText( std::to_string( i ), m_vUnits[ i ].getLocationInt() - Vei2( 30, 10 ), Colors::Red, gfx );
+            m_font.DrawText( std::to_string( i ), m_vpUnits[ i ]->getLocationInt() - Vei2( 30, 10 ), Colors::Red, gfx );
 #endif
-        }
-    }
-    for( int i = 0; i < m_vpEnemies.size(); ++i )
-    {
-        if( !m_vpEnemies[ i ]->isGroundUnit() )
-        {
-            m_vpEnemies[ i ]->draw( gfx );
         }
     }
 }
 
 void Game::checkForDestroyedUnits()
 {
-    //auto i = m_vUnits.begin();
-    //while( i != m_vUnits.end() )
-    //{
-    //    if( ( *i ).isDestroyed() )
-    //    {
-    //        i = m_vUnits.erase( i );
-    //    }
-    //    else
-    //    {
-    //        i++;
-    //    }
-    //}
-
-    auto e = m_vpEnemies.begin();
-    while( e != m_vpEnemies.end() )
+    auto u = m_vpUnits.begin();
+    while( u != m_vpUnits.end() )
     {
-        if( ( *e )->isDestroyed() )
+        if( ( *u )->isDestroyed() )
         {
-            e = m_vpEnemies.erase( e );
+            u = m_vpUnits.erase( u );
         }
         else
         {
-            e++;
+            u++;
         }
     }
 }
@@ -205,17 +178,10 @@ void Game::handleMouse()
         while( !wnd.mouse.IsEmpty() )
         {
             const Mouse::Event e = wnd.mouse.Read();
-            for( auto &u : m_vUnits )
+            for( auto &u : m_vpUnits )
             {
-                u.handleMouse( e.GetType(), wnd.mouse.GetPos(), wnd.kbd.KeyIsPressed( VK_SHIFT ), m_vUnits );
+                u->handleMouse( e.GetType(), wnd.mouse.GetPos(), wnd.kbd.KeyIsPressed( VK_SHIFT ) );
             }
-
-#if _DEBUG  /* in debug mode we can select and give commands to enemies */
-            for( auto &u : m_vpEnemies )
-            {
-                u->handleMouse( e.GetType(), wnd.mouse.GetPos(), wnd.kbd.KeyIsPressed( VK_SHIFT ), m_vUnits );
-            }
-#endif
 
             /* multi selection rectangle */
             if( e.GetType() == Mouse::Event::Type::LPress )
@@ -229,19 +195,19 @@ void Game::handleMouse()
                 m_selection.right = wnd.mouse.GetPosX();
                 m_selection.bottom = wnd.mouse.GetPosY();
 
-                for( auto &u : m_vUnits )
+                for( auto &u : m_vpUnits )
                 {
-                    u.handleSelectionRect( m_selection );
+                    u->handleSelectionRect( m_selection );
                 }
             }
             if( e.GetType() == Mouse::Event::Type::LRelease && m_bSelecting )
             {
                 m_bSelecting = false;
-                for( auto &u : m_vUnits )
+                for( auto &u : m_vpUnits )
                 {
-                    if( m_selection.Contains( u.getLocation() ) )
+                    if( m_selection.Contains( u->getLocation() ) )
                     {
-                        u.select();
+                        u->select();
                     }
                 }
             }
@@ -268,29 +234,29 @@ void Game::ComposeFrame()
 #if _DEBUG  /* display additional unit infos */
     int x = 100;
     char text[ 50 ];
-    for( int i = 0; i < m_vUnits.size(); ++i )
+    for( int i = 0; i < m_vpUnits.size(); ++i )
     {
         m_font.DrawText( std::to_string( i ), { x, 1 }, Colors::Cyan, gfx );
 
-        sprintf_s( text, "%0.3f", m_vUnits[ i ].getVelocity().GetLength() );
+        sprintf_s( text, "%0.3f", m_vpUnits[ i ]->getVelocity().GetLength() );
         m_font.DrawText( text, { x, 30 }, Colors::Cyan, gfx );
-        if( m_vUnits[ i ].getState() == Unit::State::MOVING )
+        if( m_vpUnits[ i ]->getState() == Unit::State::MOVING )
         {
             m_font.DrawText( "Moving", { x, 60 }, Colors::Cyan, gfx );
         }
-        else if( m_vUnits[ i ].getState() == Unit::State::STANDING )
+        else if( m_vpUnits[ i ]->getState() == Unit::State::STANDING )
         {
             m_font.DrawText( "Standing", { x, 60 }, Colors::Cyan, gfx );
         }
-        else if( m_vUnits[ i ].getState() == Unit::State::WAITING )
+        else if( m_vpUnits[ i ]->getState() == Unit::State::WAITING )
         {
             m_font.DrawText( "Waiting", { x, 60 }, Colors::Cyan, gfx );
         }
-        else if( m_vUnits[ i ].getState() == Unit::State::ATTACKING )
+        else if( m_vpUnits[ i ]->getState() == Unit::State::ATTACKING )
         {
             m_font.DrawText( "Attacking", { x, 60 }, Colors::Cyan, gfx );
         }
-        sprintf_s( text, "%0.3f", m_vUnits[ i ].getWaitingTime() );
+        sprintf_s( text, "%0.3f", m_vpUnits[ i ]->getWaitingTime() );
         m_font.DrawText( text, { x, 90 }, Colors::Cyan, gfx );
 
         x += 150;

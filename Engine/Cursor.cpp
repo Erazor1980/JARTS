@@ -1,13 +1,12 @@
 #include "Cursor.h"
 
-Cursor::Cursor( Graphics& gfx, const Mouse& mouse, const std::vector< Unit >& vUnits, const std::vector< Unit* >& vpEnemies, const Level& level )
+Cursor::Cursor( Graphics& gfx, const Mouse& mouse, const std::vector< Unit* >& vpUnits, const Level& level )
     :
     m_mainSprite( "..\\images\\cursor\\cursor.bmp" ),
     m_forbiddenSprite( "..\\images\\cursor\\forbidden.bmp" ),
     m_gfx( gfx ),
     m_mouse( mouse ),
-    m_vUnits( vUnits ),
-    m_vpEnemies( vpEnemies ),
+    m_vpUnits( vpUnits ),
     m_level (level )
 {
 }
@@ -16,12 +15,12 @@ void Cursor::update( const float dt )
 {
     /* check if at least one unit is selected */
     m_bUnitSelected = false;
-    for( const auto& u : m_vUnits )
+    for( const auto& u : m_vpUnits )
     {
-        if( u.isSelected() )
+        if( u->isSelected() )
         {
             m_bUnitSelected         = true;
-            m_bSelectedGroundUnit   = u.isGroundUnit();
+            m_bSelectedGroundUnit   = u->isGroundUnit();
             break;
         }
     }
@@ -29,9 +28,9 @@ void Cursor::update( const float dt )
     /* check for mouse over unit */
     Vec2 mp = m_mouse.GetPos();
     m_bMouseOverUnit = false;
-    for( const auto &u : m_vUnits )
+    for( const auto &u : m_vpUnits )
     {
-        m_rectFromUnit = u.getBoundigBox();
+        m_rectFromUnit = u->getBoundigBox();
         if( m_rectFromUnit.Contains( mp ) )
         {
             m_bMouseOverUnit = true;
@@ -39,11 +38,14 @@ void Cursor::update( const float dt )
         }
     }
 
-    m_bMouseOverEnemy = false;
-    if( !m_bMouseOverUnit ) /* check enemy units */
+    m_bMouseOverEnemy = false;      /* check enemy units */
     {
-        for( const auto &u : m_vpEnemies )
+        for( const auto &u : m_vpUnits )
         {
+            if( u->getTeam() == Team::_A )
+            {
+                continue;
+            }
             m_rectFromUnit = u->getBoundigBox();
             if( m_rectFromUnit.Contains( mp ) )
             {

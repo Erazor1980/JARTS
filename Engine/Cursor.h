@@ -7,7 +7,7 @@
 class Cursor
 {
 public:
-    Cursor( Graphics& gfx, const Mouse& mouse, const std::vector< Unit >& vUnits, const std::vector< Unit* >& vpEnemies, const Level& level );
+    Cursor( Graphics& gfx, const Mouse& mouse, const std::vector< Unit* >& vpUnits, const Level& level );
 
     void update( const float dt );
     void draw();
@@ -34,7 +34,7 @@ private:
 
     Graphics& m_gfx;
     const Mouse& m_mouse;
-    const std::vector< Unit >& m_vUnits;
-    const std::vector< Unit* >& m_vpEnemies;
+    const std::vector< Unit* >& m_vpUnits;
+    //const std::vector< Unit* >& m_vpEnemies;
     const Level& m_level;
 };

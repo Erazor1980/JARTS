@@ -69,8 +69,8 @@ private:
     std::vector< Sound > m_vTankSounds;
     std::vector< Sound > m_vJetSounds;
     std::vector< Sound > m_vSoldierSounds;
-    std::vector< Unit > m_vUnits;
-    std::vector< Unit* > m_vpEnemies;
+    std::vector< Unit* > m_vpUnits;
+    //std::vector< Unit* > m_vpEnemies;
 
     /* Cursor stuff */
     Cursor m_cursor;
