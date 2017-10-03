@@ -19,12 +19,11 @@ class Unit
 public:
     enum class State
     {
-        STANDING,
+        STANDING = 0,
         WAITING,            /* if path is temporary blocked */
         MOVING,
         ATTACKING
     };
-
     enum class Direction    /* for the 8 sprite directions */
     {
         UP = 0,
@@ -36,6 +35,12 @@ public:
         LEFT,
         UP_LEFT
     };
+    enum class SoundOrder   /* sound effect order in m_vSoundEffects */
+    {
+        SELECTION = 0,
+        COMMAND,
+        ATTACK
+    };
 public:
     Unit() = default;
     Unit( const Vei2 pos_tile, 
@@ -44,10 +49,9 @@ public:
           std::vector< Unit* >& vpEnemies,
           const UnitType type,
           const Surface& unitSprite,
-          Sound& soundSelect,
-          Sound& soundCommand );
+          std::vector< Sound >& vSoundEffects );
 
-    void draw( Graphics& gfx, const bool drawPath = false ) const;
+    void draw( Graphics& gfx, const bool drawExtraInfos = false ) const;
 
     void update( const std::vector< Unit >& vUnits, const float dt );
     void update( const std::vector< Unit >& vUnits, 
@@ -149,12 +153,10 @@ private:
     void calcSpriteDirection();                     /* which sprite to choose depending on current direction */
     void drawLifeBar( Graphics& gfx ) const;
     
-
     const Surface& m_unitSprite;                    /* unit sprite tiles */
     std::vector< RectI > m_vSpriteRects;            /* rectangles for single steps (direction) of a unit sprite set */
     Direction m_spriteDirection;
-    Sound& m_soundSelect;
-    Sound& m_soundCommand;
+    std::vector< Sound >& m_vSoundEffects;          /* order: selection -> command -> attack */
     bool m_bInsideSelectionRect = false;
 
     /////////////////////////////////////

@@ -64,8 +64,9 @@ private:
     bool m_bSelecting = false;
 
     std::vector< Surface > m_vUnitSprites;
-    std::vector< Sound > m_vSelectionSounds;
-    std::vector< Sound > m_vCommandSounds;
+    std::vector< Sound > m_vTankSounds;
+    std::vector< Sound > m_vJetSounds;
+    std::vector< Sound > m_vSoldierSounds;
     std::vector< Unit > m_vUnits;
     std::vector< Unit* > m_vpEnemies;
 

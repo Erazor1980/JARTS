@@ -9,15 +9,13 @@ Unit::Unit( const Vei2 pos_tile,
             std::vector< Unit* >& vpEnemies,
             const UnitType type,
             const Surface& unitSprite,
-            Sound& soundSelect,
-            Sound& soundCommand )
+            std::vector< Sound >& vSoundEffects )
     :
     m_level( level ),
     m_pathFinder( pathFinder ),
     m_vpEnemies( vpEnemies ),
     m_unitSprite( unitSprite ),
-    m_soundSelect( soundSelect ),
-    m_soundCommand( soundCommand )
+    m_vSoundEffects( vSoundEffects )
 {
     assert( level.isInitialized() );
     assert( pos_tile.x >= 0 && pos_tile.x < level.getWidth()
@@ -78,12 +76,24 @@ Unit::Unit( const Vei2 pos_tile,
     m_velocity.y        = 0;
 }
 
-void Unit::draw( Graphics& gfx, const bool drawPath ) const
+void Unit::draw( Graphics& gfx, const bool drawExtraInfos ) const
 {
-    /* drawing current path when selected */
-    if( drawPath && m_bSelected && State::MOVING == m_state )
+    /* drawing extra infos, like current path or attackRadius, when selected */
+    if( drawExtraInfos && m_bSelected )
     {
-        m_path.draw( gfx );
+        if( State::MOVING == m_state )
+        {
+            m_path.draw( gfx );
+        }
+
+        if( m_state == State::ATTACKING )
+        {
+            gfx.DrawCircleBorder( m_location, ( int )m_attackRadius, Colors::Red );
+        }
+        else
+        {
+            gfx.DrawCircleBorder( m_location, ( int )m_attackRadius, Colors::White );
+        }
     }
 
     if( m_bSelected )
@@ -270,6 +280,15 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
                     break;
                 }
             }
+            if( mp_currentEnemy )
+            {
+                float distToEnemy = ( mp_currentEnemy->getLocation() - m_location ).GetLength();
+                if( distToEnemy <= m_attackRadius )
+                {
+                    m_state = State::ATTACKING;
+                    return;
+                }
+            }
 
             if( m_type == UnitType::JET )
             {
@@ -283,7 +302,7 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
                 m_state = State::MOVING;
                 m_pathIdx = 0;
 #if !_DEBUG
-                m_soundCommand.Play( 1, 0.8f );
+                m_vSoundEffects[ ( int )SoundOrder::COMMAND ].Play( 1, 0.5f );
 #endif
             }
             else
@@ -295,7 +314,7 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
                     m_state = State::MOVING;
                     m_pathIdx = 0;
 #if !_DEBUG
-                    m_soundCommand.Play( 1, 0.3f );
+                    m_vSoundEffects[ ( int )SoundOrder::COMMAND ].Play( 1, 0.5f );
 #endif
                 }
             }
@@ -641,7 +660,7 @@ void Unit::select()
 {
     m_bSelected = true;
 #if !_DEBUG
-    m_soundSelect.Play();
+    m_vSoundEffects[ ( int )SoundOrder::SELECTION ].Play();
 #endif
 }
 void Unit::deselect()

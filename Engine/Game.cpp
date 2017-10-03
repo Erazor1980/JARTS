@@ -42,23 +42,24 @@ Game::Game( MainWindow& wnd )
     m_vUnitSprites.push_back( Surface( "..\\images\\units\\jet_40x40.bmp" ) );
     m_vUnitSprites.push_back( Surface( "..\\images\\units\\tank_40x40_red.bmp" ) );
     
-    /* load sounds */
-    m_vSelectionSounds.push_back( Sound( L"..\\sounds\\ready_for_duty.wav" ) );
-    m_vSelectionSounds.push_back( Sound( L"..\\sounds\\yes_sir.wav" ) );
-
-    m_vCommandSounds.push_back( Sound( L"..\\sounds\\move_tank.wav" ) );
-    m_vCommandSounds.push_back( Sound( L"..\\sounds\\move_jet.wav" ) );
+    /* load sounds - order important! selection -> command -> attack */
+    m_vTankSounds.push_back( Sound( L"..\\sounds\\ready_for_duty.wav" ) );
+    m_vTankSounds.push_back( Sound( L"..\\sounds\\move_tank.wav" ) );
+    m_vTankSounds.push_back( Sound( L"..\\sounds\\tank_firing.wav" ) );
+    
+    m_vJetSounds.push_back( Sound( L"..\\sounds\\yes_sir.wav" ) );
+    m_vJetSounds.push_back( Sound( L"..\\sounds\\move_jet.wav" ) );
+    m_vJetSounds.push_back( Sound( L"..\\sounds\\jet_firing.wav" ) );
 
     /* create units */
-    m_vUnits.push_back( Unit( { 2, 7 }, m_level, m_pathFinder, m_vpEnemies, UnitType::TANK, m_vUnitSprites[ 0 ], m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
-    m_vUnits.push_back( Unit( { 5, 7 }, m_level, m_pathFinder, m_vpEnemies, UnitType::TANK, m_vUnitSprites[ 0 ], m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
-    m_vUnits.push_back( Unit( { 2, 8 }, m_level, m_pathFinder, m_vpEnemies, UnitType::TANK, m_vUnitSprites[ 0 ], m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
-    //m_vUnits.push_back( Unit( { 5, 6 }, m_level, m_pathFinder, m_vEnemies, UnitType::TANK, m_vUnitSprites, m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
-    m_vUnits.push_back( Unit( { 13, 13 }, m_level, m_pathFinder, m_vpEnemies, UnitType::JET, m_vUnitSprites[ 2 ], m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
-    m_vUnits.push_back( Unit( { 10, 13 }, m_level, m_pathFinder, m_vpEnemies, UnitType::JET, m_vUnitSprites[ 2 ], m_vSelectionSounds[ 1 ], m_vCommandSounds[ 1 ] ) );
+    m_vUnits.push_back( Unit( { 2, 7 }, m_level, m_pathFinder, m_vpEnemies, UnitType::TANK, m_vUnitSprites[ 0 ], m_vTankSounds ) );
+    m_vUnits.push_back( Unit( { 5, 7 }, m_level, m_pathFinder, m_vpEnemies, UnitType::TANK, m_vUnitSprites[ 0 ], m_vTankSounds ) );
+    m_vUnits.push_back( Unit( { 2, 8 }, m_level, m_pathFinder, m_vpEnemies, UnitType::TANK, m_vUnitSprites[ 0 ], m_vTankSounds ) );
+    m_vUnits.push_back( Unit( { 13, 13 }, m_level, m_pathFinder, m_vpEnemies, UnitType::JET, m_vUnitSprites[ 2 ], m_vJetSounds ) );
+    m_vUnits.push_back( Unit( { 10, 13 }, m_level, m_pathFinder, m_vpEnemies, UnitType::JET, m_vUnitSprites[ 2 ], m_vJetSounds ) );
 
     /* create enemies */
-    m_vpEnemies.push_back( new Unit( { 10, 8 }, m_level, m_pathFinder, m_vpEnemies, UnitType::TANK, m_vUnitSprites[ 3 ], m_vSelectionSounds[ 0 ], m_vCommandSounds[ 0 ] ) );
+    m_vpEnemies.push_back( new Unit( { 10, 8 }, m_level, m_pathFinder, m_vpEnemies, UnitType::TANK, m_vUnitSprites[ 3 ], m_vTankSounds ) );
 
     /* disable windows standard cursor (we want to use our own) */
     ShowCursor( false );
