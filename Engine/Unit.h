@@ -48,7 +48,8 @@ public:
     {
         SELECTION = 0,
         COMMAND,
-        ATTACK
+        ATTACK,
+        DEATH
     };
 public:
     Unit() = default;

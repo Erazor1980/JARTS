@@ -42,14 +42,16 @@ Game::Game( MainWindow& wnd )
     m_vUnitSprites.push_back( Surface( "..\\images\\units\\jet_40x40.bmp" ) );
     m_vUnitSprites.push_back( Surface( "..\\images\\units\\tank_40x40_red.bmp" ) );
     
-    /* load sounds - order important! selection -> command -> attack */
+    /* load sounds - order important! selection -> command -> attack -> death */
     m_vTankSounds.push_back( Sound( L"..\\sounds\\ready_for_duty.wav" ) );
     m_vTankSounds.push_back( Sound( L"..\\sounds\\move_tank.wav" ) );
     m_vTankSounds.push_back( Sound( L"..\\sounds\\tank_firing.wav" ) );
+    m_vTankSounds.push_back( Sound( L"..\\sounds\\explosion1.wav" ) );
     
     m_vJetSounds.push_back( Sound( L"..\\sounds\\yes_sir.wav" ) );
     m_vJetSounds.push_back( Sound( L"..\\sounds\\move_jet.wav" ) );
     m_vJetSounds.push_back( Sound( L"..\\sounds\\jet_firing.wav" ) );
+    m_vJetSounds.push_back( Sound( L"..\\sounds\\explosion1.wav" ) );
 
     /* create units */
     m_vpUnits.push_back( new Unit( { 2, 7 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vUnitSprites[ 0 ], m_vTankSounds ) );
@@ -205,6 +207,10 @@ void Game::handleMouse()
                 m_bSelecting = false;
                 for( auto &u : m_vpUnits )
                 {
+                    if( u->getTeam() != Team::_A )
+                    {
+                        continue;
+                    }
                     if( m_selection.Contains( u->getLocation() ) )
                     {
                         u->select();

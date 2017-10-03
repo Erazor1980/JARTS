@@ -661,6 +661,10 @@ Vec2 Unit::getNormalPoint( const Vec2& p, const Vec2& a, const Vec2& b )
 }
 void Unit::handleSelectionRect( const RectI& selectionRect )
 {
+    if( m_team != Team::_A )
+    {
+        return;
+    }
     RectI r = selectionRect.getNormalized();
     if( r.Contains( m_location ) )
     {
@@ -688,6 +692,13 @@ void Unit::takeDamage( const int damage, const UnitType EnemyType )
 
     m_life -= damage;
     m_life = std::max( m_life, 0 );
+
+    if( m_life == 0 )
+    {
+#if !_DEBUG
+        m_vSoundEffects[ ( int )SoundOrder::DEATH ].Play();
+#endif
+    }
 }
 std::vector< int > Unit::checkNeighbourhood()
 {
