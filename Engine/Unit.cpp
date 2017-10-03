@@ -1,5 +1,7 @@
 #include "Unit.h"
 #include <assert.h>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 Unit::Unit( const Vei2 pos_tile,
             const Level& level,
@@ -37,9 +39,10 @@ Unit::Unit( const Vei2 pos_tile,
 
     if( UnitType::TANK == type )
     {
-        m_maxSpeed  = 100;
-        m_maxForce  = 0.3f;
-        m_life      = 200;
+        m_maxSpeed      = 100;
+        m_maxForce      = 0.3f;
+        m_life          = 200;
+        m_attackRadius  = 115;
     }
     else if( UnitType::JET == type )
     {
@@ -47,12 +50,14 @@ Unit::Unit( const Vei2 pos_tile,
         m_maxForce      = 0.15f;
         m_bIsGroundUnit = false;
         m_life          = 100;
+        m_attackRadius  = 150;
     }
     else if( UnitType::SOLDIER == type )
     {
-        m_maxSpeed  = 45;
-        m_maxForce  = 0.5f;
-        m_life      = 50;
+        m_maxSpeed      = 45;
+        m_maxForce      = 0.5f;
+        m_life          = 50;
+        m_attackRadius  = 70;
     }
     m_maxLife           = m_life;
     m_oneThirdMaxLife   = m_maxLife / 3.0f;
@@ -60,11 +65,17 @@ Unit::Unit( const Vei2 pos_tile,
     m_halfSize = m_size / 2;
     m_bb = RectF( m_location - Vec2( ( float )m_halfSize, ( float )m_halfSize ), m_location + Vec2( ( float )m_halfSize + 1, ( float )m_halfSize + 1 ) );
 
+
+    /* create random start direction */
+    m_velocity.x = -50.0f + rand() % 100;
+    m_velocity.y = -50.0f + rand() % 100;
+    calcSpriteDirection();
+
+    /* reset all movement values */
     m_velocity          = { 0, 0 };
     m_acceleration      = { 0, 0 };
     m_velocity.x        = 0;
     m_velocity.y        = 0;
-    m_spriteDirection   = ( Unit::Direction )( rand() % 8 );
 }
 
 void Unit::draw( Graphics& gfx, const bool drawPath ) const
@@ -99,6 +110,11 @@ void Unit::draw( Graphics& gfx, const bool drawPath ) const
     gfx.DrawSprite( ( int )m_location.x - m_halfSize, ( int )m_location.y - m_halfSize, m_vSpriteRects[ ( int )m_spriteDirection ],
                     m_unitSprite, Colors::White );
 
+    if( UnitType::TANK == m_type )
+    {
+        drawCannon( gfx );
+    }
+
 #if DEBUG_INFOS
     /* draw bounding box */
     gfx.DrawRectBorder( m_bb, 1, Colors::White );
@@ -107,6 +123,26 @@ void Unit::draw( Graphics& gfx, const bool drawPath ) const
 
 void Unit::update( const std::vector< Unit >& vUnits, const float dt )
 {
+    float distToEnemy = 0.0f;
+    if( mp_currentEnemy )
+    {
+        distToEnemy = ( mp_currentEnemy->getLocation() - m_location ).GetLength();
+        if( m_targetIdx != mp_currentEnemy->getTileIdx() )
+        {
+            m_targetIdx = mp_currentEnemy->getTileIdx();
+            if( distToEnemy > m_attackRadius )
+            {
+                recalculatePath( vUnits );
+            }
+        }
+
+        if( UnitType::TANK == m_type )
+        {
+            Vec2 dir = mp_currentEnemy->getLocation() - m_location;
+            m_cannonOrientation = atan2( dir.y, dir.x );
+        }
+    }
+
     if( State::MOVING == m_state )
     {
         if( UnitType::JET == m_type )
@@ -163,6 +199,19 @@ void Unit::update( const std::vector< Unit >& vUnits, const float dt )
             stop();
         }
     }
+    else if( State::ATTACKING == m_state )
+    {
+        if( distToEnemy <= m_attackRadius )
+        {
+            m_state = State::ATTACKING;
+        }
+        else
+        {
+            m_state = State::MOVING;
+        }
+    }
+
+
 }
 
 void Unit::update( const std::vector< Unit >& vUnits, 
@@ -253,8 +302,42 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
         }
     }
 }
+void Unit::drawCannon( Graphics& gfx ) const
+{
+    const int x     = ( int )m_location.x;
+    const int y     = ( int )m_location.y;
+    const int newX  = x + ( int )( 0.7f * m_size * cos( m_cannonOrientation ) );
+    const int newY  = y + ( int )( 0.7f * m_size * sin( m_cannonOrientation ) );
+
+    Color colorGun = { 115, 115, 115 };
+    Color colorGun2 = { 75, 75, 75 };
+    gfx.DrawLine( x, y, newX, newY, colorGun );
+    gfx.DrawLine( x + 1, y, newX + 1, newY, colorGun );
+    gfx.DrawLine( x + 2, y, newX + 2, newY, colorGun );
+    gfx.DrawLine( x - 1, y, newX - 1, newY, colorGun );
+    gfx.DrawLine( x - 2, y, newX - 2, newY, colorGun );
+    gfx.DrawLine( x, y + 1, newX, newY + 1, colorGun );
+    gfx.DrawLine( x, y + 2, newX, newY + 2, colorGun );
+    gfx.DrawLine( x, y - 1, newX, newY - 1, colorGun );
+    gfx.DrawLine( x, y - 2, newX, newY - 2, colorGun );
+    gfx.DrawCircle( ( x + newX ) / 2, ( y + newY ) / 2, 4, colorGun2 );
+    gfx.DrawCircle( newX, newY, 2, colorGun2 );
+}
 void Unit::calcSpriteDirection()
 {
+    if( UnitType::TANK == m_type && m_velocity.GetLength() )
+    {
+        if( mp_currentEnemy )
+        {
+            Vec2 dir = mp_currentEnemy->getLocation() - m_location;
+            m_cannonOrientation = atan2( dir.y, dir.x );
+        }
+        else
+        {
+            m_cannonOrientation = ( float )( atan2( m_velocity.y, m_velocity.x ) );
+        }
+    }
+
     Vec2 velNorm = m_velocity.GetNormalized();
 
     if( velNorm.x > 0.4f && velNorm.y > 0.4f )

@@ -98,6 +98,13 @@ void Game::UpdateModel()
                 u.update( m_vUnits, e.GetType(), wnd.mouse.GetPos(), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
             }
 
+#if _DEBUG  /* in debug mode we can select and give commands to enemies */
+            for( auto &u : m_vpEnemies )
+            {
+                u->update( m_vUnits, e.GetType(), wnd.mouse.GetPos(), wnd.kbd.KeyIsPressed( VK_SHIFT ), dt );
+            }
+#endif
+
             /* multi selection rectangle */
             if( e.GetType() == Mouse::Event::Type::LPress )
             {
@@ -134,6 +141,11 @@ void Game::UpdateModel()
         {
             u.update( m_vUnits, dt );
         }
+
+        for( auto &u : m_vpEnemies )
+        {
+            u->update( m_vUnits, dt );
+        }
     }
 
     if( !wnd.mouse.IsInWindow() )
@@ -168,12 +180,11 @@ void Game::drawAllUnits()
         if( m_vUnits[ i ].isGroundUnit() )
         {
             m_vUnits[ i ].draw( gfx, m_bDrawDebugStuff );
-        }
-
 #if _DEBUG
-        m_font.DrawText( std::to_string( m_vUnits[ i ].getTileIdx() ), m_vUnits[ i ].getLocationInt() - Vei2( 10, 10 ), Colors::White, gfx );
-        m_font.DrawText( std::to_string( i ), m_vUnits[ i ].getLocationInt() - Vei2( 30, 10 ), Colors::Red, gfx );
+            //m_font.DrawText( std::to_string( m_vUnits[ i ].getTileIdx() ), m_vUnits[ i ].getLocationInt() - Vei2( 10, 10 ), Colors::White, gfx );
+            m_font.DrawText( std::to_string( i ), m_vUnits[ i ].getLocationInt() - Vei2( 30, 10 ), Colors::Red, gfx );
 #endif
+        }
     }
     for( int i = 0; i < m_vpEnemies.size(); ++i )
     {
@@ -181,8 +192,7 @@ void Game::drawAllUnits()
         {
             m_vpEnemies[ i ]->draw( gfx );
         }
-    }
-    
+    }    
 
     /* draw all air units */
     for( int i = 0; i < m_vUnits.size(); ++i )
@@ -190,12 +200,11 @@ void Game::drawAllUnits()
         if( !m_vUnits[ i ].isGroundUnit() )
         {
             m_vUnits[ i ].draw( gfx, m_bDrawDebugStuff );
-        }
-
 #if _DEBUG
-        m_font.DrawText( std::to_string( m_vUnits[ i ].getTileIdx() ), m_vUnits[ i ].getLocationInt() - Vei2( 10, 10 ), Colors::White, gfx );
-        m_font.DrawText( std::to_string( i ), m_vUnits[ i ].getLocationInt() - Vei2( 30, 10 ), Colors::Red, gfx );
+            //m_font.DrawText( std::to_string( m_vUnits[ i ].getTileIdx() ), m_vUnits[ i ].getLocationInt() - Vei2( 10, 10 ), Colors::White, gfx );
+            m_font.DrawText( std::to_string( i ), m_vUnits[ i ].getLocationInt() - Vei2( 30, 10 ), Colors::Red, gfx );
 #endif
+        }
     }
     for( int i = 0; i < m_vpEnemies.size(); ++i )
     {
