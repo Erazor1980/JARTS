@@ -29,6 +29,10 @@
 #include <wrl\client.h>
 #include "COMInitializer.h"
 
+/* for not playing sounds simultaneously */
+#include <ctime>
+#include <chrono>
+
 // forward declare WAVEFORMATEX so we don't have to include bullshit headers
 struct tWAVEFORMATEX;
 typedef tWAVEFORMATEX WAVEFORMATEX;
@@ -183,4 +187,8 @@ private:
 	std::vector<SoundSystem::Channel*> activeChannelPtrs;
 	static constexpr unsigned int nullSample = 0xFFFFFFFFu;
 	static constexpr float nullSeconds = -1.0f;
+
+    /* for not playing sounds simultaneously */
+    std::chrono::steady_clock::time_point m_startTime = std::chrono::steady_clock::now();
+    static constexpr float m_minMicroSecondsBetweenPlays = 100000;
 };

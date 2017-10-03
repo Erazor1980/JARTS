@@ -978,7 +978,15 @@ Sound& Sound::operator=( Sound && donor )
 
 void Sound::Play( float freqMod,float vol )
 {
-	SoundSystem::Get().PlaySoundBuffer( *this,freqMod,vol );
+    std::chrono::steady_clock::time_point currTime = std::chrono::steady_clock::now();
+    long long timeElapsed = std::chrono::duration_cast< std::chrono::microseconds >( currTime - m_startTime ).count();
+	
+    if( timeElapsed > m_minMicroSecondsBetweenPlays )
+    {
+        SoundSystem::Get().PlaySoundBuffer( *this, freqMod, vol );
+    }
+
+    m_startTime = currTime;
 }
 
 void Sound::StopOne()
