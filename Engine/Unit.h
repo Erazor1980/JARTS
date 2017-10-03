@@ -41,7 +41,7 @@ public:
     Unit( const Vei2 pos_tile, 
           const Level& level, 
           PathFinder& pPathFinder,
-          std::vector< Unit* > vpEnemies,
+          std::vector< Unit* >& vpEnemies,
           const UnitType type,
           const Surface& unitSprite,
           Sound& soundSelect,
@@ -128,9 +128,9 @@ private:
     //////////////////
     //// FIGHTING ////
     //////////////////
-    std::vector< Unit* > m_vpEnemies;
+    std::vector< Unit* >& m_vpEnemies;
     Unit* mp_currentEnemy = nullptr;
-    float m_attackRadius = 200;
+    float m_attackRadius = 100;
 
     ///////////////////////////
     //// SELECTION & MOUSE ////

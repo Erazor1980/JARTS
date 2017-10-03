@@ -4,7 +4,7 @@
 Unit::Unit( const Vei2 pos_tile,
             const Level& level,
             PathFinder& pathFinder,
-            std::vector< Unit* > vpEnemies,
+            std::vector< Unit* >& vpEnemies,
             const UnitType type,
             const Surface& unitSprite,
             Sound& soundSelect,
@@ -80,6 +80,16 @@ void Unit::draw( Graphics& gfx, const bool drawPath ) const
         gfx.DrawRectCorners( m_bb, Colors::Green );
 
         drawLifeBar( gfx );
+#if _DEBUG
+        if( m_state == State::ATTACKING )
+        {
+            gfx.DrawCircleBorder( m_location, ( int )m_attackRadius, Colors::Red );
+        }
+        else
+        {
+            gfx.DrawCircleBorder( m_location, ( int )m_attackRadius, Colors::Gray );
+        }
+#endif
     }
     else if( m_bInsideSelectionRect )
     {
@@ -128,6 +138,15 @@ void Unit::update( const std::vector< Unit >& vUnits, const float dt )
         m_acceleration = { 0, 0 };
 
         m_tileIdx = m_level.getTileIdx( m_location );
+
+        if( mp_currentEnemy )
+        {
+            float distToEnemy = ( mp_currentEnemy->getLocation() - m_location ).GetLength();
+            if( distToEnemy <= m_attackRadius )
+            {
+                m_state = State::ATTACKING;
+            }
+        }
     }
     else if( State::WAITING == m_state )
     {
@@ -191,6 +210,18 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
             {
                 return;
             }
+
+            /* check if target is an enemy */
+            mp_currentEnemy = nullptr;
+            for( int i = 0; i < m_vpEnemies.size(); ++i )
+            {
+                if( m_targetIdx == m_vpEnemies[ i ]->getTileIdx() )
+                {
+                    mp_currentEnemy = m_vpEnemies[ i ];
+                    break;
+                }
+            }
+
             if( m_type == UnitType::JET )
             {
                 /* for jets adding only startIdx and targetIdx to path -> they are targeting directly this tile (not the path segment) */

@@ -238,6 +238,10 @@ void Game::ComposeFrame()
         {
             m_font.DrawText( "Waiting", { x, 60 }, Colors::Cyan, gfx );
         }
+        else if( m_vUnits[ i ].getState() == Unit::State::ATTACKING )
+        {
+            m_font.DrawText( "Attacking", { x, 60 }, Colors::Cyan, gfx );
+        }
         sprintf_s( text, "%0.3f", m_vUnits[ i ].getWaitingTime() );
         m_font.DrawText( text, { x, 90 }, Colors::Cyan, gfx );
 
