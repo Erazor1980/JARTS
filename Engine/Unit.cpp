@@ -5,23 +5,22 @@ Unit::Unit( const Vei2 pos_tile,
             const Level* const pLevel,
             PathFinder* const pPathFinder,
             const UnitType type,
-            const std::vector< Surface >& vUnitSprites,
+            const Surface& unitSprite,
             Sound& soundSelect,
             Sound& soundCommand )
     :
     mp_level( pLevel ),
     mp_pathFinder( pPathFinder ),
-    m_vUnitSprites( vUnitSprites ),
+    m_unitSprite( unitSprite ),
     m_soundSelect( soundSelect ),
     m_soundCommand( soundCommand )
 {
     assert( pLevel->isInitialized() );
     assert( pos_tile.x >= 0 && pos_tile.x < pLevel->getWidth()
             && pos_tile.y >= 0 && pos_tile.y < pLevel->getHeight() );
-    assert( vUnitSprites.size() > 0 );
 
     m_type      = type;
-    m_size      = m_vUnitSprites[ ( int )m_type ].GetHeight();
+    m_size      = unitSprite.GetHeight();
 
     /* calculating rectangles for unit sprite steps (directions) */
     for( int i = 0; i < 8; ++i )
@@ -86,7 +85,7 @@ void Unit::draw( Graphics& gfx, const bool drawPath ) const
     }
 
     gfx.DrawSprite( ( int )m_location.x - m_halfSize, ( int )m_location.y - m_halfSize, m_vSpriteRects[ ( int )m_spriteDirection ],
-                    m_vUnitSprites[ ( int )m_type ], Colors::White );
+                    m_unitSprite, Colors::White );
 
 #if DEBUG_INFOS
     /* draw bounding box */

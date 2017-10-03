@@ -41,7 +41,7 @@ public:
           const Level* const pLevel, 
           PathFinder* const pPathFinder, 
           const UnitType type,
-          const std::vector< Surface >& vUnitSprites,
+          const Surface& unitSprite,
           Sound& soundSelect,
           Sound& soundCommand );
 
@@ -127,7 +127,7 @@ private:
     State m_state = State::STANDING;
 
     /* graphics & sounds */
-    const std::vector< Surface >& m_vUnitSprites;   /* vector with sprites for all unit types, index = UnitType */
+    const Surface& m_unitSprite;                    /* unit sprite tiles */
     std::vector< RectI > m_vSpriteRects;            /* rectangles for single steps (direction) of a unit sprite set */
     Direction m_spriteDirection;
     Sound& m_soundSelect;

@@ -65,6 +65,7 @@ private:
     std::vector< Sound > m_vSelectionSounds;
     std::vector< Sound > m_vCommandSounds;
     std::vector< Unit > m_vUnits;
+    std::vector< Unit > m_vEnemies;
 
     /* Cursor stuff */
     Surface m_cursorSprite;
