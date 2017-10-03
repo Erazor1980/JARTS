@@ -41,6 +41,10 @@ public:
         return getTileType( getTileIdx( x, y ) );
     }
     Vec2 getTileCenter( const int tileIdx ) const;  /* return tile center in pixel coordinates */
+    Vec2 getTileCenter( const int x, const int y ) const
+    {
+        return getTileCenter( getTileIdx( x, y ) );
+    }
 
     void draw( Graphics& gfx, const bool drawGrid = false /* for debugging */ ) const;
 

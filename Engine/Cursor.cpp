@@ -39,6 +39,21 @@ void Cursor::update( const float dt )
         }
     }
 
+    m_bMouseOverEnemy = false;
+    if( !m_bMouseOverUnit ) /* check enemy units */
+    {
+        for( const auto &u : m_vEnemies )
+        {
+            m_rectFromUnit = u.getBoundigBox();
+            if( m_rectFromUnit.Contains( mp ) )
+            {
+                m_bMouseOverUnit = true;
+                m_bMouseOverEnemy = true;
+                break;
+            }
+        }
+    }
+
     if( m_bMouseOverUnit )
     {
         m_cursorBlinkTime += dt;
@@ -75,6 +90,31 @@ void Cursor::draw()
 
     const int x = m_mouse.GetPosX();
     const int y = m_mouse.GetPosY();
+    
+    if( m_bUnitSelected )
+    {
+        if( m_bMouseOverEnemy )
+        {
+            const int radius = 25 - m_animationIdx * 3;
+            Vec2 tileCenter = m_level.getTileCenter( m_mouse.GetPosX(), m_mouse.GetPosY() );
+            m_gfx.DrawCircleBorder( tileCenter, radius, Colors::Red );
+            m_gfx.DrawCircleBorder( tileCenter, radius - 4, Colors::Red );
+            m_gfx.DrawRectCorners( m_rectFromUnit, Colors::Red );
+            return;
+        }
+
+        if( m_bSelectedGroundUnit && Tile::OBSTACLE == m_level.getTileType( x, y ) )
+        {
+            m_gfx.DrawSprite( x - m_forbiddenSprite.GetWidth() / 2, y - m_forbiddenSprite.GetHeight() / 2, m_forbiddenSprite, Colors::White );
+            m_animationIdx = 0;
+            m_animationTime = 0;
+            return;
+        }        
+
+        m_gfx.DrawRectCorners( m_animationRect, Colors::Green );
+        m_gfx.DrawCircle( m_mouse.GetPos(), 4, Colors::Green );
+        return;
+    }
 
     if( m_bMouseOverUnit )
     {
@@ -84,23 +124,7 @@ void Cursor::draw()
         }
         return;
     }
-
-    if( m_bUnitSelected )
-    {
-        if( m_bSelectedGroundUnit && Tile::OBSTACLE == m_level.getTileType( x, y ) )
-        {
-            m_gfx.DrawSprite( x - m_forbiddenSprite.GetWidth() / 2, y - m_forbiddenSprite.GetHeight() / 2, m_forbiddenSprite, Colors::White );
-            m_animationIdx = 0;
-            m_animationTime = 0;
-            return;
-        }
-        
-        m_gfx.DrawRectCorners( m_animationRect, Colors::Green );
-        m_gfx.DrawCircle( m_mouse.GetPos(), 4, Colors::Green );
-        return;
-    }
-
-    if( !m_bMouseOverUnit )
+    else
     {
         m_gfx.DrawSprite( x, y, m_mainSprite, { 255, 242, 0 } );
         m_cursorBlinkTime = 0;

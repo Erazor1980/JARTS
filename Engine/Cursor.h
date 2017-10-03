@@ -18,6 +18,7 @@ private:
     bool m_bUnitSelected        = false;
     bool m_bSelectedGroundUnit  = false;
     bool m_bMouseOverUnit       = false;
+    bool m_bMouseOverEnemy      = false;
     bool m_bCursorBlinkShow     = false;
     float m_cursorBlinkDelta    = 0.3f;     // time between blink off/on of cursor in seconds
     float m_cursorBlinkTime     = 0;        // current on/off time
