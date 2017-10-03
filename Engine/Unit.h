@@ -1,4 +1,6 @@
 #pragma once
+#include <ctime>
+#include <chrono>
 #include "Graphics.h"
 #include "Sound.h"
 #include "Mouse.h"
@@ -62,6 +64,7 @@ public:
     void handleSelectionRect( const RectI& selectionRect );
     void select();
     void deselect();
+    void takeDamage( const int damage, const UnitType EnemyType );
 
     bool isSelected() const
     {
@@ -132,9 +135,14 @@ private:
     //////////////////
     //// FIGHTING ////
     //////////////////
+    void shoot();
+    int m_attackDamage;
     std::vector< Unit* >& m_vpEnemies;
     Unit* mp_currentEnemy = nullptr;
-    float m_attackRadius = 100;
+    float m_attackRadius;
+    float m_timeBetweenAttacks;                     /* in milliseconds */
+    std::chrono::steady_clock::time_point m_timeLastShot = std::chrono::steady_clock::now();
+
 
     ///////////////////////////
     //// SELECTION & MOUSE ////

@@ -37,25 +37,31 @@ Unit::Unit( const Vei2 pos_tile,
 
     if( UnitType::TANK == type )
     {
-        m_maxSpeed      = 100;
-        m_maxForce      = 0.3f;
-        m_life          = 200;
-        m_attackRadius  = 115;
+        m_maxSpeed              = 100;
+        m_maxForce              = 0.3f;
+        m_life                  = 200;
+        m_attackRadius          = 115;
+        m_attackDamage          = 20;
+        m_timeBetweenAttacks    = 1000;
     }
     else if( UnitType::JET == type )
     {
-        m_maxSpeed      = 250;
-        m_maxForce      = 0.15f;
-        m_bIsGroundUnit = false;
-        m_life          = 100;
-        m_attackRadius  = 150;
+        m_maxSpeed              = 250;
+        m_maxForce              = 0.15f;
+        m_bIsGroundUnit         = false;
+        m_life                  = 100;
+        m_attackRadius          = 150;
+        m_attackDamage          = 10;
+        m_timeBetweenAttacks    = 300;
     }
     else if( UnitType::SOLDIER == type )
     {
-        m_maxSpeed      = 45;
-        m_maxForce      = 0.5f;
-        m_life          = 50;
-        m_attackRadius  = 70;
+        m_maxSpeed              = 45;
+        m_maxForce              = 0.5f;
+        m_life                  = 50;
+        m_attackRadius          = 70;
+        m_attackDamage          = 5;
+        m_timeBetweenAttacks    = 200;
     }
     m_maxLife           = m_life;
     m_oneThirdMaxLife   = m_maxLife / 3.0f;
@@ -78,6 +84,8 @@ Unit::Unit( const Vei2 pos_tile,
 
 void Unit::draw( Graphics& gfx, const bool drawExtraInfos ) const
 {
+    drawLifeBar( gfx );
+
     /* drawing extra infos, like current path or attackRadius, when selected */
     if( drawExtraInfos && m_bSelected )
     {
@@ -100,7 +108,6 @@ void Unit::draw( Graphics& gfx, const bool drawExtraInfos ) const
     {
         gfx.DrawRectCorners( m_bb, Colors::Green );
 
-        drawLifeBar( gfx );
 #if _DEBUG
         if( m_state == State::ATTACKING )
         {
@@ -130,7 +137,6 @@ void Unit::draw( Graphics& gfx, const bool drawExtraInfos ) const
     gfx.DrawRectBorder( m_bb, 1, Colors::White );
 #endif
 }
-
 void Unit::update( const std::vector< Unit >& vUnits, const float dt )
 {
     float distToEnemy = 0.0f;
@@ -213,17 +219,20 @@ void Unit::update( const std::vector< Unit >& vUnits, const float dt )
     {
         if( distToEnemy <= m_attackRadius )
         {
-            m_state = State::ATTACKING;
+            std::chrono::steady_clock::time_point currTime = std::chrono::steady_clock::now();
+            long long timeElapsed = std::chrono::duration_cast< std::chrono::milliseconds >( currTime - m_timeLastShot ).count();
+            if( timeElapsed > m_timeBetweenAttacks )
+            {
+                m_timeLastShot = currTime;
+                shoot();
+            }
         }
         else
         {
             m_state = State::MOVING;
         }
     }
-
-
 }
-
 void Unit::update( const std::vector< Unit >& vUnits, 
                    const Mouse::Event::Type& type,
                    const Vec2& mouse_pos,
@@ -235,6 +244,12 @@ void Unit::update( const std::vector< Unit >& vUnits,
         handleMouse( type, mouse_pos, shift_pressed, vUnits );
     }
     update( vUnits, dt );
+}
+
+void Unit::shoot()
+{
+    m_vSoundEffects[ ( int )SoundOrder::ATTACK ].Play();
+    mp_currentEnemy->takeDamage( m_attackDamage, m_type );
 }
 
 void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed, const std::vector< Unit >& vUnits )
@@ -417,9 +432,9 @@ void Unit::drawLifeBar( Graphics& gfx ) const
     }
 
     int barPosY = y - ( int )( 1.3f * m_halfSize );
-    gfx.DrawLine( x - m_halfSize + ( int )( 1 - lifeMaxLifeRatio ) * m_size, barPosY + 1, x + m_halfSize, barPosY + 1, lifebarColor );
-    gfx.DrawLine( x - m_halfSize + ( int )( 1 - lifeMaxLifeRatio ) * m_size, barPosY, x + m_halfSize, barPosY, lifebarColor );
-    gfx.DrawLine( x - m_halfSize + ( int )( 1 - lifeMaxLifeRatio ) * m_size, barPosY - 1, x + m_halfSize, barPosY - 1, lifebarColor );
+    gfx.DrawLine( x - m_halfSize + ( int )( ( 1 - lifeMaxLifeRatio ) * m_size ), barPosY + 1, x + m_halfSize, barPosY + 1, lifebarColor );
+    gfx.DrawLine( x - m_halfSize + ( int )( ( 1 - lifeMaxLifeRatio ) * m_size ), barPosY, x + m_halfSize, barPosY, lifebarColor );
+    gfx.DrawLine( x - m_halfSize + ( int )( ( 1 - lifeMaxLifeRatio ) * m_size ), barPosY - 1, x + m_halfSize, barPosY - 1, lifebarColor );
     gfx.DrawLine( x - m_halfSize, barPosY - 2, x + m_halfSize, barPosY - 2, Colors::White );		// top border   -----
     gfx.DrawLine( x - m_halfSize, barPosY - 2, x - m_halfSize, barPosY + 2, Colors::White );		// left border  |_____
     gfx.DrawLine( x + m_halfSize, barPosY - 2, x + m_halfSize, barPosY + 2, Colors::White );		// right border _____|
@@ -496,7 +511,6 @@ void Unit::followPath( const std::vector< Unit >& vUnits, const float dt )
     followLineSegment( start, end, m_path.getRadius(), dt );
 #endif
 }
-
 Vec2 Unit::seek( const Vec2& target, const float dt, const bool enableBreaking )
 {
     Vec2 desired = target - m_location;
@@ -666,6 +680,13 @@ void Unit::select()
 void Unit::deselect()
 {
     m_bSelected = false;
+}
+void Unit::takeDamage( const int damage, const UnitType EnemyType )
+{
+    //TODO add damage taken depending on own type and enemy type
+
+    m_life -= damage;
+    m_life = std::max( m_life, 0 );
 }
 std::vector< int > Unit::checkNeighbourhood( const std::vector< Unit >& vUnits )
 {
