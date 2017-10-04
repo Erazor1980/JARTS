@@ -25,20 +25,29 @@ void Cursor::update( const float dt )
         }
     }
 
-    /* check for mouse over unit */
+    /* check for mouse over (own) unit */
     Vec2 mp = m_mouse.GetPos();
     m_bMouseOverUnit = false;
     for( const auto &u : m_vpUnits )
     {
+        if( u->getTeam() != Team::_A )
+        {
+            continue;
+        }
         m_rectFromUnit = u->getBoundigBox();
         if( m_rectFromUnit.Contains( mp ) )
         {
+            if( u->getTeam() != Team::_A )
+            {
+                m_bMouseOverEnemy = true;
+            }
             m_bMouseOverUnit = true;
             break;
         }
     }
 
     m_bMouseOverEnemy = false;      /* check enemy units */
+    if( !m_bMouseOverUnit )
     {
         for( const auto &u : m_vpUnits )
         {
