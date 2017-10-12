@@ -51,6 +51,8 @@ private:
     void drawAllUnits();
     void checkForDestroyedUnits();
     void handleMouse();
+    void clearMemory();
+    void restartGame();
 	/********************************/
 private:
 	MainWindow& wnd;

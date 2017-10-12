@@ -53,6 +53,28 @@ Game::Game( MainWindow& wnd )
     m_vJetSounds.push_back( Sound( L"..\\sounds\\jet_firing.wav" ) );
     m_vJetSounds.push_back( Sound( L"..\\sounds\\explosion1.wav" ) );
 
+    restartGame();
+
+    /* disable windows standard cursor (we want to use our own) */
+    ShowCursor( false );
+}
+
+Game::~Game()
+{
+    clearMemory();
+}
+void Game::clearMemory()
+{
+    for( int i = 0; i < m_vpUnits.size(); ++i )
+    {
+        delete m_vpUnits[ i ];
+    }
+    m_vpUnits.clear();
+}
+void Game::restartGame()
+{
+    clearMemory();
+
     /* create units */
     m_vpUnits.push_back( new Unit( { 2, 7 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vUnitSprites[ 0 ], m_vTankSounds ) );
     m_vpUnits.push_back( new Unit( { 5, 7 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vUnitSprites[ 0 ], m_vTankSounds ) );
@@ -62,20 +84,7 @@ Game::Game( MainWindow& wnd )
 
     /* create enemies */
     m_vpUnits.push_back( new Unit( { 10, 8 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vUnitSprites[ 3 ], m_vTankSounds ) );
-
-    /* disable windows standard cursor (we want to use our own) */
-    ShowCursor( false );
 }
-
-Game::~Game()
-{
-    for( int i = 0; i < m_vpUnits.size(); ++i )
-    {
-        delete m_vpUnits[ i ];
-    }
-    m_vpUnits.clear();
-}
-
 void Game::Go()
 {
 	gfx.BeginFrame();	
@@ -118,6 +127,14 @@ void Game::UpdateModel()
             if( e.GetCode() == VK_SPACE )
             {
                 m_bDrawDebugStuff = !m_bDrawDebugStuff;
+            }
+            else if( e.GetCode() == VK_RETURN )
+            {
+                restartGame();
+            }
+            else if( e.GetCode() == VK_ESCAPE )
+            {
+                wnd.Kill();
             }
         }
     }
