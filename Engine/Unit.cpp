@@ -116,8 +116,16 @@ void Unit::draw( Graphics& gfx, const bool drawExtraInfos ) const
         gfx.DrawRectCorners( m_bb, Colors::White );
     }
 
-    gfx.DrawSprite( ( int )m_location.x - m_halfSize, ( int )m_location.y - m_halfSize, m_vSpriteRects[ ( int )m_spriteDirection ],
-                    m_unitSprite, SpriteEffect::Chroma( Colors::White ) );
+    if( m_bDmgEffectActive )
+    {
+        gfx.DrawSprite( ( int )m_location.x - m_halfSize, ( int )m_location.y - m_halfSize, m_vSpriteRects[ ( int )m_spriteDirection ],
+                        m_unitSprite, SpriteEffect::Substitution( Colors::White, Colors::Red ) );
+    }
+    else
+    {
+        gfx.DrawSprite( ( int )m_location.x - m_halfSize, ( int )m_location.y - m_halfSize, m_vSpriteRects[ ( int )m_spriteDirection ],
+                        m_unitSprite, SpriteEffect::Chroma( Colors::White ) );
+    }
 
     if( UnitType::TANK == m_type )
     {
@@ -131,7 +139,19 @@ void Unit::draw( Graphics& gfx, const bool drawExtraInfos ) const
 }
 void Unit::update( const float dt )
 {
+    // update damage effect time if active
+    if( m_bDmgEffectActive )
+    {
+        m_dmgEffectTime += dt;
+        //deactivate effect if duration exceeded
+        if( m_dmgEffectTime >= m_dmgEffectDuration )
+        {
+            m_bDmgEffectActive = false;
+        }
+    }
+
     float distToEnemy = 0.0f;
+
     if( mp_currentEnemy )
     {
         distToEnemy = ( mp_currentEnemy->getLocation() - m_location ).GetLength();
@@ -700,6 +720,9 @@ void Unit::takeDamage( const int damage, const UnitType EnemyType )
         m_vSoundEffects[ ( int )SoundOrder::DEATH ].Play();
 #endif
     }
+
+    m_bDmgEffectActive = true;
+    m_dmgEffectTime = 0.0f;
 }
 std::vector< int > Unit::checkNeighbourhood()
 {

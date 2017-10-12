@@ -157,6 +157,10 @@ private:
     float m_attackRadius;
     float m_timeBetweenAttacks;                     /* in milliseconds */
     std::chrono::steady_clock::time_point m_timeLastShot = std::chrono::steady_clock::now();
+    /* damage animation */
+    static constexpr float m_dmgEffectDuration = 0.045f;
+    float m_dmgEffectTime = 0.0f;
+    bool m_bDmgEffectActive = false;
 
 
     ///////////////////////////
