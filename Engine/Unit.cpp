@@ -300,7 +300,7 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
             const int startIdx  = m_level.getTileIdx( m_location );
             m_targetIdx         = m_level.getTileIdx( ( int )mouse_pos.x, ( int )mouse_pos.y );
 
-            if( startIdx == m_targetIdx || Tile::OBSTACLE == m_level.getTileType( m_targetIdx ) )
+            if( startIdx == m_targetIdx || ( Tile::OBSTACLE == m_level.getTileType( m_targetIdx ) && m_bIsGroundUnit ) )
             {
                 return;
             }
