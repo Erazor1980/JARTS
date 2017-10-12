@@ -79,6 +79,8 @@ void Game::restartGame()
     m_vpUnits.push_back( new Unit( { 2, 7 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vUnitSprites[ 0 ], m_vTankSounds ) );
     m_vpUnits.push_back( new Unit( { 5, 7 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vUnitSprites[ 0 ], m_vTankSounds ) );
     m_vpUnits.push_back( new Unit( { 2, 8 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vUnitSprites[ 0 ], m_vTankSounds ) );
+    m_vpUnits.push_back( new Unit( { 2, 5 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vUnitSprites[ 0 ], m_vTankSounds ) );
+    m_vpUnits.push_back( new Unit( { 2, 3 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vUnitSprites[ 0 ], m_vTankSounds ) );
     m_vpUnits.push_back( new Unit( { 13, 13 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vUnitSprites[ 2 ], m_vJetSounds ) );
     m_vpUnits.push_back( new Unit( { 10, 13 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vUnitSprites[ 2 ], m_vJetSounds ) );
 
@@ -159,6 +161,14 @@ void Game::drawAllUnits()
 #endif
         }
     }
+    /* draw life bars on top */
+    for( int i = 0; i < m_vpUnits.size(); ++i )
+    {
+        if( m_vpUnits[ i ]->isGroundUnit() )
+        {
+            m_vpUnits[ i ]->drawLifeBar( gfx );
+        }
+    }
 
     /* draw all air units */
     for( int i = 0; i < m_vpUnits.size(); ++i )
@@ -170,6 +180,14 @@ void Game::drawAllUnits()
             //m_font.DrawText( std::to_string( m_vUnits[ i ].getTileIdx() ), m_vUnits[ i ].getLocationInt() - Vei2( 10, 10 ), Colors::White, gfx );
             m_font.DrawText( std::to_string( i ), m_vpUnits[ i ]->getLocationInt() - Vei2( 30, 10 ), Colors::Red, gfx );
 #endif
+        }
+    }
+    /* draw life bars on top */
+    for( int i = 0; i < m_vpUnits.size(); ++i )
+    {
+        if( !m_vpUnits[ i ]->isGroundUnit() )
+        {
+            m_vpUnits[ i ]->drawLifeBar( gfx );
         }
     }
 }

@@ -70,7 +70,8 @@ private:
     std::vector< Sound > m_vJetSounds;
     std::vector< Sound > m_vSoldierSounds;
     std::vector< Unit* > m_vpUnits;
-    //std::vector< Unit* > m_vpEnemies;
+    
+    bool m_bDrawLifeBars = true;
 
     /* Cursor stuff */
     Cursor m_cursor;

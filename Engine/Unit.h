@@ -63,6 +63,7 @@ public:
           std::vector< Sound >& vSoundEffects );
 
     void draw( Graphics& gfx, const bool drawExtraInfos = false ) const;
+    void drawLifeBar( Graphics& gfx ) const;
 
     void update( const float dt );
 
@@ -177,7 +178,6 @@ private:
     void drawCannon( Graphics& gfx ) const;         /* for tanks only */
     float m_cannonOrientation;
     void calcSpriteDirection();                     /* which sprite to choose depending on current direction */
-    void drawLifeBar( Graphics& gfx ) const;
     
     const Surface& m_unitSprite;                    /* unit sprite tiles */
     std::vector< RectI > m_vSpriteRects;            /* rectangles for single steps (direction) of a unit sprite set */
