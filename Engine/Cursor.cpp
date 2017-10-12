@@ -1,4 +1,5 @@
 #include "Cursor.h"
+#include "SpriteEffect.h"
 
 Cursor::Cursor( Graphics& gfx, const Mouse& mouse, const std::vector< Unit* >& vpUnits, const Level& level )
     :
@@ -116,7 +117,7 @@ void Cursor::draw()
 
         if( m_bSelectedGroundUnit && Tile::OBSTACLE == m_level.getTileType( x, y ) )
         {
-            m_gfx.DrawSprite( x - m_forbiddenSprite.GetWidth() / 2, y - m_forbiddenSprite.GetHeight() / 2, m_forbiddenSprite, Colors::White );
+            m_gfx.DrawSprite( x - m_forbiddenSprite.GetWidth() / 2, y - m_forbiddenSprite.GetHeight() / 2, m_forbiddenSprite, SpriteEffect::Chroma( Colors::White ) );
             m_animationIdx = 0;
             m_animationTime = 0;
             return;
@@ -137,7 +138,7 @@ void Cursor::draw()
     }
     else
     {
-        m_gfx.DrawSprite( x, y, m_mainSprite, { 255, 242, 0 } );
+        m_gfx.DrawSprite( x, y, m_mainSprite, SpriteEffect::Chroma( { 255, 242, 0 } ) );
         m_cursorBlinkTime = 0;
         m_bCursorBlinkShow = true;
     }

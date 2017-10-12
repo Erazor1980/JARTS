@@ -1,4 +1,5 @@
 #include "Level.h"
+#include "SpriteEffect.h"
 #include <assert.h>
 
 Level::Level( const std::string& filename )
@@ -153,7 +154,7 @@ Vec2 Level::getTileCenter( const int tileIdx ) const
 
 void Level::draw( Graphics& gfx, const bool drawGrid ) const
 {
-    gfx.DrawSprite( 0, 0, m_image );
+    gfx.DrawSprite( 0, 0, m_image, SpriteEffect::Copy{} );
     if( drawGrid )
     {
         drawTileGrid( gfx );

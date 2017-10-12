@@ -1,4 +1,5 @@
 #include "Unit.h"
+#include "SpriteEffect.h"
 #include <assert.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -116,7 +117,7 @@ void Unit::draw( Graphics& gfx, const bool drawExtraInfos ) const
     }
 
     gfx.DrawSprite( ( int )m_location.x - m_halfSize, ( int )m_location.y - m_halfSize, m_vSpriteRects[ ( int )m_spriteDirection ],
-                    m_unitSprite, Colors::White );
+                    m_unitSprite, SpriteEffect::Chroma( Colors::White ) );
 
     if( UnitType::TANK == m_type )
     {
