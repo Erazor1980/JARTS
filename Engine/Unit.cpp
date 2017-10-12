@@ -243,6 +243,13 @@ void Unit::update( const float dt )
                 m_timeLastShot = currTime;
                 shoot();
             }
+
+            // turn JETS to enemy if in radius
+            if( UnitType::JET == m_type )
+            {
+                m_velocity = mp_currentEnemy->getLocation() - m_location;
+                calcSpriteDirection();
+            }
         }
         else
         {
@@ -293,7 +300,7 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
             const int startIdx  = m_level.getTileIdx( m_location );
             m_targetIdx         = m_level.getTileIdx( ( int )mouse_pos.x, ( int )mouse_pos.y );
 
-            if( startIdx == m_targetIdx )
+            if( startIdx == m_targetIdx || Tile::OBSTACLE == m_level.getTileType( m_targetIdx ) )
             {
                 return;
             }
