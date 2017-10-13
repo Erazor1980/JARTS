@@ -32,7 +32,8 @@ Game::Game( MainWindow& wnd )
     m_level( "..\\images\\maps\\testLvl1_800x600.bmp" ),
 #endif
     m_pathFinder( m_level ),
-    m_cursor( gfx, wnd.mouse, m_vpUnits, m_level )
+    m_cursor( gfx, wnd.mouse, m_vpUnits, m_level ),
+    m_explSeqSprite( "..\\images\\effects\\expl_seq.bmp" )
 {
     srand( ( unsigned int )time( NULL ) );
 
@@ -53,10 +54,10 @@ Game::Game( MainWindow& wnd )
 
     m_backGroundSound = Sound( L"..\\sounds\\background_wind.wav", 0.0f, 59.9f );
 
-    restartGame();
-
     /* disable windows standard cursor (we want to use our own) */
     ShowCursor( false );
+
+    restartGame();
 }
 
 Game::~Game()
@@ -73,7 +74,9 @@ void Game::clearMemory()
 }
 void Game::restartGame()
 {
+#if !_DEBUG
     m_backGroundSound.Play( 1.0f, 0.5f );
+#endif
 
     clearMemory();
 
@@ -114,7 +117,24 @@ void Game::UpdateModel()
     {
         u->update( dt );
     }
-    
+
+    ///////////////////
+    //// SEQUENCES ////
+    ///////////////////
+    auto s = m_vpDeathSequences.begin();
+    while( s != m_vpDeathSequences.end() )
+    {
+        if( ( *s )->update( dt ) )
+        {
+            delete ( *s );
+            s = m_vpDeathSequences.erase( s );
+        }
+        else
+        {
+            s++;
+        }
+    }
+
     //////////////////
     //// KEYBOARD ////
     //////////////////
@@ -205,11 +225,19 @@ void Game::checkForDestroyedUnits()
     while( u != m_vpUnits.end() )
     {
         if( ( *u )->isDestroyed() )
-        {            
+        {
+            // inform all units which have current unit as enemy target
             for( int i = 0; i < m_vpUnits.size(); ++i )
             {
                 m_vpUnits[ i ]->checkDestroyedEnemy( *u );
             }
+
+            // add death sequence
+            if( ( *u )->getType() == UnitType::TANK || ( *u )->getType() == UnitType::JET )
+            {
+                m_vpDeathSequences.push_back( new SurfaceSequence( m_explSeqSprite, 14, 1, ( *u )->getLocationInt(), 0.07f ) );
+            }
+
             delete (*u);
             u = m_vpUnits.erase( u );
         }
@@ -278,6 +306,11 @@ void Game::ComposeFrame()
     m_level.draw( gfx, m_bDrawDebugStuff );
     
     drawAllUnits();
+
+    for( const auto s : m_vpDeathSequences )
+    {
+        s->Draw( gfx );
+    }
 
     if( m_bSelecting )
     {

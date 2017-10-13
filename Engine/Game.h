@@ -32,6 +32,7 @@
 #include "Font.h"
 #include "Defines.h"
 #include "Cursor.h"
+#include "SurfaceSequence.h"
 
 class Game
 {
@@ -74,6 +75,9 @@ private:
     std::vector< Unit* > m_vpUnits;
     
     Sound m_backGroundSound;
+
+    Surface m_explSeqSprite;
+    std::vector< SurfaceSequence* > m_vpDeathSequences;
 
     bool m_bDrawLifeBars = true;
 

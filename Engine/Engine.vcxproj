@@ -146,6 +146,7 @@
     <ClInclude Include="Font.h" />
     <ClInclude Include="Path.h" />
     <ClInclude Include="SpriteEffect.h" />
+    <ClInclude Include="SurfaceSequence.h" />
     <ClInclude Include="Unit.h" />
     <ClInclude Include="FrameTimer.h" />
     <ClInclude Include="Game.h" />

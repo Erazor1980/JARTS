@@ -84,6 +84,10 @@ public:
     {
         return m_team;
     }
+    UnitType getType() const
+    {
+        return m_type;
+    }
     bool isDestroyed() const
     {
         return m_life == 0;
