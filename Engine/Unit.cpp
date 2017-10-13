@@ -184,7 +184,10 @@ void Unit::update( const float dt )
             m_targetIdx = mp_currentEnemy->getTileIdx();
             if( distToEnemy > m_attackRadius )
             {
-                recalculatePath();
+                if( isGroundUnit() )
+                {
+                    recalculatePath();
+                }
             }
         }
 
