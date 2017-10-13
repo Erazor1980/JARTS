@@ -38,6 +38,18 @@ Unit::Unit( const Vei2 pos_tile,
     m_location.y    = pos_tile.y * m_size + m_size / 2.0f - 1;
     m_tileIdx       = m_level.getTileIdx( m_location );
     m_team          = team;
+    if( Team::_A == m_team )
+    {
+        m_color = Colors::Blue;
+    }
+    else if( Team::_B == m_team )
+    {
+        m_color = Colors::Red;
+    }
+    else
+    {
+        m_color = Colors::Yellow;
+    }
 
     m_bIsGroundUnit = true;
     if( UnitType::TANK == type )
@@ -89,14 +101,14 @@ Unit::Unit( const Vei2 pos_tile,
 
 void Unit::draw( Graphics& gfx, const bool drawExtraInfos ) const
 {
-    /* drawing extra infos, like current path or attackRadius, when selected */
-    if( drawExtraInfos && m_bSelected )
+    /* drawing extra infos, like current path or attackRadius */
+    if( drawExtraInfos )
     {
         if( State::MOVING == m_state )
         {
             m_path.draw( gfx );
         }
-
+                
         if( m_state == State::ATTACKING )
         {
             gfx.DrawCircleBorder( m_location, ( int )m_attackRadius, Colors::Red );
@@ -124,7 +136,7 @@ void Unit::draw( Graphics& gfx, const bool drawExtraInfos ) const
     else
     {
         gfx.DrawSprite( ( int )m_location.x - m_halfSize, ( int )m_location.y - m_halfSize, m_vSpriteRects[ ( int )m_spriteDirection ],
-                        m_vSprites[ ( int )SpriteOrder::UNIT ], SpriteEffect::Chroma( Colors::White ) );
+                        m_vSprites[ ( int )SpriteOrder::UNIT ], SpriteEffect::TeamColor( Colors::White, { 255, 242, 0 }, m_color ) );
     }
 
     if( UnitType::TANK == m_type )
@@ -190,15 +202,24 @@ void Unit::update( const float dt )
 
     if( State::MOVING == m_state )
     {
-        if( UnitType::JET == m_type )
+        if( UnitType::JET == m_type && !mp_currentEnemy )
         {
-            applyForce( separateFromOtherUnits( dt ) * 1.5f );
-            applyForce( seek( m_path.getWayPoints().back(), dt, true ) );
-            float d = ( m_location - m_path.getWayPoints().back() ).GetLength();
-            if( d < m_distToTile / 2 )
+            if( mp_currentEnemy )
             {
-                stop();
+                applyForce( separateFromOtherUnits( dt ) * 1.5f );
+                applyForce( seek( mp_currentEnemy->getLocation(), dt, true ) );
             }
+            else
+            {
+                applyForce( separateFromOtherUnits( dt ) * 1.5f );
+                applyForce( seek( m_path.getWayPoints().back(), dt, true ) );
+                float d = ( m_location - m_path.getWayPoints().back() ).GetLength();
+                if( d < m_distToTile / 2 )
+                {
+                    stop();
+                }
+            }            
+            
         }
         else
         {
@@ -283,7 +304,7 @@ void Unit::shoot()
 #if !_DEBUG
     m_vSoundEffects[ ( int )SoundOrder::ATTACK ].Play();
 #endif
-    mp_currentEnemy->takeDamage( m_attackDamage, m_type );
+    mp_currentEnemy->takeDamage( m_attackDamage, m_type, this );
 
     if( mp_currentEnemy->isDestroyed() )
     {
@@ -418,6 +439,9 @@ void Unit::drawGun( Graphics& gfx ) const
     const int y     = ( int )m_location.y;
     const int newX  = x + ( int )( GUN_LENGTH * m_size * cos( m_cannonOrientation ) );
     const int newY  = y + ( int )( GUN_LENGTH * m_size * sin( m_cannonOrientation ) );
+    
+    // draw team color
+    gfx.DrawCircle( m_location, 7, m_color );
 
     Color colorGun = { 115, 115, 115 };
     Color colorGun2 = { 75, 75, 75 };
@@ -430,7 +454,7 @@ void Unit::drawGun( Graphics& gfx ) const
     gfx.DrawLine( x, y + 2, newX, newY + 2, colorGun );
     gfx.DrawLine( x, y - 1, newX, newY - 1, colorGun );
     gfx.DrawLine( x, y - 2, newX, newY - 2, colorGun );
-    gfx.DrawCircle( ( x + newX ) / 2, ( y + newY ) / 2, 4, colorGun2 );
+    gfx.DrawCircle( ( x + newX ) / 2, ( y + newY ) / 2, 4, m_color );
     gfx.DrawCircle( newX, newY, 2, colorGun2 );
 }
 void Unit::drawShotEffect( Graphics& gfx ) const
@@ -577,6 +601,7 @@ void Unit::stop()
     m_velocity          = { 0, 0 };
     m_pathIdx           = 0;
     m_currWaitingTime   = 0.0f;
+    mp_currentEnemy     = nullptr;
 }
 void Unit::followPath( const float dt )
 {
@@ -815,7 +840,7 @@ void Unit::deselect()
 {
     m_bSelected = false;
 }
-void Unit::takeDamage( const int damage, const UnitType EnemyType )
+void Unit::takeDamage( const int damage, const UnitType EnemyType, Unit* const pAttackingUnit )
 {
     //TODO add damage taken depending on own type and enemy type
 
@@ -827,6 +852,12 @@ void Unit::takeDamage( const int damage, const UnitType EnemyType )
 #if !_DEBUG
         m_vSoundEffects[ ( int )SoundOrder::DEATH ].Play();
 #endif
+    }
+
+    if( State::STANDING == m_state )
+    {
+        mp_currentEnemy = pAttackingUnit;
+        m_state = State::ATTACKING;
     }
 
     m_bDmgEffectActive = true;

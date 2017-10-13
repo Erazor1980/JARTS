@@ -77,7 +77,7 @@ public:
     void handleSelectionRect( const RectI& selectionRect );
     void select();
     void deselect();
-    void takeDamage( const int damage, const UnitType EnemyType );
+    void takeDamage( const int damage, const UnitType EnemyType, Unit* const pAttackingUnit );
     void checkDestroyedEnemy( const Unit* const pDestroyedUnit );   /* set mp_currentEnemy to null killed unit was current target enemy */
 
     Team getTeam() const
@@ -200,6 +200,7 @@ private:
     Direction m_spriteDirection;
     std::vector< Sound >& m_vSoundEffects;          /* order: selection -> command -> attack */
     bool m_bInsideSelectionRect = false;
+    Color m_color;
 
     /////////////////////////////////////
     //// PATH PLANNING AND MOVEMENTS ////

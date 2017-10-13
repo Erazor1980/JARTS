@@ -75,4 +75,34 @@ namespace SpriteEffect
     private:
         Color chroma;
     };
+
+    class TeamColor
+    {
+    public:
+        TeamColor( Color chroma, Color chromaToSub, Color team )
+            :
+            chroma( chroma ),
+            chromaToSub( chromaToSub ),
+            sub( team )
+        {
+        }
+        void operator()( Color cSrc, int xDest, int yDest, Graphics& gfx ) const
+        {
+            if( cSrc != chroma )
+            {
+                if( cSrc == chromaToSub )
+                {
+                    gfx.PutPixel( xDest, yDest, sub );
+                }
+                else
+                {
+                    gfx.PutPixel( xDest, yDest, cSrc );
+                }
+            }
+        }
+    private:
+        Color chroma = Colors::Magenta;
+        Color chromaToSub;
+        Color sub;
+    };
 }
