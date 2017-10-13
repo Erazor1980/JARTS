@@ -205,7 +205,7 @@ void Unit::update( const float dt )
 
     if( State::MOVING == m_state )
     {
-        if( UnitType::JET == m_type && !mp_currentEnemy )
+        if( UnitType::JET == m_type  )
         {
             if( mp_currentEnemy )
             {
@@ -222,7 +222,6 @@ void Unit::update( const float dt )
                     stop();
                 }
             }            
-            
         }
         else
         {
@@ -601,7 +600,7 @@ void Unit::stop()
 {
     m_state             = State::STANDING;
     m_acceleration      = { 0, 0 };
-    m_velocity          = { 0, 0 };
+    //m_velocity          = { 0, 0 };
     m_pathIdx           = 0;
     m_currWaitingTime   = 0.0f;
     mp_currentEnemy     = nullptr;

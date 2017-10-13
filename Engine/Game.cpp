@@ -87,7 +87,7 @@ void Game::restartGame()
     m_vpUnits.push_back( new Unit( { 10, 4 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
 
     /* create enemies */
-    m_vpUnits.push_back( new Unit( { 10, 8 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
+    m_vpUnits.push_back( new Unit( { 7, 12 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
     m_vpUnits.push_back( new Unit( { 17, 13 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
     m_vpUnits.push_back( new Unit( { 15, 13 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
 }
