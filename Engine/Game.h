@@ -73,6 +73,8 @@ private:
     std::vector< Sound > m_vSoldierSounds;
     std::vector< Unit* > m_vpUnits;
     
+    Sound m_backGroundSound;
+
     bool m_bDrawLifeBars = true;
 
     /* Cursor stuff */

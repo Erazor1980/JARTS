@@ -39,10 +39,6 @@ Game::Game( MainWindow& wnd )
     /* load images */
     m_vTankSprites = { Surface( "..\\images\\units\\tank_40x40_blue.bmp" ), Surface( "..\\images\\effects\\expl_1.bmp" ), Surface( "..\\images\\effects\\expl_seq.bmp" ) };
     m_vJetSprites = { Surface( "..\\images\\units\\jet_40x40.bmp" ), Surface( "..\\images\\effects\\expl_1.bmp" ), Surface( "..\\images\\effects\\expl_seq.bmp" ) };
-    //m_vUnitSprites.push_back( Surface( "..\\images\\units\\tank_40x40_blue.bmp" ) );
-    //m_vUnitSprites.push_back( Surface( "..\\images\\units\\tank_40x40_blue.bmp" ) );   //TODO replace by soldier sprite later
-    //m_vUnitSprites.push_back( Surface( "..\\images\\units\\jet_40x40.bmp" ) );
-    //m_vUnitSprites.push_back( Surface( "..\\images\\units\\tank_40x40_red.bmp" ) );
     
     /* load sounds - order important! selection -> command -> attack -> death */
     m_vTankSounds.push_back( Sound( L"..\\sounds\\ready_for_duty.wav" ) );
@@ -54,6 +50,8 @@ Game::Game( MainWindow& wnd )
     m_vJetSounds.push_back( Sound( L"..\\sounds\\move_jet.wav" ) );
     m_vJetSounds.push_back( Sound( L"..\\sounds\\jet_firing.wav" ) );
     m_vJetSounds.push_back( Sound( L"..\\sounds\\explosion1.wav" ) );
+
+    m_backGroundSound = Sound( L"..\\sounds\\background_wind.wav", 0.0f, 59.9f );
 
     restartGame();
 
@@ -75,6 +73,8 @@ void Game::clearMemory()
 }
 void Game::restartGame()
 {
+    m_backGroundSound.Play( 1.0f, 0.5f );
+
     clearMemory();
 
     /* create units */
