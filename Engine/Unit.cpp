@@ -252,19 +252,19 @@ void Unit::update( const float dt )
     {
         if( distToEnemy <= m_attackRadius )
         {
+            // turn JETS to enemy if in radius
+            if( UnitType::JET == m_type )
+            {
+                m_velocity = mp_currentEnemy->getLocation() - m_location;
+                calcSpriteDirection();
+            }
+
             std::chrono::steady_clock::time_point currTime = std::chrono::steady_clock::now();
             long long timeElapsed = std::chrono::duration_cast< std::chrono::milliseconds >( currTime - m_timeLastShot ).count();
             if( timeElapsed > m_timeBetweenAttacks )
             {
                 m_timeLastShot = currTime;
                 shoot();
-            }
-
-            // turn JETS to enemy if in radius
-            if( UnitType::JET == m_type )
-            {
-                m_velocity = mp_currentEnemy->getLocation() - m_location;
-                calcSpriteDirection();
             }
         }
         else
@@ -284,6 +284,12 @@ void Unit::shoot()
     m_vSoundEffects[ ( int )SoundOrder::ATTACK ].Play();
 #endif
     mp_currentEnemy->takeDamage( m_attackDamage, m_type );
+
+    if( mp_currentEnemy->isDestroyed() )
+    {
+        mp_currentEnemy = nullptr;
+        m_state = State::STANDING;
+    }
 
     m_bShotEffectActive = true;
     m_shotEffectTime = 0.0f;
@@ -825,6 +831,18 @@ void Unit::takeDamage( const int damage, const UnitType EnemyType )
 
     m_bDmgEffectActive = true;
     m_dmgEffectTime = 0.0f;
+}
+void Unit::checkDestroyedEnemy( const Unit* const pDestroyedUnit )
+{
+    if( mp_currentEnemy == pDestroyedUnit )
+    {
+        mp_currentEnemy = nullptr;
+
+        if( State::ATTACKING == m_state )
+        {
+            m_state = State::STANDING;
+        }
+    }
 }
 std::vector< int > Unit::checkNeighbourhood()
 {

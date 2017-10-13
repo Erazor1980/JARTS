@@ -78,6 +78,7 @@ public:
     void select();
     void deselect();
     void takeDamage( const int damage, const UnitType EnemyType );
+    void checkDestroyedEnemy( const Unit* const pDestroyedUnit );   /* set mp_currentEnemy to null killed unit was current target enemy */
 
     Team getTeam() const
     {

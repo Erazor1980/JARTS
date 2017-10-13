@@ -114,11 +114,6 @@ void Game::UpdateModel()
     {
         u->update( dt );
     }
-
-    /*for( auto &u : m_vpEnemies )
-    {
-        u->update( dt );
-    }*/
     
     //////////////////
     //// KEYBOARD ////
@@ -139,6 +134,10 @@ void Game::UpdateModel()
             else if( e.GetCode() == VK_ESCAPE )
             {
                 wnd.Kill();
+            }
+            else if( e.GetCode() == 'L' )
+            {
+                m_bDrawLifeBars = !m_bDrawLifeBars;
             }
         }
     }
@@ -164,11 +163,14 @@ void Game::drawAllUnits()
         }
     }
     /* draw life bars on top */
-    for( int i = 0; i < m_vpUnits.size(); ++i )
+    if( m_bDrawLifeBars )
     {
-        if( m_vpUnits[ i ]->isGroundUnit() )
+        for( int i = 0; i < m_vpUnits.size(); ++i )
         {
-            m_vpUnits[ i ]->drawLifeBar( gfx );
+            if( m_vpUnits[ i ]->isGroundUnit() )
+            {
+                m_vpUnits[ i ]->drawLifeBar( gfx );
+            }
         }
     }
 
@@ -185,11 +187,14 @@ void Game::drawAllUnits()
         }
     }
     /* draw life bars on top */
-    for( int i = 0; i < m_vpUnits.size(); ++i )
+    if( m_bDrawLifeBars )
     {
-        if( !m_vpUnits[ i ]->isGroundUnit() )
+        for( int i = 0; i < m_vpUnits.size(); ++i )
         {
-            m_vpUnits[ i ]->drawLifeBar( gfx );
+            if( !m_vpUnits[ i ]->isGroundUnit() )
+            {
+                m_vpUnits[ i ]->drawLifeBar( gfx );
+            }
         }
     }
 }
@@ -200,8 +205,12 @@ void Game::checkForDestroyedUnits()
     while( u != m_vpUnits.end() )
     {
         if( ( *u )->isDestroyed() )
-        {
-            delete *u;
+        {            
+            for( int i = 0; i < m_vpUnits.size(); ++i )
+            {
+                m_vpUnits[ i ]->checkDestroyedEnemy( *u );
+            }
+            delete (*u);
             u = m_vpUnits.erase( u );
         }
         else
