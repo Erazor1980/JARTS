@@ -12,13 +12,13 @@ Unit::Unit( const Vei2 pos_tile,
             PathFinder& pathFinder,
             std::vector< Unit* >& vpUnits,
             const UnitType type,
-            const Surface& unitSprite,
+            const std::vector< Surface >& vSprites,
             std::vector< Sound >& vSoundEffects )
     :
     m_level( level ),
     m_pathFinder( pathFinder ),
     m_vpUnits( vpUnits ),
-    m_unitSprite( unitSprite ),
+    m_vSprites( vSprites ),
     m_vSoundEffects( vSoundEffects )
 {
     assert( level.isInitialized() );
@@ -26,7 +26,7 @@ Unit::Unit( const Vei2 pos_tile,
             && pos_tile.y >= 0 && pos_tile.y < level.getHeight() );
 
     m_type      = type;
-    m_size      = unitSprite.GetHeight();
+    m_size      = m_vSprites[ ( int )SpriteOrder::UNIT ].GetHeight();
 
     /* calculating rectangles for unit sprite steps (directions) */
     for( int i = 0; i < 8; ++i )
@@ -119,12 +119,12 @@ void Unit::draw( Graphics& gfx, const bool drawExtraInfos ) const
     if( m_bDmgEffectActive )
     {
         gfx.DrawSprite( ( int )m_location.x - m_halfSize, ( int )m_location.y - m_halfSize, m_vSpriteRects[ ( int )m_spriteDirection ],
-                        m_unitSprite, SpriteEffect::Substitution( Colors::White, Colors::Red ) );
+                        m_vSprites[ ( int )SpriteOrder::UNIT ], SpriteEffect::Substitution( Colors::White, Colors::Red ) );
     }
     else
     {
         gfx.DrawSprite( ( int )m_location.x - m_halfSize, ( int )m_location.y - m_halfSize, m_vSpriteRects[ ( int )m_spriteDirection ],
-                        m_unitSprite, SpriteEffect::Chroma( Colors::White ) );
+                        m_vSprites[ ( int )SpriteOrder::UNIT ], SpriteEffect::Chroma( Colors::White ) );
     }
 
     if( UnitType::TANK == m_type )
@@ -164,7 +164,6 @@ void Unit::update( const float dt )
     }
 
     float distToEnemy = 0.0f;
-
     if( mp_currentEnemy )
     {
         distToEnemy = ( mp_currentEnemy->getLocation() - m_location ).GetLength();
@@ -273,6 +272,10 @@ void Unit::update( const float dt )
             m_state = State::MOVING;
         }
     }
+    else if( State::STANDING == m_state )
+    {
+        checkForEnemiesInRadius();
+    }
 }
 
 void Unit::shoot()
@@ -284,6 +287,29 @@ void Unit::shoot()
 
     m_bShotEffectActive = true;
     m_shotEffectTime = 0.0f;
+}
+void Unit::checkForEnemiesInRadius()
+{
+    if( m_state != State::STANDING )
+    {
+        return;
+    }
+
+    for( const auto u: m_vpUnits )
+    {
+        if( u->getTeam() == m_team )
+        {
+            continue;
+        }
+        const float d = ( u->getLocation() - m_location ).GetLength();
+
+        if( d <= m_attackRadius )
+        {
+            mp_currentEnemy = u;
+            m_state = State::ATTACKING;
+            return;
+        }
+    }
 }
 void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed )
 {
@@ -409,11 +435,11 @@ void Unit::drawShotEffect( Graphics& gfx ) const
 
     if( UnitType::TANK == m_type )
     {
-        const int hs = m_gunShotSprite.GetHeight() / 2;
+        const int hs = m_vSprites[ ( int )SpriteOrder::SHOT ].GetHeight() / 2;
         const int x = ( int )m_location.x + ( int )( GUN_LENGTH * m_size * cos( m_cannonOrientation ) );
         const int y = ( int )m_location.y + ( int )( GUN_LENGTH * m_size * sin( m_cannonOrientation ) );
         
-        gfx.DrawSprite( x - hs, y - hs, m_gunShotSprite, SpriteEffect::Chroma( Colors::White ) );
+        gfx.DrawSprite( x - hs, y - hs, m_vSprites[ ( int )SpriteOrder::SHOT ], SpriteEffect::Chroma( Colors::White ) );
 
         Vec2 shot = Vec2( ( float )x, ( float )y ) + ( ep - Vec2( ( float )x, ( float )y ) ) * ratio;
         gfx.DrawCircle( shot, 4, Colors::Gray );

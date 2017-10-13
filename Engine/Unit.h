@@ -51,15 +51,21 @@ public:
         ATTACK,
         DEATH
     };
+    enum class SpriteOrder  /* sprite order in m_vSprites */
+    {
+        UNIT = 0,
+        SHOT,
+        DEATH
+    };
 public:
     Unit() = default;
     Unit( const Vei2 pos_tile,
           const Team team,
-          const Level& level, 
+          const Level& level,
           PathFinder& pPathFinder,
           std::vector< Unit* >& vpUnits,
           const UnitType type,
-          const Surface& unitSprite,
+          const std::vector< Surface >& vSprites,
           std::vector< Sound >& vSoundEffects );
 
     void draw( Graphics& gfx, const bool drawExtraInfos = false ) const;
@@ -152,6 +158,7 @@ private:
     //////////////////
     Team m_team;
     void shoot();
+    void checkForEnemiesInRadius();
     int m_attackDamage;
     std::vector< Unit* >& m_vpUnits;
     Unit* mp_currentEnemy = nullptr;
@@ -183,12 +190,11 @@ private:
     float m_cannonOrientation;
     void calcSpriteDirection();                     /* which sprite to choose depending on current direction */
     
-    const Surface& m_unitSprite;                    /* unit sprite tiles */
+    const std::vector< Surface >& m_vSprites;       /* order: unit sprite -> gun shot -> death (sequence) */
     std::vector< RectI > m_vSpriteRects;            /* rectangles for single steps (direction) of a unit sprite set */
     Direction m_spriteDirection;
     std::vector< Sound >& m_vSoundEffects;          /* order: selection -> command -> attack */
     bool m_bInsideSelectionRect = false;
-    const Surface& m_gunShotSprite = Surface( "..\\images\\effects\\expl_1.bmp" );
 
     /////////////////////////////////////
     //// PATH PLANNING AND MOVEMENTS ////
