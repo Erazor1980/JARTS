@@ -81,15 +81,16 @@ void Game::restartGame()
     clearMemory();
 
     /* create units */
-    m_vpUnits.push_back( new Unit( { 2, 5 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
-    m_vpUnits.push_back( new Unit( { 2, 4 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
+    m_vpUnits.push_back( new Unit( { 3, 5 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
+    m_vpUnits.push_back( new Unit( { 2, 3 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
+    m_vpUnits.push_back( new Unit( { 14, 3 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
     m_vpUnits.push_back( new Unit( { 7, 2 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
     m_vpUnits.push_back( new Unit( { 10, 4 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
 
     /* create enemies */
     m_vpUnits.push_back( new Unit( { 7, 12 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
     m_vpUnits.push_back( new Unit( { 17, 13 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
-    m_vpUnits.push_back( new Unit( { 15, 13 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
+    m_vpUnits.push_back( new Unit( { 13, 13 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
 }
 void Game::Go()
 {
