@@ -201,6 +201,7 @@ void Game::checkForDestroyedUnits()
     {
         if( ( *u )->isDestroyed() )
         {
+            delete *u;
             u = m_vpUnits.erase( u );
         }
         else
