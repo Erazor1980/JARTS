@@ -4,6 +4,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#define GUN_LENGTH 0.7f     /* for tanks. ratio of the gun to m_size */
+
 Unit::Unit( const Vei2 pos_tile,
             const Team team,
             const Level& level,
@@ -87,8 +89,6 @@ Unit::Unit( const Vei2 pos_tile,
 
 void Unit::draw( Graphics& gfx, const bool drawExtraInfos ) const
 {
-    drawLifeBar( gfx );
-
     /* drawing extra infos, like current path or attackRadius, when selected */
     if( drawExtraInfos && m_bSelected )
     {
@@ -115,7 +115,7 @@ void Unit::draw( Graphics& gfx, const bool drawExtraInfos ) const
     {
         gfx.DrawRectCorners( m_bb, Colors::White );
     }
-
+    
     if( m_bDmgEffectActive )
     {
         gfx.DrawSprite( ( int )m_location.x - m_halfSize, ( int )m_location.y - m_halfSize, m_vSpriteRects[ ( int )m_spriteDirection ],
@@ -129,7 +129,12 @@ void Unit::draw( Graphics& gfx, const bool drawExtraInfos ) const
 
     if( UnitType::TANK == m_type )
     {
-        drawCannon( gfx );
+        drawGun( gfx );
+    }
+
+    if( State::ATTACKING == m_state && m_bShotEffectActive )
+    {
+        drawShotEffect( gfx );
     }
 
 #if DEBUG_INFOS
@@ -143,10 +148,18 @@ void Unit::update( const float dt )
     if( m_bDmgEffectActive )
     {
         m_dmgEffectTime += dt;
-        //deactivate effect if duration exceeded
         if( m_dmgEffectTime >= m_dmgEffectDuration )
         {
             m_bDmgEffectActive = false;
+        }
+    }
+    // update shot effect time if active
+    if( m_bShotEffectActive )
+    {
+        m_shotEffectTime += dt;
+        if( m_shotEffectTime >= m_shotEffectDuration )
+        {
+            m_bShotEffectActive = false;
         }
     }
 
@@ -226,6 +239,10 @@ void Unit::update( const float dt )
                 m_currWaitingTime += dt;
                 m_state = State::WAITING;
             }
+            else
+            {
+                m_currWaitingTime   = 0.0f;
+            }
         }
         else
         {
@@ -264,6 +281,9 @@ void Unit::shoot()
     m_vSoundEffects[ ( int )SoundOrder::ATTACK ].Play();
 #endif
     mp_currentEnemy->takeDamage( m_attackDamage, m_type );
+
+    m_bShotEffectActive = true;
+    m_shotEffectTime = 0.0f;
 }
 void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed )
 {
@@ -360,12 +380,12 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
         }
     }
 }
-void Unit::drawCannon( Graphics& gfx ) const
+void Unit::drawGun( Graphics& gfx ) const
 {
     const int x     = ( int )m_location.x;
     const int y     = ( int )m_location.y;
-    const int newX  = x + ( int )( 0.7f * m_size * cos( m_cannonOrientation ) );
-    const int newY  = y + ( int )( 0.7f * m_size * sin( m_cannonOrientation ) );
+    const int newX  = x + ( int )( GUN_LENGTH * m_size * cos( m_cannonOrientation ) );
+    const int newY  = y + ( int )( GUN_LENGTH * m_size * sin( m_cannonOrientation ) );
 
     Color colorGun = { 115, 115, 115 };
     Color colorGun2 = { 75, 75, 75 };
@@ -380,6 +400,55 @@ void Unit::drawCannon( Graphics& gfx ) const
     gfx.DrawLine( x, y - 2, newX, newY - 2, colorGun );
     gfx.DrawCircle( ( x + newX ) / 2, ( y + newY ) / 2, 4, colorGun2 );
     gfx.DrawCircle( newX, newY, 2, colorGun2 );
+}
+void Unit::drawShotEffect( Graphics& gfx ) const
+{
+    const float ratio = m_shotEffectTime / m_shotEffectDuration;
+    const Vec2 sp = m_location;
+    const Vec2 ep = mp_currentEnemy->getLocation();
+
+    if( UnitType::TANK == m_type )
+    {
+        const int hs = m_gunShotSprite.GetHeight() / 2;
+        const int x = ( int )m_location.x + ( int )( GUN_LENGTH * m_size * cos( m_cannonOrientation ) );
+        const int y = ( int )m_location.y + ( int )( GUN_LENGTH * m_size * sin( m_cannonOrientation ) );
+        
+        gfx.DrawSprite( x - hs, y - hs, m_gunShotSprite, SpriteEffect::Chroma( Colors::White ) );
+
+        Vec2 shot = Vec2( ( float )x, ( float )y ) + ( ep - Vec2( ( float )x, ( float )y ) ) * ratio;
+        gfx.DrawCircle( shot, 4, Colors::Gray );
+    }
+    else if( UnitType::JET == m_type )
+    {
+        const float s4 = m_size / 4.0f;     /* 1/4 of jet size */
+                
+        Vec2 shot1;
+        Vec2 shot2;
+
+        if( Direction::UP == m_spriteDirection || Direction::DOWN == m_spriteDirection )
+        {            
+            shot1 = m_location - Vec2( s4, 0 ) + ( ep - sp ) * ratio;
+            shot2 = m_location + Vec2( s4, 0 ) + ( ep - sp ) * ratio;
+        }
+        else if( Direction::LEFT == m_spriteDirection || Direction::RIGHT == m_spriteDirection )
+        {
+            shot1 = m_location - Vec2( 0, s4 ) + ( ep - sp ) * ratio;
+            shot2 = m_location + Vec2( 0, s4 ) + ( ep - sp ) * ratio;
+        }
+        else if( Direction::UP_LEFT == m_spriteDirection || Direction::DOWN_RIGHT == m_spriteDirection )
+        {
+            shot1 = m_location - Vec2( s4, -s4 ) + ( ep - sp ) * ratio;
+            shot2 = m_location + Vec2( s4, -s4 ) + ( ep - sp ) * ratio;
+        }
+        else
+        {
+            shot1 = m_location - Vec2( s4, s4 ) + ( ep - sp ) * ratio;
+            shot2 = m_location + Vec2( s4, s4 ) + ( ep - sp ) * ratio;
+        }
+
+        gfx.DrawCircle( shot1, 2, Colors::Yellow );
+        gfx.DrawCircle( shot2, 2, Colors::Yellow );
+    }
 }
 void Unit::calcSpriteDirection()
 {
@@ -475,7 +544,7 @@ void Unit::stop()
     m_acceleration      = { 0, 0 };
     m_velocity          = { 0, 0 };
     m_pathIdx           = 0;
-    m_currWaitingTime   = 0;
+    m_currWaitingTime   = 0.0f;
 }
 void Unit::followPath( const float dt )
 {

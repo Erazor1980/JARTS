@@ -162,7 +162,10 @@ private:
     static constexpr float m_dmgEffectDuration = 0.045f;
     float m_dmgEffectTime = 0.0f;
     bool m_bDmgEffectActive = false;
-
+    /* shot animation */
+    static constexpr float m_shotEffectDuration = 0.15f;
+    float m_shotEffectTime = 0.0f;
+    bool m_bShotEffectActive = false;
 
     ///////////////////////////
     //// SELECTION & MOUSE ////
@@ -175,7 +178,8 @@ private:
     ///////////////////////////
     //// GRAPHICS & SOUNDS ////
     ///////////////////////////
-    void drawCannon( Graphics& gfx ) const;         /* for tanks only */
+    void drawGun( Graphics& gfx ) const;            /* for tanks only */
+    void drawShotEffect( Graphics& gfx ) const;
     float m_cannonOrientation;
     void calcSpriteDirection();                     /* which sprite to choose depending on current direction */
     
@@ -184,6 +188,7 @@ private:
     Direction m_spriteDirection;
     std::vector< Sound >& m_vSoundEffects;          /* order: selection -> command -> attack */
     bool m_bInsideSelectionRect = false;
+    const Surface& m_gunShotSprite = Surface( "..\\images\\effects\\expl_1.bmp" );
 
     /////////////////////////////////////
     //// PATH PLANNING AND MOVEMENTS ////
