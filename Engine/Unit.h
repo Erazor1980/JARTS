@@ -68,8 +68,8 @@ public:
           const std::vector< Surface >& vSprites,
           std::vector< Sound >& vSoundEffects );
 
-    void draw( Graphics& gfx, const bool drawExtraInfos = false ) const;
-    void drawLifeBar( Graphics& gfx ) const;
+    void draw( Graphics& gfx, const Vei2& camPos, const bool drawExtraInfos = false ) const;
+    void drawLifeBar( Graphics& gfx, const Vei2& camPos ) const;
 
     void update( const float dt );
 
@@ -190,8 +190,8 @@ private:
     ///////////////////////////
     //// GRAPHICS & SOUNDS ////
     ///////////////////////////
-    void drawGun( Graphics& gfx ) const;            /* for tanks only */
-    void drawShotEffect( Graphics& gfx ) const;
+    void drawGun( Graphics& gfx, const Vei2& offset ) const;            /* for tanks only */
+    void drawShotEffect( Graphics& gfx, const Vei2& offset ) const;
     float m_cannonOrientation;
     void calcSpriteDirection();                     /* which sprite to choose depending on current direction */
     

@@ -89,6 +89,10 @@ public:
     void DrawRectBorder( const RectI& rect, const int border, Color c );
     void DrawRectCorners( const RectF& rect, Color c );
     void DrawCircle( int x, int y, int radius, Color c );
+    void DrawCircle( const Vei2 pos, int radius, Color c )
+    {
+        DrawCircle( pos.x, pos.y, radius, c );
+    }
     void DrawCircle( const Vec2 pos, int radius, Color c )
     {
         DrawCircle( ( int )pos.x, ( int )pos.y, radius, c );

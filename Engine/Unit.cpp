@@ -99,59 +99,63 @@ Unit::Unit( const Vei2 pos_tile,
     m_velocity.y        = 0;
 }
 
-void Unit::draw( Graphics& gfx, const bool drawExtraInfos ) const
+void Unit::draw( Graphics& gfx, const Vei2& camPos, const bool drawExtraInfos ) const
 {
+    const Vei2 halfScreen( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
+    const Vei2 offset = camPos - halfScreen;
+
     /* drawing extra infos, like current path or attackRadius */
     if( drawExtraInfos )
     {
         if( State::MOVING == m_state )
         {
-            m_path.draw( gfx );
+            m_path.draw( gfx, camPos );
         }
                 
         if( m_state == State::ATTACKING )
         {
-            gfx.DrawCircleBorder( m_location, ( int )m_attackRadius, Colors::Red );
+            gfx.DrawCircleBorder( m_location - offset, ( int )m_attackRadius, Colors::Red );
         }
         else
         {
-            gfx.DrawCircleBorder( m_location, ( int )m_attackRadius, Colors::White );
+            gfx.DrawCircleBorder( m_location - offset, ( int )m_attackRadius, Colors::White );
         }
     }
 
+    RectF bb( m_bb.left - offset.x, m_bb.right - offset.x, m_bb.top - offset.y, m_bb.bottom - offset.y );
     if( m_bSelected )
     {
-        gfx.DrawRectCorners( m_bb, Colors::Green );
+        gfx.DrawRectCorners( bb, Colors::Green );
     }
     else if( m_bInsideSelectionRect )
     {
-        gfx.DrawRectCorners( m_bb, Colors::White );
+        gfx.DrawRectCorners( bb, Colors::White );
     }
     
     if( m_bDmgEffectActive )
     {
-        gfx.DrawSprite( ( int )m_location.x - m_halfSize, ( int )m_location.y - m_halfSize, m_vSpriteRects[ ( int )m_spriteDirection ],
+        gfx.DrawSprite( ( int )m_location.x - m_halfSize - offset.x, ( int )m_location.y - m_halfSize - offset.y, m_vSpriteRects[ ( int )m_spriteDirection ],
                         m_vSprites[ ( int )SpriteOrder::UNIT ], SpriteEffect::Substitution( Colors::White, Colors::Red ) );
     }
     else
     {
-        gfx.DrawSprite( ( int )m_location.x - m_halfSize, ( int )m_location.y - m_halfSize, m_vSpriteRects[ ( int )m_spriteDirection ],
+        gfx.DrawSprite( ( int )m_location.x - m_halfSize - offset.x, ( int )m_location.y - m_halfSize - offset.y, m_vSpriteRects[ ( int )m_spriteDirection ],
                         m_vSprites[ ( int )SpriteOrder::UNIT ], SpriteEffect::TeamColor( Colors::White, { 255, 242, 0 }, m_color ) );
     }
 
     if( UnitType::TANK == m_type )
     {
-        drawGun( gfx );
+        drawGun( gfx, offset );
     }
 
     if( State::ATTACKING == m_state && m_bShotEffectActive )
     {
-        drawShotEffect( gfx );
+        drawShotEffect( gfx, offset );
     }
 
 #if DEBUG_INFOS
     /* draw bounding box */
-    gfx.DrawRectBorder( m_bb, 1, Colors::White );
+    gfx.DrawRectBorder( bb, 1, Colors::White );
 #endif
 }
 void Unit::update( const float dt )
@@ -300,7 +304,6 @@ void Unit::update( const float dt )
         checkForEnemiesInRadius();
     }
 }
-
 void Unit::shoot()
 {
 #if !_DEBUG
@@ -435,15 +438,15 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
         }
     }
 }
-void Unit::drawGun( Graphics& gfx ) const
+void Unit::drawGun( Graphics& gfx, const Vei2& offset ) const
 {
-    const int x     = ( int )m_location.x;
-    const int y     = ( int )m_location.y;
+    const int x     = ( int )m_location.x - offset.x;
+    const int y     = ( int )m_location.y - offset.y;
     const int newX  = x + ( int )( GUN_LENGTH * m_size * cos( m_cannonOrientation ) );
     const int newY  = y + ( int )( GUN_LENGTH * m_size * sin( m_cannonOrientation ) );
     
     // draw team color
-    gfx.DrawCircle( m_location, 7, m_color );
+    gfx.DrawCircle( Vei2( x, y ), 7, m_color );
 
     Color colorGun = { 115, 115, 115 };
     Color colorGun2 = { 75, 75, 75 };
@@ -459,17 +462,17 @@ void Unit::drawGun( Graphics& gfx ) const
     gfx.DrawCircle( ( x + newX ) / 2, ( y + newY ) / 2, 4, m_color );
     gfx.DrawCircle( newX, newY, 2, colorGun2 );
 }
-void Unit::drawShotEffect( Graphics& gfx ) const
+void Unit::drawShotEffect( Graphics& gfx, const Vei2& offset ) const
 {
     const float ratio = m_shotEffectTime / m_shotEffectDuration;
-    const Vec2 sp = m_location;
-    const Vec2 ep = mp_currentEnemy->getLocation();
+    const Vec2 sp = Vec2( m_location.x - offset.x, m_location.y - offset.y );
+    const Vec2 ep = mp_currentEnemy->getLocation() - Vec2( ( float )offset.x, ( float )offset.y );
 
     if( UnitType::TANK == m_type )
     {
         const int hs = m_vSprites[ ( int )SpriteOrder::SHOT ].GetHeight() / 2;
-        const int x = ( int )m_location.x + ( int )( GUN_LENGTH * m_size * cos( m_cannonOrientation ) );
-        const int y = ( int )m_location.y + ( int )( GUN_LENGTH * m_size * sin( m_cannonOrientation ) );
+        const int x = ( int )m_location.x + ( int )( GUN_LENGTH * m_size * cos( m_cannonOrientation ) ) - offset.x;
+        const int y = ( int )m_location.y + ( int )( GUN_LENGTH * m_size * sin( m_cannonOrientation ) ) - offset.y;
         
         gfx.DrawSprite( x - hs, y - hs, m_vSprites[ ( int )SpriteOrder::SHOT ], SpriteEffect::Chroma( Colors::White ) );
 
@@ -485,23 +488,23 @@ void Unit::drawShotEffect( Graphics& gfx ) const
 
         if( Direction::UP == m_spriteDirection || Direction::DOWN == m_spriteDirection )
         {            
-            shot1 = m_location - Vec2( s4, 0 ) + ( ep - sp ) * ratio;
-            shot2 = m_location + Vec2( s4, 0 ) + ( ep - sp ) * ratio;
+            shot1 = sp - Vec2( s4, 0 ) + ( ep - sp ) * ratio;
+            shot2 = sp + Vec2( s4, 0 ) + ( ep - sp ) * ratio;
         }
         else if( Direction::LEFT == m_spriteDirection || Direction::RIGHT == m_spriteDirection )
         {
-            shot1 = m_location - Vec2( 0, s4 ) + ( ep - sp ) * ratio;
-            shot2 = m_location + Vec2( 0, s4 ) + ( ep - sp ) * ratio;
+            shot1 = sp - Vec2( 0, s4 ) + ( ep - sp ) * ratio;
+            shot2 = sp + Vec2( 0, s4 ) + ( ep - sp ) * ratio;
         }
         else if( Direction::UP_LEFT == m_spriteDirection || Direction::DOWN_RIGHT == m_spriteDirection )
         {
-            shot1 = m_location - Vec2( s4, -s4 ) + ( ep - sp ) * ratio;
-            shot2 = m_location + Vec2( s4, -s4 ) + ( ep - sp ) * ratio;
+            shot1 = sp - Vec2( s4, -s4 ) + ( ep - sp ) * ratio;
+            shot2 = sp + Vec2( s4, -s4 ) + ( ep - sp ) * ratio;
         }
         else
         {
-            shot1 = m_location - Vec2( s4, s4 ) + ( ep - sp ) * ratio;
-            shot2 = m_location + Vec2( s4, s4 ) + ( ep - sp ) * ratio;
+            shot1 = sp - Vec2( s4, s4 ) + ( ep - sp ) * ratio;
+            shot2 = sp + Vec2( s4, s4 ) + ( ep - sp ) * ratio;
         }
 
         gfx.DrawCircle( shot1, 2, Colors::Yellow );
@@ -563,11 +566,13 @@ void Unit::calcSpriteDirection()
         m_spriteDirection = Direction::DOWN;
     }
 }
-void Unit::drawLifeBar( Graphics& gfx ) const
+void Unit::drawLifeBar( Graphics& gfx, const Vei2& camPos ) const
 {
+    const Vei2 halfScreen( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
+    const Vei2 offset = camPos - halfScreen;
     Color lifebarColor;
-    const int x = ( int )m_location.x;
-    const int y = ( int )m_location.y;
+    const int x = ( int )m_location.x - offset.x;
+    const int y = ( int )m_location.y - offset.y;
 
     float lifeMaxLifeRatio = ( float )m_life / m_maxLife;
 

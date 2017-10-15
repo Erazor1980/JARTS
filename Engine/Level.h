@@ -49,8 +49,8 @@ public:
     void draw( Graphics& gfx, const Vei2& camera, const bool drawGrid = false /* for debugging */ ) const;
 
     /* test functions for visualization and debugging */
-    void drawTileGrid( Graphics& gfx ) const;
-    void drawPath( Graphics& gfx, std::vector< int > vPath, const int currIdx = 0, const int startIdx = -1, const int targetIdx = -1 ) const;
+    void drawTileGrid( Graphics& gfx, const Vei2& camera ) const;
+    void drawPath( Graphics& gfx, const Vei2& camera, std::vector< int > vPath, const int currIdx = 0, const int startIdx = -1, const int targetIdx = -1 ) const;
 
     /* getter functions */
     int getTileSize() const

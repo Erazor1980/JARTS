@@ -88,7 +88,7 @@ private:
     bool m_bDrawDebugStuff = false;
 
     /* Scrolling */
-    Vei2 m_camera = Vei2( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
+    Vei2 m_camPos = Vei2( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
 
 	/********************************/
 };

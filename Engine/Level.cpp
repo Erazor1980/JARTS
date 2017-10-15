@@ -173,19 +173,23 @@ void Level::draw( Graphics& gfx, const Vei2& camera, const bool drawGrid ) const
 
     if( drawGrid )
     {
-        drawTileGrid( gfx );
+        drawTileGrid( gfx, camera );
     }
 }
 
-void Level::drawTileGrid( Graphics& gfx ) const
+void Level::drawTileGrid( Graphics& gfx, const Vei2& camera ) const
 {
     assert( m_height > 0 && m_width > 0 && m_tileSize > 0 );
+
+    const int xOffset = camera.x - Graphics::halfScreenWidth;
+    const int yOffset = camera.y - Graphics::halfScreenHeight;
 
     for( int x = 0; x < m_widthInTiles; ++x )
     {
         for( int y = 0; y < m_heightInTiles; ++y )
         {
-            RectI tile( { x * m_tileSize, y * m_tileSize }, { ( x + 1 ) * m_tileSize - 1, ( y + 1 ) * m_tileSize - 1 } );
+            RectI tile( { x * m_tileSize - xOffset, y * m_tileSize - yOffset },
+                        { ( x + 1 ) * m_tileSize - 1 - xOffset, ( y + 1 ) * m_tileSize - 1 - yOffset } );
 
             if( Tile::EMPTY == mp_content[ y * m_widthInTiles + x ] )
             {
@@ -199,7 +203,7 @@ void Level::drawTileGrid( Graphics& gfx ) const
     }
 }
 
-void Level::drawPath( Graphics& gfx, std::vector< int > vPath, const int currIdx, const int startIdx, const int targetIdx ) const
+void Level::drawPath( Graphics& gfx, const Vei2& camera, std::vector< int > vPath, const int currIdx, const int startIdx, const int targetIdx ) const
 {
     /* draw path */
     for( int i = currIdx; i < vPath.size(); ++i )
@@ -207,7 +211,7 @@ void Level::drawPath( Graphics& gfx, std::vector< int > vPath, const int currIdx
         const int x = vPath[ i ] % m_widthInTiles;
         const int y = vPath[ i ] / m_widthInTiles;
 
-        RectI tile( { x * m_tileSize, y * m_tileSize }, { ( x + 1 ) * m_tileSize - 1, ( y + 1 ) * m_tileSize - 1 } );
+        RectI tile( { x * m_tileSize - ( int )camera.x, y * m_tileSize - ( int )camera.y }, { ( x + 1 ) * m_tileSize - 1, ( y + 1 ) * m_tileSize - 1 } );
 
         gfx.DrawCircle( tile.GetCenter().x, tile.GetCenter().y, 4, Colors::White );
     }

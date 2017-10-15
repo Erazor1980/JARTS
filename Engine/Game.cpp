@@ -103,25 +103,25 @@ void Game::updateCamera( const float dt )
     const int pixelsToMove = int( 500.0f * dt );
     if( mp.x < r.left )
     {
-        m_camera.x -= pixelsToMove;
+        m_camPos.x -= pixelsToMove;
     }
     else if( mp.x > r.right )
     {
-        m_camera.x += pixelsToMove;
+        m_camPos.x += pixelsToMove;
     }
     if( mp.y < r.top )
     {
-        m_camera.y -= pixelsToMove;
+        m_camPos.y -= pixelsToMove;
     }
     else if( mp.y > r.bottom )
     {
-        m_camera.y += pixelsToMove;
+        m_camPos.y += pixelsToMove;
     }
 
-    m_camera.x = std::max( Graphics::halfScreenWidth, m_camera.x );
-    m_camera.x = std::min( m_level.getWidth() - Graphics::halfScreenWidth, m_camera.x );
-    m_camera.y = std::max( Graphics::halfScreenHeight, m_camera.y );
-    m_camera.y = std::min( m_level.getHeight() - Graphics::halfScreenHeight, m_camera.y );
+    m_camPos.x = std::max( Graphics::halfScreenWidth, m_camPos.x );
+    m_camPos.x = std::min( m_level.getWidth() - Graphics::halfScreenWidth, m_camPos.x );
+    m_camPos.y = std::max( Graphics::halfScreenHeight, m_camPos.y );
+    m_camPos.y = std::min( m_level.getHeight() - Graphics::halfScreenHeight, m_camPos.y );
 }
 void Game::Go()
 {
@@ -208,7 +208,7 @@ void Game::drawAllUnits()
     {
         if( m_vpUnits[ i ]->isGroundUnit() )
         {
-            m_vpUnits[ i ]->draw( gfx, m_bDrawDebugStuff );
+            m_vpUnits[ i ]->draw( gfx, { m_camPos.x, m_camPos.y }, m_bDrawDebugStuff );
 #if _DEBUG
             //m_font.DrawText( std::to_string( m_vUnits[ i ].getTileIdx() ), m_vUnits[ i ].getLocationInt() - Vei2( 10, 10 ), Colors::White, gfx );
             m_font.DrawText( std::to_string( i ), m_vpUnits[ i ]->getLocationInt() - Vei2( 30, 10 ), Colors::Red, gfx );
@@ -222,7 +222,7 @@ void Game::drawAllUnits()
         {
             if( m_vpUnits[ i ]->isGroundUnit() )
             {
-                m_vpUnits[ i ]->drawLifeBar( gfx );
+                m_vpUnits[ i ]->drawLifeBar( gfx, m_camPos );
             }
         }
     }
@@ -232,7 +232,7 @@ void Game::drawAllUnits()
     {
         if( !m_vpUnits[ i ]->isGroundUnit() )
         {
-            m_vpUnits[ i ]->draw( gfx, m_bDrawDebugStuff );
+            m_vpUnits[ i ]->draw( gfx, m_camPos, m_bDrawDebugStuff );
 #if _DEBUG
             //m_font.DrawText( std::to_string( m_vUnits[ i ].getTileIdx() ), m_vUnits[ i ].getLocationInt() - Vei2( 10, 10 ), Colors::White, gfx );
             m_font.DrawText( std::to_string( i ), m_vpUnits[ i ]->getLocationInt() - Vei2( 30, 10 ), Colors::Red, gfx );
@@ -246,7 +246,7 @@ void Game::drawAllUnits()
         {
             if( !m_vpUnits[ i ]->isGroundUnit() )
             {
-                m_vpUnits[ i ]->drawLifeBar( gfx );
+                m_vpUnits[ i ]->drawLifeBar( gfx, m_camPos );
             }
         }
     }
@@ -336,7 +336,7 @@ void Game::handleMouse()
 
 void Game::ComposeFrame()
 {
-    m_level.draw( gfx, m_camera, m_bDrawDebugStuff );
+    m_level.draw( gfx, m_camPos, m_bDrawDebugStuff );
     
     drawAllUnits();
 

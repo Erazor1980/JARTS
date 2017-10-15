@@ -14,7 +14,7 @@ public:
     {
         addPoint( Vec2( x, y ) );
     }
-    void draw( Graphics& gfx ) const;
+    void draw( Graphics& gfx, const Vei2& camPos ) const;
 
     float getRadius() const
     {
