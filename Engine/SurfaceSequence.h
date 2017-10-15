@@ -41,15 +41,18 @@ public:
         }
     }
 
-    void Draw( Graphics& gfx, int x = -100, int y = -100 ) const
+    void Draw( Graphics& gfx, const Vei2& camPos, int x = -100, int y = -100 ) const
     {
+        const Vei2 halfScreen( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
+        const Vei2 offset = camPos - halfScreen;
+
         if( x != -100 && y != -100 )
         {
             gfx.DrawSprite( x - m_halfWidth, y - m_halfHeight, m_vSpriteRects[ m_iCurSurface ], m_sprite, SpriteEffect::Chroma( m_chroma ) );
         }
         else
         {
-            gfx.DrawSprite( m_pos.x - m_halfWidth, m_pos.y - m_halfHeight, m_vSpriteRects[ m_iCurSurface ], m_sprite, SpriteEffect::Chroma( m_chroma ) );
+            gfx.DrawSprite( m_pos.x - m_halfWidth - offset.x, m_pos.y - m_halfHeight - offset.y, m_vSpriteRects[ m_iCurSurface ], m_sprite, SpriteEffect::Chroma( m_chroma ) );
         }        
     }
     bool update( const float dt )       /* returns true when sequence is over */

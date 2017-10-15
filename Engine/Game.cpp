@@ -344,7 +344,7 @@ void Game::ComposeFrame()
 
     for( const auto s : m_vpDeathSequences )
     {
-        s->Draw( gfx );
+        s->Draw( gfx, m_camPos );
     }
 
     if( m_bSelecting )
