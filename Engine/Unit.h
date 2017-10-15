@@ -74,7 +74,7 @@ public:
     void update( const float dt );
 
     void handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const Vei2& camPos, const bool shift_pressed );
-    void handleSelectionRect( const RectI& selectionRect );
+    void handleSelectionRect( const RectI& selectionRect, const Vei2& camOffset );
     void select();
     void deselect();
     void takeDamage( const int damage, const UnitType EnemyType, Unit* const pAttackingUnit );

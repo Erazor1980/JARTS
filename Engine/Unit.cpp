@@ -824,14 +824,14 @@ Vec2 Unit::getNormalPoint( const Vec2& p, const Vec2& a, const Vec2& b )
 
     return normalPoint;
 }
-void Unit::handleSelectionRect( const RectI& selectionRect )
+void Unit::handleSelectionRect( const RectI& selectionRect, const Vei2& camOffset )
 {
     if( m_team != Team::_A )
     {
         return;
     }
     RectI r = selectionRect.getNormalized();
-    if( r.Contains( m_location ) )
+    if( r.Contains( m_location - camOffset ) )
     {
         m_bInsideSelectionRect = true;
     }

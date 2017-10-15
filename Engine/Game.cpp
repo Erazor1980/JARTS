@@ -287,6 +287,9 @@ void Game::handleMouse()
 {
     if( wnd.mouse.IsInWindow() && !wnd.mouse.IsEmpty() )
     {
+        const Vei2 halfScreen( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
+        const Vei2 offset = m_camPos - halfScreen;
+
         while( !wnd.mouse.IsEmpty() )
         {
             const Mouse::Event e = wnd.mouse.Read();
@@ -309,7 +312,7 @@ void Game::handleMouse()
 
                 for( auto &u : m_vpUnits )
                 {
-                    u->handleSelectionRect( m_selection );
+                    u->handleSelectionRect( m_selection, offset );
                 }
             }
             if( e.GetType() == Mouse::Event::Type::LRelease && m_bSelecting )
@@ -321,7 +324,7 @@ void Game::handleMouse()
                     {
                         continue;
                     }
-                    if( m_selection.Contains( u->getLocation() ) )
+                    if( m_selection.Contains( u->getLocation() - offset ) )
                     {
                         u->select();
                     }
