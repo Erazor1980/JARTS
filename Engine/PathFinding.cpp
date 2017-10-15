@@ -20,8 +20,8 @@ PathFinder::~PathFinder()
 void PathFinder::init()
 {
     assert( m_level.m_width > 0 && m_level.m_height > 0 );
-    m_width     = m_level.m_width;
-    m_height    = m_level.m_height;
+    m_width     = m_level.m_widthInTiles;
+    m_height    = m_level.m_heightInTiles;
     mp_mapContent = m_level.mp_content;
 
     if( mp_all_H_values )

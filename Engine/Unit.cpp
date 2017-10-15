@@ -22,8 +22,8 @@ Unit::Unit( const Vei2 pos_tile,
     m_vSoundEffects( vSoundEffects )
 {
     assert( level.isInitialized() );
-    assert( pos_tile.x >= 0 && pos_tile.x < level.getWidth()
-            && pos_tile.y >= 0 && pos_tile.y < level.getHeight() );
+    assert( pos_tile.x >= 0 && pos_tile.x < level.getWidthInTiles()
+            && pos_tile.y >= 0 && pos_tile.y < level.getHeightInTiles() );
 
     m_type      = type;
     m_size      = m_vSprites[ ( int )SpriteOrder::UNIT ].GetHeight();
@@ -880,8 +880,8 @@ void Unit::checkDestroyedEnemy( const Unit* const pDestroyedUnit )
 std::vector< int > Unit::checkNeighbourhood()
 {
     std::vector< int > vOccupiedNeighbourTiles;
-    const int width     = m_level.getWidth();
-    const int height    = m_level.getHeight();
+    const int width     = m_level.getWidthInTiles();
+    const int height    = m_level.getHeightInTiles();
 
     const int currX     = m_tileIdx % width;
     const int currY     = m_tileIdx / width;
@@ -920,8 +920,8 @@ std::vector< int > Unit::checkNeighbourhood()
 int Unit::findNextFreeTile( const int targetIdx )
 {
     std::vector< int > vFreeNeighbourTiles;
-    const int width     = m_level.getWidth();
-    const int height    = m_level.getHeight();
+    const int width     = m_level.getWidthInTiles();
+    const int height    = m_level.getHeightInTiles();
 
     const int currX     = targetIdx % width;
     const int currY     = targetIdx / width;

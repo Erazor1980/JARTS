@@ -164,5 +164,7 @@ private:
 public:
 	static constexpr int ScreenWidth = 800;
 	static constexpr int ScreenHeight = 600;
+    static constexpr int halfScreenWidth = ScreenWidth / 2;
+    static constexpr int halfScreenHeight = ScreenHeight / 2;
 	static RectI GetScreenRect();
 };

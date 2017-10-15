@@ -52,6 +52,7 @@ private:
     void handleMouse();
     void clearMemory();
     void restartGame();
+    void updateCamera( const float dt );
 	/********************************/
 private:
 	MainWindow& wnd;
@@ -85,5 +86,9 @@ private:
     Cursor m_cursor;
 
     bool m_bDrawDebugStuff = false;
+
+    /* Scrolling */
+    Vei2 m_camera = Vei2( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
+
 	/********************************/
 };

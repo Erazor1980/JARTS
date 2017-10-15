@@ -24,7 +24,7 @@ public:
         int xTile = int( x / m_tileSize );
         int yTile = int( y / m_tileSize );
 
-        return yTile * m_width + xTile;
+        return yTile * m_widthInTiles + xTile;
     }
     int getTileIdx( const Vec2& pixPos ) const
     {
@@ -46,7 +46,7 @@ public:
         return getTileCenter( getTileIdx( x, y ) );
     }
 
-    void draw( Graphics& gfx, const bool drawGrid = false /* for debugging */ ) const;
+    void draw( Graphics& gfx, const Vei2& camera, const bool drawGrid = false /* for debugging */ ) const;
 
     /* test functions for visualization and debugging */
     void drawTileGrid( Graphics& gfx ) const;
@@ -56,6 +56,14 @@ public:
     int getTileSize() const
     {
         return m_tileSize;
+    }
+    int getWidthInTiles() const
+    {
+        return m_widthInTiles;
+    }
+    int getHeightInTiles() const
+    {
+        return m_heightInTiles;
     }
     int getWidth() const
     {
@@ -73,14 +81,20 @@ public:
     {
         assert( m_bInitialized );
 
-        return RectI( { 0, 0 }, m_width * m_tileSize, m_height * m_tileSize );
+        return RectI( { 0, 0 }, m_widthInTiles * m_tileSize, m_heightInTiles * m_tileSize );
     }
 private:
     bool m_bInitialized = false;
 
     /* level size in tiles */
+    int m_widthInTiles;
+    int m_heightInTiles;
+
+    /* level size in pixels */
     int m_width;
     int m_height;
+    int m_halfWidth;
+    int m_halfHeight;
 
     /* tile size in pixels */
     int m_tileSize = 40;

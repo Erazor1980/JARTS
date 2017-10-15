@@ -1,6 +1,7 @@
 #include "Level.h"
 #include "SpriteEffect.h"
 #include <assert.h>
+#include <algorithm>
 
 Level::Level( const std::string& filename )
     :
@@ -20,21 +21,26 @@ Level::~Level()
 
 void Level::init()
 {
-#if _DEBUG
-    m_width     = 800 / m_tileSize;
-    m_height    = 600 / m_tileSize;
-#else
-    m_width     = m_image.GetWidth() / m_tileSize;
-    m_height    = m_image.GetHeight() / m_tileSize;
-#endif
+//#if _DEBUG
+//    m_widthInTiles     = 800 / m_tileSize;
+//    m_heightInTiles    = 600 / m_tileSize;
+//#else
+    m_widthInTiles     = m_image.GetWidth() / m_tileSize;
+    m_heightInTiles    = m_image.GetHeight() / m_tileSize;
+//#endif
 
-    assert( m_height > 0 && m_width > 0 );
+    m_width         = m_image.GetWidth();
+    m_height        = m_image.GetHeight();
+    m_halfWidth     = m_width / 2;
+    m_halfHeight    = m_height / 2;
 
+    assert( m_width > 0 && m_height > 0 && m_heightInTiles > 0 && m_widthInTiles > 0 );
+    
     if( mp_content )
     {
         delete[] mp_content;
     }
-    mp_content = new Tile[ m_width * m_height ];
+    mp_content = new Tile[ m_widthInTiles * m_heightInTiles ];
 
 #if 0   /* random level */
     for( int i = 0; i < m_width * m_height; ++i )
@@ -49,7 +55,7 @@ void Level::init()
         }
     }
 #else   /* test level 2 (river & bridge) */
-    for( int i = 0; i < m_width * m_height; ++i )
+    for( int i = 0; i < m_widthInTiles * m_heightInTiles; ++i )
     {
         mp_content[ i ] = Tile::EMPTY;
     }
@@ -143,8 +149,8 @@ void Level::init()
 
 Vec2 Level::getTileCenter( const int tileIdx ) const
 {
-    const int xTile = tileIdx % m_width;
-    const int yTile = tileIdx / m_width;
+    const int xTile = tileIdx % m_widthInTiles;
+    const int yTile = tileIdx / m_widthInTiles;
 
     const float x = xTile * m_tileSize + m_tileSize / 2.0f - 1;
     const float y = yTile * m_tileSize + m_tileSize / 2.0f - 1;
@@ -152,9 +158,19 @@ Vec2 Level::getTileCenter( const int tileIdx ) const
     return Vec2( x, y );
 }
 
-void Level::draw( Graphics& gfx, const bool drawGrid ) const
+void Level::draw( Graphics& gfx, const Vei2& camera, const bool drawGrid ) const
 {
-    gfx.DrawSprite( 0, 0, m_image, SpriteEffect::Copy{} );
+    /* calculate RectI of the current visible map snippet */
+    const int xStart = std::max( camera.x - Graphics::halfScreenWidth, 0 );
+    const int yStart = std::max( camera.y - Graphics::halfScreenHeight, 0 );
+    const int xEnd = std::min( m_width, camera.x + Graphics::halfScreenWidth );
+    const int yEnd = std::min( m_height, camera.y + Graphics::halfScreenHeight );
+
+    RectI snippet = RectI( xStart, xEnd, yStart, yEnd );
+
+    //gfx.DrawSprite( 0, 0, m_image, SpriteEffect::Copy{} );
+    gfx.DrawSprite( 0, 0, snippet, m_image, SpriteEffect::Copy{} );
+
     if( drawGrid )
     {
         drawTileGrid( gfx );
@@ -165,13 +181,13 @@ void Level::drawTileGrid( Graphics& gfx ) const
 {
     assert( m_height > 0 && m_width > 0 && m_tileSize > 0 );
 
-    for( int x = 0; x < m_width; ++x )
+    for( int x = 0; x < m_widthInTiles; ++x )
     {
-        for( int y = 0; y < m_height; ++y )
+        for( int y = 0; y < m_heightInTiles; ++y )
         {
             RectI tile( { x * m_tileSize, y * m_tileSize }, { ( x + 1 ) * m_tileSize - 1, ( y + 1 ) * m_tileSize - 1 } );
 
-            if( Tile::EMPTY == mp_content[ y * m_width + x ] )
+            if( Tile::EMPTY == mp_content[ y * m_widthInTiles + x ] )
             {
                 gfx.DrawRectBorder( tile, 1, Colors::Green );
             }
@@ -188,8 +204,8 @@ void Level::drawPath( Graphics& gfx, std::vector< int > vPath, const int currIdx
     /* draw path */
     for( int i = currIdx; i < vPath.size(); ++i )
     {
-        const int x = vPath[ i ] % m_width;
-        const int y = vPath[ i ] / m_width;
+        const int x = vPath[ i ] % m_widthInTiles;
+        const int y = vPath[ i ] / m_widthInTiles;
 
         RectI tile( { x * m_tileSize, y * m_tileSize }, { ( x + 1 ) * m_tileSize - 1, ( y + 1 ) * m_tileSize - 1 } );
 
@@ -199,13 +215,13 @@ void Level::drawPath( Graphics& gfx, std::vector< int > vPath, const int currIdx
     /* draw start and target */
     if( startIdx >= 0 && targetIdx >= 0 )
     {
-        const int xS = startIdx % m_width;
-        const int yS = startIdx / m_width;
+        const int xS = startIdx % m_widthInTiles;
+        const int yS = startIdx / m_widthInTiles;
         RectI start( { xS * m_tileSize, yS * m_tileSize }, { ( xS + 1 ) * m_tileSize - 1, ( yS + 1 ) * m_tileSize - 1 } );
         gfx.DrawRectBorder( start, 2, Colors::Red );
 
-        const int xT = targetIdx % m_width;
-        const int yT = targetIdx / m_width;
+        const int xT = targetIdx % m_widthInTiles;
+        const int yT = targetIdx / m_widthInTiles;
         RectI end( { xT * m_tileSize, yT * m_tileSize }, { ( xT + 1 ) * m_tileSize - 1, ( yT + 1 ) * m_tileSize - 1 } );
         gfx.DrawRectBorder( end, 2, Colors::Blue );
     }

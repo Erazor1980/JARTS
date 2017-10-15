@@ -27,9 +27,9 @@ Game::Game( MainWindow& wnd )
 	gfx( wnd ),
     m_font( "..\\images\\Fixedsys16x28.bmp" ),
 #if _DEBUG
-    m_level( "..\\images\\maps\\testLvl1_debug.bmp" ),
+    m_level( "..\\images\\maps\\test.bmp" ),
 #else
-    m_level( "..\\images\\maps\\testLvl1_800x600.bmp" ),
+    m_level( "..\\images\\maps\\test.bmp" ),
 #endif
     m_pathFinder( m_level ),
     m_cursor( gfx, wnd.mouse, m_vpUnits, m_level ),
@@ -92,6 +92,37 @@ void Game::restartGame()
     m_vpUnits.push_back( new Unit( { 17, 13 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
     m_vpUnits.push_back( new Unit( { 13, 13 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
 }
+void Game::updateCamera( const float dt )
+{
+    Vec2 mp = wnd.mouse.GetPos();
+
+    /* when mouse is outside this rectangle we move the camera */
+    const float border = 50;
+    RectF r = RectF( border, Graphics::ScreenWidth - border, border, Graphics::ScreenHeight - border );
+
+    const int pixelsToMove = int( 500.0f * dt );
+    if( mp.x < r.left )
+    {
+        m_camera.x -= pixelsToMove;
+    }
+    else if( mp.x > r.right )
+    {
+        m_camera.x += pixelsToMove;
+    }
+    if( mp.y < r.top )
+    {
+        m_camera.y -= pixelsToMove;
+    }
+    else if( mp.y > r.bottom )
+    {
+        m_camera.y += pixelsToMove;
+    }
+
+    m_camera.x = std::max( Graphics::halfScreenWidth, m_camera.x );
+    m_camera.x = std::min( m_level.getWidth() - Graphics::halfScreenWidth, m_camera.x );
+    m_camera.y = std::max( Graphics::halfScreenHeight, m_camera.y );
+    m_camera.y = std::min( m_level.getHeight() - Graphics::halfScreenHeight, m_camera.y );
+}
 void Game::Go()
 {
 	gfx.BeginFrame();	
@@ -103,8 +134,10 @@ void Game::Go()
 void Game::UpdateModel()
 {
     checkForDestroyedUnits();
-
+    
     const float dt = ft.Mark();
+    updateCamera( dt );
+
     /////////////////
     ///// MOUSE /////
     /////////////////
@@ -303,7 +336,7 @@ void Game::handleMouse()
 
 void Game::ComposeFrame()
 {
-    m_level.draw( gfx, m_bDrawDebugStuff );
+    m_level.draw( gfx, m_camera, m_bDrawDebugStuff );
     
     drawAllUnits();
 
