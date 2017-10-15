@@ -292,7 +292,7 @@ void Game::handleMouse()
             const Mouse::Event e = wnd.mouse.Read();
             for( auto &u : m_vpUnits )
             {
-                u->handleMouse( e.GetType(), wnd.mouse.GetPos(), wnd.kbd.KeyIsPressed( VK_SHIFT ) );
+                u->handleMouse( e.GetType(), wnd.mouse.GetPos(), m_camPos, wnd.kbd.KeyIsPressed( VK_SHIFT ) );
             }
 
             /* multi selection rectangle */

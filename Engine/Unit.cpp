@@ -343,8 +343,11 @@ void Unit::checkForEnemiesInRadius()
         }
     }
 }
-void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const bool shift_pressed )
+void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, const Vei2& camPos, const bool shift_pressed )
 {
+    const Vei2 halfScreen( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
+    const Vei2 offset = camPos - halfScreen;
+
 #if !_DEBUG  /* in debug mode we can select and give commands to enemies */
     if( Team::_A != m_team )
     {
@@ -354,10 +357,11 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
 
     if( type == Mouse::Event::Type::LPress )
     {
+        RectF bb( m_bb.left - offset.x, m_bb.right - offset.x, m_bb.top - offset.y, m_bb.bottom - offset.y );
         if( !m_bSelected )
         {
             /* check if we click inside the bounding box */
-            if( m_bb.IsOverlappingWith( RectF( mouse_pos, 1, 1 ) ) )
+            if( bb.IsOverlappingWith( RectF( mouse_pos, 1, 1 ) ) )
             {
                 select();
             }
@@ -374,9 +378,9 @@ void Unit::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos, c
     {
         if( m_bSelected )
         {
-            Tile targetTile     = m_level.getTileType( ( int )mouse_pos.x, ( int )mouse_pos.y );
+            Tile targetTile     = m_level.getTileType( ( int )mouse_pos.x + offset.x, ( int )mouse_pos.y + offset.y );
             const int startIdx  = m_level.getTileIdx( m_location );
-            m_targetIdx         = m_level.getTileIdx( ( int )mouse_pos.x, ( int )mouse_pos.y );
+            m_targetIdx         = m_level.getTileIdx( ( int )mouse_pos.x + offset.x, ( int )mouse_pos.y + offset.y );
 
             if( startIdx == m_targetIdx || ( Tile::OBSTACLE == m_level.getTileType( m_targetIdx ) && m_bIsGroundUnit ) )
             {

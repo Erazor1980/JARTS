@@ -196,7 +196,7 @@ void Level::drawTileGrid( Graphics& gfx, const Vei2& camera ) const
 
             if( Tile::EMPTY == mp_content[ y * m_widthInTiles + x ] )
             {
-                gfx.DrawRectBorder( tile, 1, Colors::Green );
+                gfx.DrawRectBorder( tile, 1, Colors::Green );                
             }
             else
             {
