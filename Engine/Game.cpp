@@ -27,7 +27,7 @@ Game::Game( MainWindow& wnd )
 	gfx( wnd ),
     m_font( "..\\images\\Fixedsys16x28.bmp" ),
 #if _DEBUG
-    m_level( "..\\images\\maps\\test.bmp" ),
+    m_level( "..\\images\\maps\\testLvl1_debug.bmp" ),
 #else
     m_level( "..\\images\\maps\\test.bmp" ),
 #endif
@@ -203,6 +203,10 @@ void Game::UpdateModel()
 
 void Game::drawAllUnits()
 {
+#if _DEBUG
+    const Vei2 halfScreen( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
+    const Vei2 offset = m_camPos - halfScreen;
+#endif
     /* draw all ground units first */
     for( int i = 0; i < m_vpUnits.size(); ++i )
     {
@@ -210,8 +214,7 @@ void Game::drawAllUnits()
         {
             m_vpUnits[ i ]->draw( gfx, { m_camPos.x, m_camPos.y }, m_bDrawDebugStuff );
 #if _DEBUG
-            //m_font.DrawText( std::to_string( m_vUnits[ i ].getTileIdx() ), m_vUnits[ i ].getLocationInt() - Vei2( 10, 10 ), Colors::White, gfx );
-            m_font.DrawText( std::to_string( i ), m_vpUnits[ i ]->getLocationInt() - Vei2( 30, 10 ), Colors::Red, gfx );
+            m_font.DrawText( std::to_string( i ), m_vpUnits[ i ]->getLocationInt() - Vei2( 30, 10 ) - offset, Colors::Red, gfx );
 #endif
         }
     }
@@ -234,8 +237,7 @@ void Game::drawAllUnits()
         {
             m_vpUnits[ i ]->draw( gfx, m_camPos, m_bDrawDebugStuff );
 #if _DEBUG
-            //m_font.DrawText( std::to_string( m_vUnits[ i ].getTileIdx() ), m_vUnits[ i ].getLocationInt() - Vei2( 10, 10 ), Colors::White, gfx );
-            m_font.DrawText( std::to_string( i ), m_vpUnits[ i ]->getLocationInt() - Vei2( 30, 10 ), Colors::Red, gfx );
+            m_font.DrawText( std::to_string( i ), m_vpUnits[ i ]->getLocationInt() - Vei2( 30, 10 ) - offset, Colors::Red, gfx );
 #endif
         }
     }

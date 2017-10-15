@@ -21,16 +21,18 @@ Level::~Level()
 
 void Level::init()
 {
-//#if _DEBUG
-//    m_widthInTiles     = 800 / m_tileSize;
-//    m_heightInTiles    = 600 / m_tileSize;
-//#else
+#if _DEBUG
+    m_widthInTiles  = 1600 / m_tileSize;
+    m_heightInTiles = 800 / m_tileSize;
+    m_width         = 1600;
+    m_height        = 800;
+#else
     m_widthInTiles     = m_image.GetWidth() / m_tileSize;
     m_heightInTiles    = m_image.GetHeight() / m_tileSize;
-//#endif
-
     m_width         = m_image.GetWidth();
     m_height        = m_image.GetHeight();
+#endif
+
     m_halfWidth     = m_width / 2;
     m_halfHeight    = m_height / 2;
 
@@ -168,8 +170,9 @@ void Level::draw( Graphics& gfx, const Vei2& camera, const bool drawGrid ) const
 
     RectI snippet = RectI( xStart, xEnd, yStart, yEnd );
 
-    //gfx.DrawSprite( 0, 0, m_image, SpriteEffect::Copy{} );
+#if !_DEBUG
     gfx.DrawSprite( 0, 0, snippet, m_image, SpriteEffect::Copy{} );
+#endif
 
     if( drawGrid )
     {

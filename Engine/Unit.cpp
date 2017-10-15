@@ -34,8 +34,8 @@ Unit::Unit( const Vei2 pos_tile,
         m_vSpriteRects.emplace_back( i * m_size, ( i + 1 ) * m_size, 0, m_size );
     }
     
-    m_location.x    = pos_tile.x * m_size + m_size / 2.0f - 1;
-    m_location.y    = pos_tile.y * m_size + m_size / 2.0f - 1;
+    m_location.x    = pos_tile.x * m_level.getTileSize() + m_level.getTileSize() / 2.0f - 1;
+    m_location.y    = pos_tile.y * m_level.getTileSize() + m_level.getTileSize() / 2.0f - 1;
     m_tileIdx       = m_level.getTileIdx( m_location );
     m_team          = team;
     if( Team::_A == m_team )
