@@ -81,14 +81,16 @@ private:
     std::vector< SurfaceSequence* > m_vpDeathSequences;
 
     bool m_bDrawLifeBars = true;
-
-    /* Cursor stuff */
-    Cursor m_cursor;
-
     bool m_bDrawDebugStuff = false;
 
     /* Scrolling */
     Vei2 m_camPos = Vei2( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
+    
+    /* when mouse is outside this rectangle we move the camera */
+    const float m_scrolling_border = 50;
+    RectF m_scrolling_rect = RectF( m_scrolling_border, Graphics::ScreenWidth - m_scrolling_border, m_scrolling_border, Graphics::ScreenHeight - m_scrolling_border );
 
+    /* Cursor stuff */
+    Cursor m_cursor;
 	/********************************/
 };

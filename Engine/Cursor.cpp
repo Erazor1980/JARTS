@@ -1,19 +1,31 @@
 #include "Cursor.h"
 #include "SpriteEffect.h"
 
-Cursor::Cursor( Graphics& gfx, const Mouse& mouse, const std::vector< Unit* >& vpUnits, const Level& level )
+Cursor::Cursor( Graphics& gfx, const Mouse& mouse, const std::vector< Unit* >& vpUnits, const Level& level, const RectF& scrollRect )
     :
     m_mainSprite( "..\\images\\cursor\\cursor.bmp" ),
     m_forbiddenSprite( "..\\images\\cursor\\forbidden.bmp" ),
+    m_arrowSprites( "..\\images\\cursor\\arrows.bmp" ),
     m_gfx( gfx ),
     m_mouse( mouse ),
     m_vpUnits( vpUnits ),
-    m_level (level )
+    m_level (level ),
+    m_scrollingRect( scrollRect )
 {
+    /* calculating rectangles for the arrow sprites (directions) */
+    m_arrowWidth     = m_arrowSprites.GetWidth() / 8;
+    m_arrowHeight    = m_arrowSprites.GetHeight();
+    for( int i = 0; i < 8; ++i )
+    {
+        m_vArrowSpriteRects.emplace_back( i * m_arrowWidth, ( i + 1 ) * m_arrowWidth, 0, m_arrowHeight );
+    }
 }
 
-void Cursor::update( const float dt )
+void Cursor::update( const float dt, const Vei2& camPos )
 {
+    const Vei2 halfScreen( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
+    const Vei2 offset = camPos - halfScreen;
+
     /* check if at least one unit is selected */
     m_bUnitSelected = false;
     for( const auto& u : m_vpUnits )
@@ -35,7 +47,9 @@ void Cursor::update( const float dt )
         {
             continue;
         }
-        m_rectFromUnit = u->getBoundigBox();
+    
+        RectF bb = u->getBoundigBox(); 
+        m_rectFromUnit = RectF( bb.left - offset.x, bb.right - offset.x, bb.top - offset.y, bb.bottom - offset.y );
         if( m_rectFromUnit.Contains( mp ) )
         {
             if( u->getTeam() != Team::_A )
@@ -56,7 +70,8 @@ void Cursor::update( const float dt )
             {
                 continue;
             }
-            m_rectFromUnit = u->getBoundigBox();
+            RectF bb = u->getBoundigBox();
+            m_rectFromUnit = RectF( bb.left - offset.x, bb.right - offset.x, bb.top - offset.y, bb.bottom - offset.y );
             if( m_rectFromUnit.Contains( mp ) )
             {
                 m_bMouseOverUnit = true;
@@ -93,16 +108,63 @@ void Cursor::update( const float dt )
     }
 }
 
-void Cursor::draw()
+void Cursor::draw( const Vei2& camPos )
 {
     if( !m_mouse.IsInWindow() )
     {
         return;
     }
-
     const int x = m_mouse.GetPosX();
     const int y = m_mouse.GetPosY();
-    
+    RectF r = m_scrollingRect.getNormalized();
+
+    if( !r.Contains( m_mouse.GetPos() ) )
+    {
+        if( x < r.left )
+        {
+            if( y < r.top )
+            {
+                m_gfx.DrawSprite( 0, 0, m_vArrowSpriteRects[ ( int )Direction::UP_LEFT ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+            }
+            else if( y > r.bottom )
+            {
+                m_gfx.DrawSprite( 0, Graphics::ScreenHeight - m_arrowWidth, m_vArrowSpriteRects[ ( int )Direction::DOWN_LEFT ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+            }
+            else
+            {
+                m_gfx.DrawSprite( 5, y - m_arrowHeight / 2, m_vArrowSpriteRects[ ( int )Direction::LEFT ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+            }
+        }
+        else if( x > r.right )
+        {
+            if( y < r.top )
+            {
+                m_gfx.DrawSprite( Graphics::ScreenWidth - m_arrowWidth, 0, m_vArrowSpriteRects[ ( int )Direction::UP_RIGHT ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+            }
+            else if( y > r.bottom )
+            {
+                m_gfx.DrawSprite( Graphics::ScreenWidth - m_arrowWidth, Graphics::ScreenHeight - m_arrowHeight,
+                                  m_vArrowSpriteRects[ ( int )Direction::DOWN_RIGHT ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+            }
+            else
+            {
+                m_gfx.DrawSprite( Graphics::ScreenWidth - m_arrowWidth, y - m_arrowHeight / 2, m_vArrowSpriteRects[ ( int )Direction::RIGHT ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+            }
+        }
+        else if( y < r.top )
+        {
+            m_gfx.DrawSprite( x - m_arrowWidth / 2, 0, m_vArrowSpriteRects[ ( int )Direction::UP ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+        }
+        else
+        {
+            m_gfx.DrawSprite( x - m_arrowWidth / 2, Graphics::ScreenHeight - m_arrowHeight, m_vArrowSpriteRects[ ( int )Direction::DOWN ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+        }
+        return;
+    }
+
+    const Vei2 halfScreen( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
+    const Vei2 offset = camPos - halfScreen;
+        
     if( m_bUnitSelected )
     {
         if( m_bMouseOverEnemy )
@@ -115,7 +177,7 @@ void Cursor::draw()
             return;
         }
 
-        if( m_bSelectedGroundUnit && Tile::OBSTACLE == m_level.getTileType( x, y ) )
+        if( m_bSelectedGroundUnit && Tile::OBSTACLE == m_level.getTileType( x + offset.x, y + offset.y ) )
         {
             m_gfx.DrawSprite( x - m_forbiddenSprite.GetWidth() / 2, y - m_forbiddenSprite.GetHeight() / 2, m_forbiddenSprite, SpriteEffect::Chroma( Colors::White ) );
             m_animationIdx = 0;

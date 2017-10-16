@@ -7,13 +7,17 @@
 class Cursor
 {
 public:
-    Cursor( Graphics& gfx, const Mouse& mouse, const std::vector< Unit* >& vpUnits, const Level& level );
+    Cursor( Graphics& gfx, const Mouse& mouse, const std::vector< Unit* >& vpUnits, const Level& level, const RectF& scrollRect );
 
-    void update( const float dt );
-    void draw();
+    void update( const float dt, const Vei2& camPos );
+    void draw( const Vei2& camPos );
 private:
     const Surface m_mainSprite;
     const Surface m_forbiddenSprite;
+    const Surface m_arrowSprites;
+    std::vector< RectI > m_vArrowSpriteRects;
+    int m_arrowWidth;
+    int m_arrowHeight;
 
     bool m_bUnitSelected        = false;
     bool m_bSelectedGroundUnit  = false;
@@ -35,6 +39,7 @@ private:
     Graphics& m_gfx;
     const Mouse& m_mouse;
     const std::vector< Unit* >& m_vpUnits;
-    //const std::vector< Unit* >& m_vpEnemies;
     const Level& m_level;
+
+    const RectF& m_scrollingRect;
 };

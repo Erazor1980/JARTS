@@ -22,6 +22,17 @@ enum class Team         /* in which team is the current unit */
     _C,
     _D
 };
+enum class Direction    /* for the 8 sprite directions */
+{
+    UP = 0,
+    UP_RIGHT,
+    RIGHT,
+    DOWN_RIGHT,
+    DOWN,
+    DOWN_LEFT,
+    LEFT,
+    UP_LEFT
+};
 
 class Unit
 {
@@ -32,17 +43,6 @@ public:
         WAITING,            /* if path is temporary blocked */
         MOVING,
         ATTACKING
-    };
-    enum class Direction    /* for the 8 sprite directions */
-    {
-        UP = 0,
-        UP_RIGHT,
-        RIGHT,
-        DOWN_RIGHT,
-        DOWN,
-        DOWN_LEFT,
-        LEFT,
-        UP_LEFT
     };
     enum class SoundOrder   /* sound effect order in m_vSoundEffects */
     {

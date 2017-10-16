@@ -44,8 +44,8 @@ void Level::init()
     }
     mp_content = new Tile[ m_widthInTiles * m_heightInTiles ];
 
-#if 0   /* random level */
-    for( int i = 0; i < m_width * m_height; ++i )
+#if 1   /* random level */
+    for( int i = 0; i < m_widthInTiles * m_heightInTiles; ++i )
     {
         if( rand() % 4 )
         {

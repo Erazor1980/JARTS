@@ -29,10 +29,10 @@ Game::Game( MainWindow& wnd )
 #if _DEBUG
     m_level( "..\\images\\maps\\testLvl1_debug.bmp" ),
 #else
-    m_level( "..\\images\\maps\\test.bmp" ),
+    m_level( "..\\images\\maps\\desert.bmp" ),
 #endif
     m_pathFinder( m_level ),
-    m_cursor( gfx, wnd.mouse, m_vpUnits, m_level ),
+    m_cursor( gfx, wnd.mouse, m_vpUnits, m_level, m_scrolling_rect ),
     m_explSeqSprite( "..\\images\\effects\\expl_seq.bmp" )
 {
     srand( ( unsigned int )time( NULL ) );
@@ -95,25 +95,21 @@ void Game::restartGame()
 void Game::updateCamera( const float dt )
 {
     Vec2 mp = wnd.mouse.GetPos();
-
-    /* when mouse is outside this rectangle we move the camera */
-    const float border = 50;
-    RectF r = RectF( border, Graphics::ScreenWidth - border, border, Graphics::ScreenHeight - border );
-
+    
     const int pixelsToMove = int( 500.0f * dt );
-    if( mp.x < r.left )
+    if( mp.x < m_scrolling_rect.left )
     {
         m_camPos.x -= pixelsToMove;
     }
-    else if( mp.x > r.right )
+    else if( mp.x > m_scrolling_rect.right )
     {
         m_camPos.x += pixelsToMove;
     }
-    if( mp.y < r.top )
+    if( mp.y < m_scrolling_rect.top )
     {
         m_camPos.y -= pixelsToMove;
     }
-    else if( mp.y > r.bottom )
+    else if( mp.y > m_scrolling_rect.bottom )
     {
         m_camPos.y += pixelsToMove;
     }
@@ -198,7 +194,7 @@ void Game::UpdateModel()
     ////////////////
     //// CURSOR ////
     ////////////////
-    m_cursor.update( dt );
+    m_cursor.update( dt, m_camPos );
 }
 
 void Game::drawAllUnits()
@@ -341,20 +337,31 @@ void Game::handleMouse()
 
 void Game::ComposeFrame()
 {
+    /* LEVEL */
     m_level.draw( gfx, m_camPos, m_bDrawDebugStuff );
     
+    /* SCROLLING RECT */
+    if( m_bDrawDebugStuff )
+    {
+        gfx.DrawRectBorder( m_scrolling_rect, 1, Colors::Magenta );
+    }
+
+    /* UNITS */
     drawAllUnits();
 
+    /* DEATH SEQs */
     for( const auto s : m_vpDeathSequences )
     {
         s->Draw( gfx, m_camPos );
     }
 
+    /* SELECTING RECT */
     if( m_bSelecting )
     {
         gfx.DrawRectBorder( m_selection.getNormalized(), 1, Colors::White );
     }
 
+    /* DEBUG STUFF */
 #if _DEBUG  /* display additional unit infos */
     int x = 100;
     char text[ 50 ];
@@ -386,5 +393,7 @@ void Game::ComposeFrame()
         x += 150;
     }
 #endif
-    m_cursor.draw();
+
+    /* CURSOR */
+    m_cursor.draw( m_camPos );
 }
