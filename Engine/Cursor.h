@@ -10,11 +10,12 @@ public:
     Cursor( Graphics& gfx, const Mouse& mouse, const std::vector< Unit* >& vpUnits, const Level& level, const RectF& scrollRect );
 
     void update( const float dt, const Vei2& camPos );
-    void draw( const Vei2& camPos );
+    void draw( const Vei2& camPos, bool bScrollingPressed = false );
 private:
     const Surface m_mainSprite;
     const Surface m_forbiddenSprite;
     const Surface m_arrowSprites;
+    const Surface m_arrow4directions;
     std::vector< RectI > m_vArrowSpriteRects;
     int m_arrowWidth;
     int m_arrowHeight;

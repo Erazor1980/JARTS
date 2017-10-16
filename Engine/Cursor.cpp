@@ -6,6 +6,7 @@ Cursor::Cursor( Graphics& gfx, const Mouse& mouse, const std::vector< Unit* >& v
     m_mainSprite( "..\\images\\cursor\\cursor.bmp" ),
     m_forbiddenSprite( "..\\images\\cursor\\forbidden.bmp" ),
     m_arrowSprites( "..\\images\\cursor\\arrows.bmp" ),
+    m_arrow4directions( "..\\images\\cursor\\4_arrows.bmp" ),
     m_gfx( gfx ),
     m_mouse( mouse ),
     m_vpUnits( vpUnits ),
@@ -108,14 +109,22 @@ void Cursor::update( const float dt, const Vei2& camPos )
     }
 }
 
-void Cursor::draw( const Vei2& camPos )
+void Cursor::draw( const Vei2& camPos, bool bScrollingPressed )
 {
     if( !m_mouse.IsInWindow() )
     {
         return;
     }
+    
     const int x = m_mouse.GetPosX();
     const int y = m_mouse.GetPosY();
+
+    if( bScrollingPressed )
+    {
+        m_gfx.DrawSprite( x - m_arrow4directions.GetWidth() / 2, y - m_arrow4directions.GetHeight() / 2, m_arrow4directions, SpriteEffect::Chroma( Colors::Black ) );
+        return;
+    }
+    
     RectF r = m_scrollingRect.getNormalized();
 
     if( !r.Contains( m_mouse.GetPos() ) )

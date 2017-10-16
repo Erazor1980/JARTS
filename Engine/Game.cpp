@@ -84,6 +84,8 @@ void Game::restartGame()
     m_vpUnits.push_back( new Unit( { 3, 5 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
     m_vpUnits.push_back( new Unit( { 2, 3 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
     m_vpUnits.push_back( new Unit( { 14, 3 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
+    m_vpUnits.push_back( new Unit( { 32, 3 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
+    m_vpUnits.push_back( new Unit( { 34, 7 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
     m_vpUnits.push_back( new Unit( { 7, 2 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
     m_vpUnits.push_back( new Unit( { 10, 4 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
 
@@ -91,27 +93,42 @@ void Game::restartGame()
     m_vpUnits.push_back( new Unit( { 7, 12 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
     m_vpUnits.push_back( new Unit( { 17, 13 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
     m_vpUnits.push_back( new Unit( { 13, 13 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
+    m_vpUnits.push_back( new Unit( { 27, 17 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
+    m_vpUnits.push_back( new Unit( { 33, 15 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
+    m_vpUnits.push_back( new Unit( { 31, 13 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
 }
 void Game::updateCamera( const float dt )
 {
     Vec2 mp = wnd.mouse.GetPos();
     
-    const int pixelsToMove = int( 500.0f * dt );
-    if( mp.x < m_scrolling_rect.left )
+    if( m_bScrollingPressed )
     {
-        m_camPos.x -= pixelsToMove;
+        Vec2 d = m_scrollingStartPos - mp;
+
+        m_camPos.x += ( int )d.x;
+        m_camPos.y += ( int )d.y;
+
+        m_scrollingStartPos = mp;
     }
-    else if( mp.x > m_scrolling_rect.right )
+    else
     {
-        m_camPos.x += pixelsToMove;
-    }
-    if( mp.y < m_scrolling_rect.top )
-    {
-        m_camPos.y -= pixelsToMove;
-    }
-    else if( mp.y > m_scrolling_rect.bottom )
-    {
-        m_camPos.y += pixelsToMove;
+        const int pixelsToMove = int( 500.0f * dt );
+        if( mp.x < m_scrolling_rect.left )
+        {
+            m_camPos.x -= pixelsToMove;
+        }
+        else if( mp.x > m_scrolling_rect.right )
+        {
+            m_camPos.x += pixelsToMove;
+        }
+        if( mp.y < m_scrolling_rect.top )
+        {
+            m_camPos.y -= pixelsToMove;
+        }
+        else if( mp.y > m_scrolling_rect.bottom )
+        {
+            m_camPos.y += pixelsToMove;
+        }
     }
 
     m_camPos.x = std::max( Graphics::halfScreenWidth, m_camPos.x );
@@ -326,6 +343,20 @@ void Game::handleMouse()
                     }
                 }
             }
+            if( e.RightIsPressed() )
+            {
+                if( !m_bStartedScrolling )
+                {
+                    m_scrollingStartPos = wnd.mouse.GetPos();
+                    m_bStartedScrolling = true;
+                }
+                m_bScrollingPressed = true;
+            }
+            else
+            {
+                m_bScrollingPressed = false;
+                m_bStartedScrolling = false;
+            }
         }
     }
 
@@ -395,5 +426,5 @@ void Game::ComposeFrame()
 #endif
 
     /* CURSOR */
-    m_cursor.draw( m_camPos );
+    m_cursor.draw( m_camPos, m_bScrollingPressed );
 }
