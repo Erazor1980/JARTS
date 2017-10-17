@@ -218,12 +218,19 @@ void Unit::update( const float dt )
             }
             else
             {
-                applyForce( separateFromOtherUnits( dt ) * 1.5f );
-                applyForce( seek( m_path.getWayPoints().back(), dt, true ) );
-                float d = ( m_location - m_path.getWayPoints().back() ).GetLength();
-                if( d < m_distToTile / 2 )
+                if( m_path.getWayPoints().empty() )
                 {
                     stop();
+                }
+                else
+                {
+                    applyForce( separateFromOtherUnits( dt ) * 1.5f );
+                    applyForce( seek( m_path.getWayPoints().back(), dt, true ) );
+                    float d = ( m_location - m_path.getWayPoints().back() ).GetLength();
+                    if( d < m_distToTile / 2 )
+                    {
+                        stop();
+                    }
                 }
             }            
         }
@@ -750,7 +757,7 @@ Vec2 Unit::separateFromOtherUnits( const float dt )
 }
 void Unit::followLineSegment( const Vec2& start, const Vec2& end, const float radius, const float dt )
 {
-    // Step 1: Predict the vehicle’s future location.
+    // Step 1: Predict the vehicleÂ’s future location.
     Vec2 predict = m_velocity;
     predict.Normalize();
     predict *= 25;          /* 25 pixels away (maybe add parameter or dynamic value depending on speed etc later) */
