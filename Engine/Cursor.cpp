@@ -179,9 +179,8 @@ void Cursor::draw( const Vei2& camPos, bool bScrollingPressed )
         if( m_bMouseOverEnemy )
         {
             const int radius = 25 - m_animationIdx * 3;
-            Vec2 tileCenter = m_level.getTileCenter( m_mouse.GetPosX(), m_mouse.GetPosY() );
-            m_gfx.DrawCircleBorder( tileCenter, radius, Colors::Red );
-            m_gfx.DrawCircleBorder( tileCenter, radius - 4, Colors::Red );
+            m_gfx.DrawCircleBorder( m_mouse.GetPos(), radius, Colors::Red );
+            m_gfx.DrawCircleBorder( m_mouse.GetPos(), radius - 4, Colors::Red );
             m_gfx.DrawRectCorners( m_rectFromUnit, Colors::Red );
             return;
         }
@@ -205,14 +204,14 @@ void Cursor::draw( const Vei2& camPos, bool bScrollingPressed )
         {
             m_gfx.DrawRectCorners( m_rectFromUnit, Colors::White );
         }
-        return;
     }
     else
     {
-        m_gfx.DrawSprite( x, y, m_mainSprite, SpriteEffect::Chroma( { 255, 242, 0 } ) );
-        m_cursorBlinkTime = 0;
         m_bCursorBlinkShow = true;
+        m_cursorBlinkTime = 0;
     }
+
+    m_gfx.DrawSprite( x, y, m_mainSprite, SpriteEffect::Chroma( { 255, 242, 0 } ) );    
 }
 
 void Cursor::advanceAnimation()
