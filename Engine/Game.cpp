@@ -102,6 +102,11 @@ void Game::restartGame()
 }
 void Game::updateCamera( const float dt )
 {
+    if( m_bSelecting )
+    {
+        return;     /* not allowing to scroll while selecting units with rectangle */
+    }
+
     Vec2 mp = wnd.mouse.GetPos();
     
     if( m_bScrollingPressed )
@@ -165,8 +170,14 @@ void Game::updateKeyboard( const float dt )
         }
     }
 
-    const int pixelsToMove = int( 500.0f * dt );
 
+    /* keyboard scrolling */
+    if( m_bSelecting )
+    {
+        return;     /* not allowing to scroll while selecting units with rectangle */
+    }
+
+    const int pixelsToMove = int( 500.0f * dt );
     if( wnd.kbd.KeyIsPressed( VK_RIGHT ) || wnd.kbd.KeyIsPressed( 'D' ) )
     {
         m_camPos.x += pixelsToMove;
@@ -341,15 +352,25 @@ void Game::handleMouse()
 {
     if( wnd.mouse.IsInWindow() && !wnd.mouse.IsEmpty() )
     {
+        bool bMouseOverActionBar = false;
+        if( wnd.mouse.GetPosX() > Graphics::ScreenWidth - m_actionBar.getWidth() )
+        {
+            bMouseOverActionBar = true;
+        }
+
         const Vei2 halfScreen( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
         const Vei2 offset = m_camPos - halfScreen;
 
         while( !wnd.mouse.IsEmpty() )
         {
             const Mouse::Event e = wnd.mouse.Read();
-            for( auto &u : m_vpUnits )
+
+            if( !bMouseOverActionBar )
             {
-                u->handleMouse( e.GetType(), wnd.mouse.GetPos(), m_camPos, wnd.kbd.KeyIsPressed( VK_SHIFT ) );
+                for( auto &u : m_vpUnits )
+                {
+                    u->handleMouse( e.GetType(), wnd.mouse.GetPos(), m_camPos, wnd.kbd.KeyIsPressed( VK_SHIFT ) );
+                }
             }
 
             /* multi selection rectangle */
@@ -361,8 +382,15 @@ void Game::handleMouse()
             if( e.LeftIsPressed() )
             {
                 m_bSelecting = true;
-                m_selection.right = wnd.mouse.GetPosX();
                 m_selection.bottom = wnd.mouse.GetPosY();
+                if( bMouseOverActionBar )
+                {
+                    m_selection.right = Graphics::ScreenWidth - m_actionBar.getWidth();
+                }
+                else
+                {
+                    m_selection.right = wnd.mouse.GetPosX();
+                }
 
                 for( auto &u : m_vpUnits )
                 {
@@ -386,7 +414,7 @@ void Game::handleMouse()
             }
 
             /* right-mouse-button-scrolling */
-            if( e.RightIsPressed() && !unitSelected() )
+            if( !bMouseOverActionBar && e.RightIsPressed() && !unitSelected() )
             {
                 if( !m_bStartedScrolling )
                 {
