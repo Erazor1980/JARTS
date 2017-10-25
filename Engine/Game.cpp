@@ -84,7 +84,7 @@ void Game::restartGame()
     m_vpUnits.push_back( new Unit( { 3, 5 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
     m_vpUnits.push_back( new Unit( { 2, 3 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
     m_vpUnits.push_back( new Unit( { 14, 3 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
-    m_vpUnits.push_back( new Unit( { 32, 3 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
+    m_vpUnits.push_back( new Unit( { 39, 3 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
     m_vpUnits.push_back( new Unit( { 34, 7 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
     m_vpUnits.push_back( new Unit( { 7, 2 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
     m_vpUnits.push_back( new Unit( { 10, 4 }, Team::_A, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
@@ -140,7 +140,7 @@ void Game::updateCamera( const float dt )
     }
 
     m_camPos.x = std::max( Graphics::halfScreenWidth, m_camPos.x );
-    m_camPos.x = std::min( m_level.getWidth() - Graphics::halfScreenWidth, m_camPos.x );
+    m_camPos.x = std::min( m_level.getWidth() - Graphics::halfScreenWidth + m_actionBar.getWidth(), m_camPos.x );
     m_camPos.y = std::max( Graphics::halfScreenHeight, m_camPos.y );
     m_camPos.y = std::min( m_level.getHeight() - Graphics::halfScreenHeight, m_camPos.y );
 }

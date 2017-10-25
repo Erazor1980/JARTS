@@ -166,7 +166,7 @@ void Level::draw( Graphics& gfx, const Vei2& camera, const bool drawGrid ) const
     /* calculate RectI of the current visible map snippet */
     const int xStart = std::max( camera.x - Graphics::halfScreenWidth, 0 );
     const int yStart = std::max( camera.y - Graphics::halfScreenHeight, 0 );
-    const int xEnd = std::min( m_width, camera.x + Graphics::halfScreenWidth ) - m_actionBarWidth;
+    const int xEnd = std::min( m_width, camera.x + Graphics::halfScreenWidth - m_actionBarWidth );
     const int yEnd = std::min( m_height, camera.y + Graphics::halfScreenHeight );
 
     RectI snippet = RectI( xStart, xEnd, yStart, yEnd );
