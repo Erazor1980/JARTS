@@ -47,6 +47,7 @@ public:
     }
 
     void draw( Graphics& gfx, const Vei2& camera, const bool drawGrid = false /* for debugging */ ) const;
+    void drawActionBar( Graphics& gfx ) const;
 
     /* test functions for visualization and debugging */
     void drawTileGrid( Graphics& gfx, const Vei2& camera, const bool drawFreeTiles = false ) const;

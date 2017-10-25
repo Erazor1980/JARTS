@@ -176,14 +176,16 @@ void Level::draw( Graphics& gfx, const Vei2& camera, const bool drawGrid ) const
     gfx.DrawSprite( 0, 0, snippet, m_lvlImg, SpriteEffect::Copy{} );
 #endif
 
-    /* action bar */
-    gfx.DrawSprite( Graphics::ScreenWidth - m_actionBarWidth, 0, m_actionBarImg, SpriteEffect::Copy{} );
-
     /* tile grid */
     if( drawGrid )
     {
         drawTileGrid( gfx, camera, false );
-    }
+    }    
+}
+
+void Level::drawActionBar( Graphics& gfx ) const
+{
+    gfx.DrawSprite( Graphics::ScreenWidth - m_actionBarWidth, 0, m_actionBarImg, SpriteEffect::Copy{} );
 }
 
 void Level::drawTileGrid( Graphics& gfx, const Vei2& camera, const bool drawFreeTiles ) const
@@ -195,9 +197,14 @@ void Level::drawTileGrid( Graphics& gfx, const Vei2& camera, const bool drawFree
 
     for( int x = 0; x < m_widthInTiles; ++x )
     {
+        int leftX = x * m_tileSize - xOffset;
+        if( leftX > Graphics::ScreenWidth - m_actionBarWidth )
+        {
+            continue;
+        }
         for( int y = 0; y < m_heightInTiles; ++y )
         {
-            RectI tile( { x * m_tileSize - xOffset, y * m_tileSize - yOffset },
+            RectI tile( { leftX, y * m_tileSize - yOffset },
                         { ( x + 1 ) * m_tileSize - 1 - xOffset, ( y + 1 ) * m_tileSize - 1 - yOffset } );
 
             if( Tile::OBSTACLE == mp_content[ y * m_widthInTiles + x ] )

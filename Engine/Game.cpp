@@ -437,9 +437,10 @@ void Game::ComposeFrame()
 
     /* DEBUG STUFF */
 #if _DEBUG  /* display additional unit infos */
-    int x = 100;
+    int x = 50;
     char text[ 50 ];
-    for( int i = 0; i < m_vpUnits.size(); ++i )
+    int numberUnitInfos = std::min( 5, ( int )m_vpUnits.size() );
+    for( int i = 0; i < numberUnitInfos; ++i )
     {
         m_font.DrawText( std::to_string( i ), { x, 1 }, Colors::Cyan, gfx );
 
@@ -467,6 +468,9 @@ void Game::ComposeFrame()
         x += 150;
     }
 #endif
+
+    /* ACTION BAR */
+    m_level.drawActionBar( gfx );
 
     /* CURSOR */
     m_cursor.draw( m_camPos, m_bScrollingPressed );
