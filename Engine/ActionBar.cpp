@@ -24,7 +24,7 @@ ActionBar::ActionBar()
     m_vBuildingRects.push_back( RectI( Graphics::ScreenWidth - size, Graphics::ScreenWidth, startY, startY + size ) );
 }
 
-void ActionBar::draw( Graphics& gfx, Font& font, const Vec2& mousePos, const Level& level, const Vei2& camPos ) const
+void ActionBar::draw( Graphics& gfx, Font& font, const Vec2& mousePos )
 {
 #if _DEBUG
     RectI r( Graphics::ScreenWidth - m_width, Graphics::ScreenWidth, 0, Graphics::ScreenHeight );
@@ -52,24 +52,50 @@ void ActionBar::draw( Graphics& gfx, Font& font, const Vec2& mousePos, const Lev
         }
         else
         {
-            const Vei2 halfScreen( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
-            const Vei2 offset = camPos - halfScreen;
-
-            const float tileSize = ( float )level.getTileSize();
-            for( int x = 0; x < m_buildingSize.x; ++x )
+            for( int i = 0; i < m_vBuildingTiles.size(); ++i )
             {
-                for( int y = 0; y < m_buildingSize.y; ++y )
+                if( m_vTileOccupancy[ i ] )
                 {
-                    RectF r     = level.getTileRect( mousePos + Vec2( x * tileSize, y * tileSize ), camPos );
-                    Tile tile   = level.getTileType( ( int )mousePos.x + offset.x + x * ( int )tileSize, ( int )mousePos.y + offset.y + y * ( int )tileSize );
-                    if( Tile::EMPTY == tile )
-                    {
-                        gfx.DrawRectBorder( r, 2, Colors::Green );
-                    }
-                    else
-                    {
-                        gfx.DrawRectBorder( r, 2, Colors::Red );
-                    }
+                    gfx.DrawRectBorder( m_vBuildingTiles[ i ], 2, Colors::Green );
+                }
+                else
+                {
+                    gfx.DrawRectBorder( m_vBuildingTiles[ i ], 2, Colors::Red );
+                }
+            }
+        }
+    }
+}
+
+void ActionBar::update( const float dt, const Vec2& mousePos, const Vei2& camPos, const Level& level )
+{
+    if( m_bPlacing )
+    {
+        m_vBuildingTiles.clear();
+        m_vTileOccupancy.clear();
+
+        const Vei2 halfScreen( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
+        const Vei2 offset       = camPos - halfScreen;
+
+        const float tileSize    = ( float )level.getTileSize();
+        m_bFreeSpace            = true;
+        for( int x = 0; x < m_buildingSize.x; ++x )
+        {
+            for( int y = 0; y < m_buildingSize.y; ++y )
+            {
+                RectF r     = level.getTileRect( mousePos + Vec2( x * tileSize, y * tileSize ), camPos );
+                Tile tile   = level.getTileType( ( int )mousePos.x + offset.x + x * ( int )tileSize, ( int )mousePos.y + offset.y + y * ( int )tileSize );
+
+                m_vBuildingTiles.push_back( r );
+                if( Tile::EMPTY == tile )
+                {
+                    m_vTileOccupancy.push_back( true );
+                    
+                }
+                else
+                {
+                    m_vTileOccupancy.push_back( false );
+                    m_bFreeSpace = false;
                 }
             }
         }
@@ -90,9 +116,10 @@ void ActionBar::handleMouse( const Mouse::Event::Type& type, const Vec2& mousePo
                     m_buildingType  = Building::Type( i );
                     m_bPlacing      = true;
                     m_buildingSize  = Building::getSizeInTiles( m_buildingType );
-                    int deb = 0;
+                    return;
                 }
             }
+            m_bPlacing = false;
         }
     }
 }

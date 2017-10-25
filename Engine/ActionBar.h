@@ -13,7 +13,9 @@ class ActionBar
 public:
     ActionBar();
 
-    void draw( Graphics& gfx, Font& font, const Vec2& mousePos, const Level& level, const Vei2& camPos ) const;
+    void draw( Graphics& gfx, Font& font, const Vec2& mousePos );
+
+    void update( const float dt, const Vec2& mousePos, const Vei2& camPos, const Level& level );
 
     void handleMouse( const Mouse::Event::Type& type, const Vec2& mousePos );
     
@@ -39,6 +41,11 @@ private:
     Building::Type m_buildingType;
     Vei2 m_buildingSize;
     bool m_bPlacing = false;
+    bool m_bFreeSpace = false;
+
+    /* placing tiles and colors */
+    std::vector< RectF > m_vBuildingTiles;
+    std::vector< bool > m_vTileOccupancy;   /* true = free, false = occupied */
 
     /* rectangles for specific buildings inside the action bar */
     std::vector< RectI > m_vBuildingRects;

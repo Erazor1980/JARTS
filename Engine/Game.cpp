@@ -272,6 +272,11 @@ void Game::UpdateModel()
     ////////////////
     m_cursor.update( dt, m_camPos );
 
+    ////////////////////
+    //// ACTION BAR ////
+    ////////////////////
+    m_actionBar.update( dt, wnd.mouse.GetPos(), m_camPos, m_level );
+
     ////////////////
     //// CAMERA ////
     ////////////////
@@ -515,7 +520,7 @@ void Game::ComposeFrame()
 #endif
 
     /* ACTION BAR */
-    m_actionBar.draw( gfx, m_font, wnd.mouse.GetPos(), m_level, m_camPos );
+    m_actionBar.draw( gfx, m_font, wnd.mouse.GetPos() );
 
     /* SCROLLING RECT */
     if( m_bDrawDebugStuff )
