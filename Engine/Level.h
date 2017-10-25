@@ -83,6 +83,10 @@ public:
 
         return RectI( { 0, 0 }, m_widthInTiles * m_tileSize, m_heightInTiles * m_tileSize );
     }
+    int getActionBarWidth() const
+    {
+        return m_actionBarWidth;
+    }
 private:
     bool m_bInitialized = false;
 
@@ -103,7 +107,11 @@ private:
     Tile* mp_content = nullptr;
 
     /* level image */
-    Surface m_image;
+    Surface m_lvlImg;
+
+    /* action bar */
+    Surface m_actionBarImg;
+    int m_actionBarWidth;
 
     friend PathFinder;
 };

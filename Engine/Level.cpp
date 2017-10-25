@@ -5,8 +5,10 @@
 
 Level::Level( const std::string& filename )
     :
-    m_image( filename )
+    m_lvlImg( filename ),
+    m_actionBarImg( "..\\images\\actionBar.bmp" )
 {
+    m_actionBarWidth = m_actionBarImg.GetWidth();
     init();
 }
 
@@ -27,10 +29,10 @@ void Level::init()
     m_width         = 1600;
     m_height        = 800;
 #else
-    m_widthInTiles     = m_image.GetWidth() / m_tileSize;
-    m_heightInTiles    = m_image.GetHeight() / m_tileSize;
-    m_width         = m_image.GetWidth();
-    m_height        = m_image.GetHeight();
+    m_widthInTiles      = m_lvlImg.GetWidth() / m_tileSize;
+    m_heightInTiles     = m_lvlImg.GetHeight() / m_tileSize;
+    m_width             = m_lvlImg.GetWidth();
+    m_height            = m_lvlImg.GetHeight();
 #endif
 
     m_halfWidth     = m_width / 2;
@@ -165,15 +167,19 @@ void Level::draw( Graphics& gfx, const Vei2& camera, const bool drawGrid ) const
     /* calculate RectI of the current visible map snippet */
     const int xStart = std::max( camera.x - Graphics::halfScreenWidth, 0 );
     const int yStart = std::max( camera.y - Graphics::halfScreenHeight, 0 );
-    const int xEnd = std::min( m_width, camera.x + Graphics::halfScreenWidth );
+    const int xEnd = std::min( m_width, camera.x + Graphics::halfScreenWidth ) - m_actionBarWidth;
     const int yEnd = std::min( m_height, camera.y + Graphics::halfScreenHeight );
 
     RectI snippet = RectI( xStart, xEnd, yStart, yEnd );
 
 #if !_DEBUG
-    gfx.DrawSprite( 0, 0, snippet, m_image, SpriteEffect::Copy{} );
+    gfx.DrawSprite( 0, 0, snippet, m_lvlImg, SpriteEffect::Copy{} );
 #endif
 
+    /* action bar */
+    gfx.DrawSprite( Graphics::ScreenWidth - m_actionBarWidth, 0, m_actionBarImg, SpriteEffect::Copy{} );
+
+    /* tile grid */
     if( drawGrid )
     {
         drawTileGrid( gfx, camera, false );
