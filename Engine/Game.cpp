@@ -96,6 +96,9 @@ void Game::restartGame()
     m_vpUnits.push_back( new Unit( { 27, 17 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::TANK, m_vTankSprites, m_vTankSounds ) );
     m_vpUnits.push_back( new Unit( { 33, 15 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
     m_vpUnits.push_back( new Unit( { 31, 13 }, Team::_B, m_level, m_pathFinder, m_vpUnits, UnitType::JET, m_vJetSprites, m_vJetSounds ) );
+
+    /* reset camera position */
+    m_camPos = Vei2( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
 }
 void Game::updateCamera( const float dt )
 {
@@ -110,7 +113,7 @@ void Game::updateCamera( const float dt )
 
         m_scrollingStartPos = mp;
     }
-    else
+    else if( wnd.mouse.IsInWindow() )
     {
         const int pixelsToMove = int( 500.0f * dt );
         if( mp.x < m_scrolling_rect.left )
@@ -136,6 +139,62 @@ void Game::updateCamera( const float dt )
     m_camPos.y = std::max( Graphics::halfScreenHeight, m_camPos.y );
     m_camPos.y = std::min( m_level.getHeight() - Graphics::halfScreenHeight, m_camPos.y );
 }
+void Game::updateKeyboard( const float dt )
+{
+    while( !wnd.kbd.KeyIsEmpty() )
+    {
+        const Keyboard::Event e = wnd.kbd.ReadKey();
+        if( e.IsRelease() )
+        {
+            if( e.GetCode() == VK_SPACE )
+            {
+                m_bDrawDebugStuff = !m_bDrawDebugStuff;
+            }
+            else if( e.GetCode() == VK_RETURN )
+            {
+                restartGame();
+            }
+            else if( e.GetCode() == VK_ESCAPE )
+            {
+                wnd.Kill();
+            }
+            else if( e.GetCode() == 'L' )
+            {
+                m_bDrawLifeBars = !m_bDrawLifeBars;
+            }
+        }
+    }
+
+    const int pixelsToMove = int( 500.0f * dt );
+
+    if( wnd.kbd.KeyIsPressed( VK_RIGHT ) )
+    {
+        m_camPos.x += pixelsToMove;
+    }
+    if( wnd.kbd.KeyIsPressed( VK_LEFT ) )
+    {
+        m_camPos.x -= pixelsToMove;
+    }
+    if( wnd.kbd.KeyIsPressed( VK_UP ) )
+    {
+        m_camPos.y -= pixelsToMove;
+    }
+    if( wnd.kbd.KeyIsPressed( VK_DOWN ) )
+    {
+        m_camPos.y += pixelsToMove;
+    }
+}
+bool Game::unitSelected()
+{
+    for( auto u : m_vpUnits )
+    {
+        if( u->isSelected() )
+        {
+            return true;
+        }
+    }
+    return false;
+}
 void Game::Go()
 {
 	gfx.BeginFrame();	
@@ -149,7 +208,6 @@ void Game::UpdateModel()
     checkForDestroyedUnits();
     
     const float dt = ft.Mark();
-    updateCamera( dt );
 
     /////////////////
     ///// MOUSE /////
@@ -184,34 +242,17 @@ void Game::UpdateModel()
     //////////////////
     //// KEYBOARD ////
     //////////////////
-    while( !wnd.kbd.KeyIsEmpty() )
-    {
-        const Keyboard::Event e = wnd.kbd.ReadKey();
-        if( e.IsRelease() )
-        {
-            if( e.GetCode() == VK_SPACE )
-            {
-                m_bDrawDebugStuff = !m_bDrawDebugStuff;
-            }
-            else if( e.GetCode() == VK_RETURN )
-            {
-                restartGame();
-            }
-            else if( e.GetCode() == VK_ESCAPE )
-            {
-                wnd.Kill();
-            }
-            else if( e.GetCode() == 'L' )
-            {
-                m_bDrawLifeBars = !m_bDrawLifeBars;
-            }
-        }
-    }
+    updateKeyboard( dt );
 
     ////////////////
     //// CURSOR ////
     ////////////////
     m_cursor.update( dt, m_camPos );
+
+    ////////////////
+    //// CAMERA ////
+    ////////////////
+    updateCamera( dt );
 }
 
 void Game::drawAllUnits()
@@ -343,7 +384,9 @@ void Game::handleMouse()
                     }
                 }
             }
-            if( e.RightIsPressed() )
+
+            /* right-mouse-button-scrolling */
+            if( e.RightIsPressed() && !unitSelected() )
             {
                 if( !m_bStartedScrolling )
                 {

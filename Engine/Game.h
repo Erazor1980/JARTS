@@ -53,6 +53,8 @@ private:
     void clearMemory();
     void restartGame();
     void updateCamera( const float dt );
+    void updateKeyboard( const float dt );
+    bool unitSelected();    /* checks if at least one unit is selected (no right-button-mouse-scrolling then) */
 	/********************************/
 private:
 	MainWindow& wnd;
