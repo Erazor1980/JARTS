@@ -1,7 +1,7 @@
 #include "Cursor.h"
 #include "SpriteEffect.h"
 
-Cursor::Cursor( Graphics& gfx, const Mouse& mouse, const std::vector< Unit* >& vpUnits, const Level& level, const RectF& scrollRect )
+Cursor::Cursor( Graphics& gfx, const Mouse& mouse, const std::vector< Unit* >& vpUnits, const Level& level, const RectF& scrollRect, const int actionBarWidth )
     :
     m_mainSprite( "..\\images\\cursor\\cursor.bmp" ),
     m_forbiddenSprite( "..\\images\\cursor\\forbidden.bmp" ),
@@ -13,6 +13,7 @@ Cursor::Cursor( Graphics& gfx, const Mouse& mouse, const std::vector< Unit* >& v
     m_level (level ),
     m_scrollingRect( scrollRect )
 {
+    m_actionBarWidth = actionBarWidth;
     /* calculating rectangles for the arrow sprites (directions) */
     m_arrowWidth     = m_arrowSprites.GetWidth() / 8;
     m_arrowHeight    = m_arrowSprites.GetHeight();
@@ -115,10 +116,10 @@ void Cursor::draw( const Vei2& camPos, bool bScrollingPressed )
     {
         return;
     }
-    
+        
     const int x = m_mouse.GetPosX();
     const int y = m_mouse.GetPosY();
-
+    
     if( bScrollingPressed )
     {
         m_gfx.DrawSprite( x - m_arrow4directions.GetWidth() / 2, y - m_arrow4directions.GetHeight() / 2, m_arrow4directions, SpriteEffect::Chroma( Colors::Black ) );
@@ -171,6 +172,12 @@ void Cursor::draw( const Vei2& camPos, bool bScrollingPressed )
         return;
     }
 
+    if( x > Graphics::ScreenWidth - m_actionBarWidth )
+    {
+        m_gfx.DrawSprite( x, y, m_mainSprite, SpriteEffect::Chroma( { 255, 242, 0 } ) );
+        return;
+    }
+
     const Vei2 halfScreen( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
     const Vei2 offset = camPos - halfScreen;
         
@@ -211,7 +218,7 @@ void Cursor::draw( const Vei2& camPos, bool bScrollingPressed )
         m_cursorBlinkTime = 0;
     }
 
-    m_gfx.DrawSprite( x, y, m_mainSprite, SpriteEffect::Chroma( { 255, 242, 0 } ) );    
+    m_gfx.DrawSprite( x, y, m_mainSprite, SpriteEffect::Chroma( { 255, 242, 0 } ) );
 }
 
 void Cursor::advanceAnimation()

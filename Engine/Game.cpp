@@ -32,7 +32,7 @@ Game::Game( MainWindow& wnd )
     m_level( "..\\images\\maps\\desert.bmp", m_actionBar.getWidth() ),
 #endif
     m_pathFinder( m_level ),
-    m_cursor( gfx, wnd.mouse, m_vpUnits, m_level, m_scrolling_rect ),
+    m_cursor( gfx, wnd.mouse, m_vpUnits, m_level, m_scrolling_rect, m_actionBar.getWidth() ),
     m_explSeqSprite( "..\\images\\effects\\expl_seq.bmp" )
 {
     srand( ( unsigned int )time( NULL ) );

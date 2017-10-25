@@ -7,7 +7,7 @@
 class Cursor
 {
 public:
-    Cursor( Graphics& gfx, const Mouse& mouse, const std::vector< Unit* >& vpUnits, const Level& level, const RectF& scrollRect );
+    Cursor( Graphics& gfx, const Mouse& mouse, const std::vector< Unit* >& vpUnits, const Level& level, const RectF& scrollRect, const int actionBarWidth );
 
     void update( const float dt, const Vei2& camPos );
     void draw( const Vei2& camPos, bool bScrollingPressed = false );
@@ -19,6 +19,7 @@ private:
     std::vector< RectI > m_vArrowSpriteRects;
     int m_arrowWidth;
     int m_arrowHeight;
+    int m_actionBarWidth;
 
     bool m_bUnitSelected        = false;
     bool m_bSelectedGroundUnit  = false;
