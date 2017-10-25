@@ -33,6 +33,7 @@
 #include "Defines.h"
 #include "Cursor.h"
 #include "SurfaceSequence.h"
+#include "ActionBar.h"
 
 class Game
 {
@@ -61,7 +62,8 @@ private:
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
-	FrameTimer ft;
+    ActionBar m_actionBar;
+    FrameTimer ft;
     Font m_font;
     Level m_level;
     PathFinder m_pathFinder;
@@ -84,7 +86,7 @@ private:
 
     bool m_bDrawLifeBars = true;
     bool m_bDrawDebugStuff = false;
-
+    
     /* Scrolling */
     Vei2 m_camPos = Vei2( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
     /* when mouse is outside this rectangle we move the camera */

@@ -27,9 +27,9 @@ Game::Game( MainWindow& wnd )
 	gfx( wnd ),
     m_font( "..\\images\\Fixedsys16x28.bmp" ),
 #if _DEBUG
-    m_level( "..\\images\\debugImg.bmp" ),
+    m_level( "..\\images\\debugImg.bmp", m_actionBar.getWidth() ),
 #else
-    m_level( "..\\images\\maps\\desert.bmp" ),
+    m_level( "..\\images\\maps\\desert.bmp", m_actionBar.getWidth() ),
 #endif
     m_pathFinder( m_level ),
     m_cursor( gfx, wnd.mouse, m_vpUnits, m_level, m_scrolling_rect ),
@@ -414,12 +414,6 @@ void Game::ComposeFrame()
     /* LEVEL */
     m_level.draw( gfx, m_camPos, m_bDrawDebugStuff );
     
-    /* SCROLLING RECT */
-    if( m_bDrawDebugStuff )
-    {
-        gfx.DrawRectBorder( m_scrolling_rect, 1, Colors::Magenta );
-    }
-
     /* UNITS */
     drawAllUnits();
 
@@ -470,7 +464,13 @@ void Game::ComposeFrame()
 #endif
 
     /* ACTION BAR */
-    m_level.drawActionBar( gfx );
+    m_actionBar.draw( gfx );
+
+    /* SCROLLING RECT */
+    if( m_bDrawDebugStuff )
+    {
+        gfx.DrawRectBorder( m_scrolling_rect, 1, Colors::Magenta );
+    }
 
     /* CURSOR */
     m_cursor.draw( m_camPos, m_bScrollingPressed );

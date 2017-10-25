@@ -102,6 +102,9 @@
     <ClInclude Include="SurfaceSequence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ActionBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -165,6 +168,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Cursor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

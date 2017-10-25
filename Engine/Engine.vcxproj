@@ -136,6 +136,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ActionBar.h" />
     <ClInclude Include="ChiliException.h" />
     <ClInclude Include="ChiliWin.h" />
     <ClInclude Include="Colors.h" />
@@ -166,6 +167,7 @@
     <ClInclude Include="Vei2.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ActionBar.cpp" />
     <ClCompile Include="COMInitializer.cpp" />
     <ClCompile Include="Cursor.cpp" />
     <ClCompile Include="DXErr.cpp" />

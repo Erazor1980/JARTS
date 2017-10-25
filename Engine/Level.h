@@ -15,7 +15,7 @@ enum class Tile
 class Level
 {
 public:
-    Level( const std::string& filename );
+    Level( const std::string& filename, const int actionBarWidth );
     ~Level();
 
     void init();
@@ -47,7 +47,6 @@ public:
     }
 
     void draw( Graphics& gfx, const Vei2& camera, const bool drawGrid = false /* for debugging */ ) const;
-    void drawActionBar( Graphics& gfx ) const;
 
     /* test functions for visualization and debugging */
     void drawTileGrid( Graphics& gfx, const Vei2& camera, const bool drawFreeTiles = false ) const;
@@ -111,7 +110,6 @@ private:
     Surface m_lvlImg;
 
     /* action bar */
-    Surface m_actionBarImg;
     int m_actionBarWidth;
 
     friend PathFinder;
