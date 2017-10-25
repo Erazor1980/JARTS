@@ -376,10 +376,17 @@ void Game::handleMouse()
             /* multi selection rectangle */
             if( e.GetType() == Mouse::Event::Type::LPress )
             {
-                m_selection.left = wnd.mouse.GetPosX();
-                m_selection.top = wnd.mouse.GetPosY();
+                if( bMouseOverActionBar )
+                {
+                    m_selection.left = -1;
+                }
+                else
+                {
+                    m_selection.left = wnd.mouse.GetPosX();
+                    m_selection.top = wnd.mouse.GetPosY();
+                }
             }
-            if( e.LeftIsPressed() )
+            if( e.LeftIsPressed() && m_selection.left >=0 )
             {
                 m_bSelecting = true;
                 m_selection.bottom = wnd.mouse.GetPosY();

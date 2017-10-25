@@ -20,7 +20,7 @@ void ActionBar::draw( Graphics& gfx ) const
 {
 #if _DEBUG
     RectI r( Graphics::ScreenWidth - m_width, Graphics::ScreenWidth, 0, Graphics::ScreenHeight );
-    gfx.DrawRect( r, Colors::LightGray );
+    gfx.DrawRectBorder( r, 4, Colors::LightGray );
 #else
     gfx.DrawSprite( Graphics::ScreenWidth - m_width, 0, m_img, SpriteEffect::Copy{} );
 #endif
