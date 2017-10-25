@@ -87,14 +87,15 @@ public:
     {
         return m_actionBarWidth;
     }
-    RectF getTileRect( const Vec2& mousePos, const Vei2& camPos )
+    /* return RectF of the tile at mouse position in screen coordinates (not world coordinates!) */
+    RectF getTileRect( const Vec2& mousePos, const Vei2& camPos ) const
     {
         const Vei2 halfScreen( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
         const Vei2 offset = camPos - halfScreen;
 
         int tileIdx = getTileIdx( ( int )mousePos.x + offset.x, ( int )mousePos.y + offset.y );
 
-        Vec2 topLeft = getTileCenter( tileIdx ) - Vec2( m_tileSize / 2.0f, m_tileSize / 2.0f );
+        Vec2 topLeft = getTileCenter( tileIdx ) - Vec2( m_tileSize / 2.0f, m_tileSize / 2.0f ) - offset;
         
         return RectF( topLeft, ( float )m_tileSize, ( float )m_tileSize );
     }
