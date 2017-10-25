@@ -508,5 +508,5 @@ void Game::ComposeFrame()
     }
 
     /* CURSOR */
-    m_cursor.draw( m_camPos, m_bScrollingPressed );
+    m_cursor.draw( m_camPos, m_bScrollingPressed, m_bSelecting );
 }

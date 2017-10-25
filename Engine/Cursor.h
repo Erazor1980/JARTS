@@ -10,7 +10,7 @@ public:
     Cursor( Graphics& gfx, const Mouse& mouse, const std::vector< Unit* >& vpUnits, const Level& level, const RectF& scrollRect, const int actionBarWidth );
 
     void update( const float dt, const Vei2& camPos );
-    void draw( const Vei2& camPos, bool bScrollingPressed = false );
+    void draw( const Vei2& camPos, bool bScrollingPressed = false, bool bSelectingRectangle = false );
 private:
     const Surface m_mainSprite;
     const Surface m_forbiddenSprite;

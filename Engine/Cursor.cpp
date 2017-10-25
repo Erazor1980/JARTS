@@ -110,7 +110,7 @@ void Cursor::update( const float dt, const Vei2& camPos )
     }
 }
 
-void Cursor::draw( const Vei2& camPos, bool bScrollingPressed )
+void Cursor::draw( const Vei2& camPos, bool bScrollingPressed, bool bSelectingRectangle )
 {
     if( !m_mouse.IsInWindow() )
     {
@@ -128,7 +128,8 @@ void Cursor::draw( const Vei2& camPos, bool bScrollingPressed )
     
     RectF r = m_scrollingRect.getNormalized();
 
-    if( !r.Contains( m_mouse.GetPos() ) )
+    /* scrolling arrows */
+    if( !bSelectingRectangle && !r.Contains( m_mouse.GetPos() ) )
     {
         if( x < r.left )
         {
