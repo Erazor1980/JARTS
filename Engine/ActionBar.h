@@ -45,11 +45,13 @@ private:
     bool m_bPlacing = false;
     bool m_bFreeSpace = false;
 
-    /* placing tiles and colors */
-    std::vector< RectF > m_vBuildingTiles;
+    /* placing attributes */
+    std::vector< RectF > m_vBuildingTiles;  /* rects in screen coordinates */
     std::vector< bool > m_vTileOccupancy;   /* true = free, false = occupied */
+    std::vector< int > m_vBuildingIndices;  /* indices of current building in map (for placing) */
 
-    /* rectangles for specific buildings inside the action bar */
-    std::vector< RectI > m_vBuildingRects;
+    /* rectangles for specific buildings/units inside the action bar */
+    std::vector< RectI > m_vRectsInBar_buildings;
+    std::vector< RectI > m_vRectsInBar_units;
 };
 

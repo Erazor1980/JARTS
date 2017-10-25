@@ -20,10 +20,10 @@ ActionBar::ActionBar()
     const int size      = m_width / 2;
     const int startY    = 50;
     /* barracks (top left) */
-    m_vBuildingRects.push_back( RectI( Graphics::ScreenWidth - m_width, Graphics::ScreenWidth - size, startY, startY + size ) );
+    m_vRectsInBar_buildings.push_back( RectI( Graphics::ScreenWidth - m_width, Graphics::ScreenWidth - size, startY, startY + size ) );
 
     /* factory (top right) */
-    m_vBuildingRects.push_back( RectI( Graphics::ScreenWidth - size, Graphics::ScreenWidth, startY, startY + size ) );
+    m_vRectsInBar_buildings.push_back( RectI( Graphics::ScreenWidth - size, Graphics::ScreenWidth, startY, startY + size ) );
 }
 
 void ActionBar::draw( Graphics& gfx, Font& font, const Vec2& mousePos )
@@ -36,14 +36,14 @@ void ActionBar::draw( Graphics& gfx, Font& font, const Vec2& mousePos )
 #endif
 
     /* draw building rects */
-    for( auto b : m_vBuildingRects )
+    for( auto b : m_vRectsInBar_buildings )
     {
         gfx.DrawRectBorder( b, 2, Colors::Blue );
     }
 
     /* draw building names */
-    font.DrawText( "B", m_vBuildingRects[ ( int )Building::Type::BARRACKS ].GetCenter() - Vei2( 8, 14 ), Colors::Blue, gfx );
-    font.DrawText( "F", m_vBuildingRects[ ( int )Building::Type::FACTORY ].GetCenter() - Vei2( 8, 14 ), Colors::Blue, gfx );
+    font.DrawText( "B", m_vRectsInBar_buildings[ ( int )Building::Type::BARRACKS ].GetCenter() - Vei2( 8, 14 ), Colors::Blue, gfx );
+    font.DrawText( "F", m_vRectsInBar_buildings[ ( int )Building::Type::FACTORY ].GetCenter() - Vei2( 8, 14 ), Colors::Blue, gfx );
 
     /* building placing */
     if( m_bPlacing )
@@ -96,6 +96,7 @@ void ActionBar::update( const float dt, const Vec2& mousePos, const Vei2& camPos
     {
         m_vBuildingTiles.clear();
         m_vTileOccupancy.clear();
+        m_vBuildingIndices.clear();
 
         const Vei2 halfScreen( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
         const Vei2 offset       = camPos - halfScreen;
@@ -108,7 +109,9 @@ void ActionBar::update( const float dt, const Vec2& mousePos, const Vei2& camPos
             {
                 RectF r     = level.getTileRect( mousePos + Vec2( x * tileSize, y * tileSize ), camPos );
                 Tile tile   = level.getTileType( ( int )mousePos.x + offset.x + x * ( int )tileSize, ( int )mousePos.y + offset.y + y * ( int )tileSize );
+                int idx     = level.getTileIdx( ( int )mousePos.x + offset.x + x * ( int )tileSize, ( int )mousePos.y + offset.y + y * ( int )tileSize );
 
+                m_vBuildingIndices.push_back( idx );
                 m_vBuildingTiles.push_back( r );
                 if( Tile::EMPTY == tile )
                 {
@@ -127,21 +130,37 @@ void ActionBar::update( const float dt, const Vec2& mousePos, const Vei2& camPos
 
 void ActionBar::handleMouse( const Mouse::Event::Type& type, const Vec2& mousePos )
 {
-    /* buildings */
-    if( mousePos.y < m_vBuildingRects.back().bottom )
+    if( type == Mouse::Event::Type::LPress )
     {
-        if( type == Mouse::Event::Type::LPress )
+        /* inside action bar */
+        if( mousePos.x > Graphics::ScreenWidth - m_width )
         {
-            for( int i = 0; i < m_vBuildingRects.size(); ++i )
+            /* buildings */
+            if( mousePos.y < m_vRectsInBar_buildings.back().bottom )
             {
-                if( m_vBuildingRects[ i ].Contains( mousePos ) )
+                for( int i = 0; i < m_vRectsInBar_buildings.size(); ++i )
                 {
-                    m_buildingType  = Building::Type( i );
-                    m_bPlacing      = true;
-                    m_buildingSize  = Building::getSizeInTiles( m_buildingType );
-                    return;
+                    if( m_vRectsInBar_buildings[ i ].Contains( mousePos ) )
+                    {
+                        m_buildingType  = Building::Type( i );
+                        m_bPlacing      = true;
+                        m_buildingSize  = Building::getSizeInTiles( m_buildingType );
+                        return;
+                    }
                 }
             }
+            /* units */
+            //else if( mousePos.y < m_vRectsInBar_units.back().bottom )
+            //{
+                //TODO add later
+            //}
+        }
+
+    }
+    if( m_bPlacing )
+    {
+        if( type == Mouse::Event::Type::RPress )
+        {
             m_bPlacing = false;
         }
     }
