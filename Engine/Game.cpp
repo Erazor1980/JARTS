@@ -162,6 +162,7 @@ void Game::updateKeyboard( const float dt )
             else if( e.GetCode() == VK_ESCAPE )
             {
                 deselectAllUnits();
+                m_actionBar.cancelPlacing();
             }
             else if( e.GetCode() == 'Q' )
             {
@@ -265,7 +266,7 @@ void Game::UpdateModel()
     //// KEYBOARD ////
     //////////////////
     updateKeyboard( dt );
-
+    
     ////////////////
     //// CURSOR ////
     ////////////////
@@ -376,6 +377,10 @@ void Game::handleMouse()
         {
             const Mouse::Event e = wnd.mouse.Read();
 
+            /* action bar */
+            m_actionBar.handleMouse( e.GetType(), wnd.mouse.GetPos() );
+
+            /* units */
             if( !bMouseOverActionBar )
             {
                 for( auto &u : m_vpUnits )
@@ -510,7 +515,7 @@ void Game::ComposeFrame()
 #endif
 
     /* ACTION BAR */
-    m_actionBar.draw( gfx );
+    m_actionBar.draw( gfx, m_font, wnd.mouse.GetPos(), m_level, m_camPos );
 
     /* SCROLLING RECT */
     if( m_bDrawDebugStuff )
