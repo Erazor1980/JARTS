@@ -56,6 +56,7 @@ private:
     void updateCamera( const float dt );
     void updateKeyboard( const float dt );
     bool unitSelected();    /* checks if at least one unit is selected (no right-button-mouse-scrolling then) */
+    void deselectAllUnits();
 	/********************************/
 private:
 	MainWindow& wnd;

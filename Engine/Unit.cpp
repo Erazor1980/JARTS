@@ -757,7 +757,7 @@ Vec2 Unit::separateFromOtherUnits( const float dt )
 }
 void Unit::followLineSegment( const Vec2& start, const Vec2& end, const float radius, const float dt )
 {
-    // Step 1: Predict the vehicles future location.
+    // Step 1: Predict the vehicles future location.
     Vec2 predict = m_velocity;
     predict.Normalize();
     predict *= 25;          /* 25 pixels away (maybe add parameter or dynamic value depending on speed etc later) */
@@ -856,7 +856,8 @@ void Unit::select()
 }
 void Unit::deselect()
 {
-    m_bSelected = false;
+    m_bSelected             = false;
+    m_bInsideSelectionRect  = false;
 }
 void Unit::takeDamage( const int damage, const UnitType EnemyType, Unit* const pAttackingUnit )
 {

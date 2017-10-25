@@ -161,6 +161,10 @@ void Game::updateKeyboard( const float dt )
             }
             else if( e.GetCode() == VK_ESCAPE )
             {
+                deselectAllUnits();
+            }
+            else if( e.GetCode() == 'Q' )
+            {
                 wnd.Kill();
             }
             else if( e.GetCode() == 'L' )
@@ -205,6 +209,13 @@ bool Game::unitSelected()
         }
     }
     return false;
+}
+void Game::deselectAllUnits()
+{
+    for( auto u : m_vpUnits )
+    {
+        u->deselect();
+    }
 }
 void Game::Go()
 {
@@ -386,7 +397,7 @@ void Game::handleMouse()
                     m_selection.top = wnd.mouse.GetPosY();
                 }
             }
-            if( e.LeftIsPressed() && m_selection.left >=0 )
+            if( e.LeftIsPressed() && m_selection.left >= 0 )
             {
                 m_bSelecting = true;
                 m_selection.bottom = wnd.mouse.GetPosY();
