@@ -4,6 +4,8 @@
 
 ActionBar::ActionBar()
     :
+    m_factoryImg( "..\\images\\actionBar\\factory.bmp" ),
+    m_barracksImg( "..\\images\\actionBar\\barracks.bmp" ),
 #if _DEBUG
     m_img( "..\\images\\debugImg.bmp" )
 #else
@@ -46,9 +48,22 @@ void ActionBar::draw( Graphics& gfx, Font& font, const Vec2& mousePos )
     /* building placing */
     if( m_bPlacing )
     {
+        Surface* pCurrentBuilding = nullptr;
+        switch( m_buildingType )
+        {
+        case Building::Type::BARRACKS:
+            pCurrentBuilding = &m_barracksImg;
+            break;
+        case Building::Type::FACTORY:
+            pCurrentBuilding = &m_factoryImg;
+            break;
+        default:
+            pCurrentBuilding = nullptr;
+        }
+
         if( mousePos.x >= Graphics::ScreenWidth - m_width )
         {
-
+            gfx.DrawSprite( ( int )mousePos.x, ( int )mousePos.y, *pCurrentBuilding, SpriteEffect::Ghost( { 255, 242, 0 } ) );
         }
         else
         {
@@ -63,7 +78,15 @@ void ActionBar::draw( Graphics& gfx, Font& font, const Vec2& mousePos )
                     gfx.DrawRectBorder( m_vBuildingTiles[ i ], 2, Colors::Red );
                 }
             }
-        }
+            if( m_bFreeSpace )
+            {
+                gfx.DrawSprite( ( int )m_vBuildingTiles.front().left, ( int )m_vBuildingTiles.front().top, *pCurrentBuilding, SpriteEffect::Chroma( { 255, 242, 0 } ) );
+            }
+            else
+            {
+                gfx.DrawSprite( ( int )m_vBuildingTiles.front().left, ( int )m_vBuildingTiles.front().top, *pCurrentBuilding, SpriteEffect::Ghost( { 255, 242, 0 } ) );
+            }
+        }        
     }
 }
 

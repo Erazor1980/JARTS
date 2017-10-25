@@ -33,8 +33,10 @@ public:
         return m_bPlacing;
     }
 private:
-    /* image and width of the action bar */
+    /* images and width of the action bar */
     Surface m_img;
+    Surface m_factoryImg;
+    Surface m_barracksImg;
     int m_width;
 
     /* current building attributes */
