@@ -167,19 +167,19 @@ void Game::updateKeyboard( const float dt )
 
     const int pixelsToMove = int( 500.0f * dt );
 
-    if( wnd.kbd.KeyIsPressed( VK_RIGHT ) )
+    if( wnd.kbd.KeyIsPressed( VK_RIGHT ) || wnd.kbd.KeyIsPressed( 'D' ) )
     {
         m_camPos.x += pixelsToMove;
     }
-    if( wnd.kbd.KeyIsPressed( VK_LEFT ) )
+    if( wnd.kbd.KeyIsPressed( VK_LEFT ) || wnd.kbd.KeyIsPressed( 'A' ) )
     {
         m_camPos.x -= pixelsToMove;
     }
-    if( wnd.kbd.KeyIsPressed( VK_UP ) )
+    if( wnd.kbd.KeyIsPressed( VK_UP ) || wnd.kbd.KeyIsPressed( 'W' ) )
     {
         m_camPos.y -= pixelsToMove;
     }
-    if( wnd.kbd.KeyIsPressed( VK_DOWN ) )
+    if( wnd.kbd.KeyIsPressed( VK_DOWN ) || wnd.kbd.KeyIsPressed( 'S' ) )
     {
         m_camPos.y += pixelsToMove;
     }

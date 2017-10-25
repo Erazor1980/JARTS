@@ -176,11 +176,11 @@ void Level::draw( Graphics& gfx, const Vei2& camera, const bool drawGrid ) const
 
     if( drawGrid )
     {
-        drawTileGrid( gfx, camera );
+        drawTileGrid( gfx, camera, false );
     }
 }
 
-void Level::drawTileGrid( Graphics& gfx, const Vei2& camera ) const
+void Level::drawTileGrid( Graphics& gfx, const Vei2& camera, const bool drawFreeTiles ) const
 {
     assert( m_height > 0 && m_width > 0 && m_tileSize > 0 );
 
@@ -194,13 +194,16 @@ void Level::drawTileGrid( Graphics& gfx, const Vei2& camera ) const
             RectI tile( { x * m_tileSize - xOffset, y * m_tileSize - yOffset },
                         { ( x + 1 ) * m_tileSize - 1 - xOffset, ( y + 1 ) * m_tileSize - 1 - yOffset } );
 
-            if( Tile::EMPTY == mp_content[ y * m_widthInTiles + x ] )
-            {
-                gfx.DrawRectBorder( tile, 1, Colors::Green );                
-            }
-            else
+            if( Tile::OBSTACLE == mp_content[ y * m_widthInTiles + x ] )
             {
                 gfx.DrawRectBorder( tile, 1, Colors::Red );
+                Vei2 tl = { tile.left, tile.top };
+                Vei2 br = { tile.right, tile.bottom };
+                gfx.DrawLine( tl, br, Colors::Red );
+            }
+            else if( drawFreeTiles )
+            {
+                gfx.DrawRectBorder( tile, 1, Colors::Green );
             }
         }
     }
