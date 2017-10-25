@@ -169,6 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ActionBar.cpp" />
+    <ClCompile Include="Building.cpp" />
     <ClCompile Include="COMInitializer.cpp" />
     <ClCompile Include="Cursor.cpp" />
     <ClCompile Include="DXErr.cpp" />

@@ -1,5 +1,6 @@
 #include "ActionBar.h"
 #include "SpriteEffect.h"
+#include "RectF.h"
 
 ActionBar::ActionBar()
     :
@@ -23,7 +24,7 @@ ActionBar::ActionBar()
     m_vBuildingRects.push_back( RectI( Graphics::ScreenWidth - size, Graphics::ScreenWidth, startY, startY + size ) );
 }
 
-void ActionBar::draw( Graphics& gfx, Font& font, const Vec2& mouse_pos, const Level& level, const Vei2& camPos ) const
+void ActionBar::draw( Graphics& gfx, Font& font, const Vec2& mousePos, const Level& level, const Vei2& camPos ) const
 {
 #if _DEBUG
     RectI r( Graphics::ScreenWidth - m_width, Graphics::ScreenWidth, 0, Graphics::ScreenHeight );
@@ -43,35 +44,37 @@ void ActionBar::draw( Graphics& gfx, Font& font, const Vec2& mouse_pos, const Le
     font.DrawText( "F", m_vBuildingRects[ ( int )Building::Type::FACTORY ].GetCenter() - Vei2( 8, 14 ), Colors::Blue, gfx );
 
     /* building placing */
-    if( m_bPlacing )
+    if( m_bPlacing && mousePos.x < Graphics::ScreenWidth - m_width )
     {
-        const Vei2 halfScreen( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
+        /*const Vei2 halfScreen( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
         const Vei2 offset = camPos - halfScreen;
 
         Tile tile   = level.getTileType( ( int )mouse_pos.x + offset.x, ( int )mouse_pos.y + offset.y );
-        int tileIdx = level.getTileIdx( ( int )mouse_pos.x + offset.x, ( int )mouse_pos.y + offset.y );
+        int tileIdx = level.getTileIdx( ( int )mouse_pos.x + offset.x, ( int )mouse_pos.y + offset.y );*/
 
         //level.getTileIdx
+        RectF tile = level.getTileRect( mousePos, camPos );
+        gfx.DrawRect( tile, Colors::Green );
     }
 }
 
-void ActionBar::handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos )
+void ActionBar::handleMouse( const Mouse::Event::Type& type, const Vec2& mousePos )
 {
     /* buildings */
-    if( mouse_pos.y < m_vBuildingRects.back().bottom )
+    if( mousePos.y < m_vBuildingRects.back().bottom )
     {
         if( type == Mouse::Event::Type::LPress )
         {
             for( int i = 0; i < m_vBuildingRects.size(); ++i )
             {
-                if( m_vBuildingRects[ i ].Contains( mouse_pos ) )
+                if( m_vBuildingRects[ i ].Contains( mousePos ) )
                 {
                     m_buildingType  = Building::Type( i );
                     m_bPlacing      = true;
+                    m_buildingSize  = Building::getSizeInTiles( m_buildingType );
                     int deb = 0;
                 }
             }
-        }        
+        }
     }
-
 }

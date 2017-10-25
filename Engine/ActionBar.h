@@ -13,9 +13,9 @@ class ActionBar
 public:
     ActionBar();
 
-    void draw( Graphics& gfx, Font& font, const Vec2& mouse_pos, const Level& level, const Vei2& camPos ) const;
+    void draw( Graphics& gfx, Font& font, const Vec2& mousePos, const Level& level, const Vei2& camPos ) const;
 
-    void handleMouse( const Mouse::Event::Type& type, const Vec2& mouse_pos );
+    void handleMouse( const Mouse::Event::Type& type, const Vec2& mousePos );
     
     void cancelPlacing()
     {
@@ -35,8 +35,9 @@ private:
     Surface m_img;
     int m_width;
 
-    /* current building type to build/place */
+    /* current building attributes */
     Building::Type m_buildingType;
+    Vei2 m_buildingSize;
     bool m_bPlacing = false;
 
     /* rectangles for specific buildings inside the action bar */
