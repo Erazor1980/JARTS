@@ -6,9 +6,18 @@
 Level::Level( const std::string& filename )
     :
     m_lvlImg( filename ),
+#if _DEBUG
+    m_actionBarImg( "..\\images\\debugImg.bmp" )
+#else
     m_actionBarImg( "..\\images\\actionBar.bmp" )
+#endif
 {
+#if _DEBUG
+    m_actionBarWidth = 200;
+#else
     m_actionBarWidth = m_actionBarImg.GetWidth();
+#endif
+    
     init();
 }
 
@@ -185,7 +194,12 @@ void Level::draw( Graphics& gfx, const Vei2& camera, const bool drawGrid ) const
 
 void Level::drawActionBar( Graphics& gfx ) const
 {
+#if _DEBUG
+    RectI r( Graphics::ScreenWidth - m_actionBarWidth, Graphics::ScreenWidth, 0, Graphics::ScreenHeight );
+    gfx.DrawRect( r, Colors::LightGray );
+#else
     gfx.DrawSprite( Graphics::ScreenWidth - m_actionBarWidth, 0, m_actionBarImg, SpriteEffect::Copy{} );
+#endif
 }
 
 void Level::drawTileGrid( Graphics& gfx, const Vei2& camera, const bool drawFreeTiles ) const

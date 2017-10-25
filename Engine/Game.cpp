@@ -27,7 +27,7 @@ Game::Game( MainWindow& wnd )
 	gfx( wnd ),
     m_font( "..\\images\\Fixedsys16x28.bmp" ),
 #if _DEBUG
-    m_level( "..\\images\\maps\\testLvl1_debug.bmp" ),
+    m_level( "..\\images\\debugImg.bmp" ),
 #else
     m_level( "..\\images\\maps\\desert.bmp" ),
 #endif
