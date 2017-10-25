@@ -7,7 +7,7 @@ ActionBar::ActionBar()
 #if _DEBUG
     m_img( "..\\images\\debugImg.bmp" )
 #else
-    m_img( "..\\images\\actionBar.bmp" )
+    m_img( "..\\images\\actionBar\\actionBar.bmp" )
 #endif
 {
 #if _DEBUG
@@ -44,17 +44,35 @@ void ActionBar::draw( Graphics& gfx, Font& font, const Vec2& mousePos, const Lev
     font.DrawText( "F", m_vBuildingRects[ ( int )Building::Type::FACTORY ].GetCenter() - Vei2( 8, 14 ), Colors::Blue, gfx );
 
     /* building placing */
-    if( m_bPlacing && mousePos.x < Graphics::ScreenWidth - m_width )
+    if( m_bPlacing )
     {
-        /*const Vei2 halfScreen( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
-        const Vei2 offset = camPos - halfScreen;
+        if( mousePos.x >= Graphics::ScreenWidth - m_width )
+        {
 
-        Tile tile   = level.getTileType( ( int )mouse_pos.x + offset.x, ( int )mouse_pos.y + offset.y );
-        int tileIdx = level.getTileIdx( ( int )mouse_pos.x + offset.x, ( int )mouse_pos.y + offset.y );*/
+        }
+        else
+        {
+            const Vei2 halfScreen( Graphics::halfScreenWidth, Graphics::halfScreenHeight );
+            const Vei2 offset = camPos - halfScreen;
 
-        //level.getTileIdx
-        RectF tile = level.getTileRect( mousePos, camPos );
-        gfx.DrawRect( tile, Colors::Green );
+            const float tileSize = ( float )level.getTileSize();
+            for( int x = 0; x < m_buildingSize.x; ++x )
+            {
+                for( int y = 0; y < m_buildingSize.y; ++y )
+                {
+                    RectF r     = level.getTileRect( mousePos + Vec2( x * tileSize, y * tileSize ), camPos );
+                    Tile tile   = level.getTileType( ( int )mousePos.x + offset.x + x * ( int )tileSize, ( int )mousePos.y + offset.y + y * ( int )tileSize );
+                    if( Tile::EMPTY == tile )
+                    {
+                        gfx.DrawRectBorder( r, 2, Colors::Green );
+                    }
+                    else
+                    {
+                        gfx.DrawRectBorder( r, 2, Colors::Red );
+                    }
+                }
+            }
+        }
     }
 }
 
