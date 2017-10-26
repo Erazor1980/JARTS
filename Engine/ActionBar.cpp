@@ -28,12 +28,9 @@ ActionBar::ActionBar()
 
 void ActionBar::draw( Graphics& gfx, Font& font, const Vec2& mousePos )
 {
-#if _DEBUG
     RectI r( Graphics::ScreenWidth - m_width, Graphics::ScreenWidth, 0, Graphics::ScreenHeight );
-    gfx.DrawRectBorder( r, 4, Colors::LightGray );
-#else
-    gfx.DrawSprite( Graphics::ScreenWidth - m_width, 0, m_img, SpriteEffect::Copy{} );
-#endif
+    gfx.DrawRect( r, Colors::LightGray );
+    //gfx.DrawSprite( Graphics::ScreenWidth - m_width, 0, m_img, SpriteEffect::Copy{} );
 
     /* draw building rects */
     for( auto b : m_vRectsInBar_buildings )
@@ -41,9 +38,24 @@ void ActionBar::draw( Graphics& gfx, Font& font, const Vec2& mousePos )
         gfx.DrawRectBorder( b, 2, Colors::Blue );
     }
 
-    /* draw building names */
-    font.DrawText( "B", m_vRectsInBar_buildings[ ( int )Building::Type::BARRACKS ].GetCenter() - Vei2( 8, 14 ), Colors::Blue, gfx );
-    font.DrawText( "F", m_vRectsInBar_buildings[ ( int )Building::Type::FACTORY ].GetCenter() - Vei2( 8, 14 ), Colors::Blue, gfx );
+    /* draw building names/images */
+    gfx.DrawSprite( m_vRectsInBar_buildings[ ( int )Building::Type::BARRACKS ].left + 10, m_vRectsInBar_buildings[ ( int )Building::Type::BARRACKS ].top + 10,
+                    m_barracksImg, SpriteEffect::Chroma( { 255, 242, 0 } ) );
+    gfx.DrawSprite( m_vRectsInBar_buildings[ ( int )Building::Type::FACTORY ].left, m_vRectsInBar_buildings[ ( int )Building::Type::BARRACKS ].top + 10,
+                    m_factoryImg, SpriteEffect::Chroma( { 255, 242, 0 } ) );
+    font.DrawText( "B", m_vRectsInBar_buildings[ ( int )Building::Type::BARRACKS ].GetCenter() - Vei2( m_width / 5, m_width / 5 ), Colors::Blue, gfx );
+    font.DrawText( "F", m_vRectsInBar_buildings[ ( int )Building::Type::FACTORY ].GetCenter() - Vei2( m_width / 5, m_width / 5 ), Colors::Blue, gfx );
+
+    /* dummy text */
+    font.DrawText( "resources", Vei2( Graphics::ScreenWidth - m_width + 2, 10 ), Colors::Blue, gfx );
+    font.DrawText( "other", Vei2( Graphics::ScreenWidth - m_width + 2, 180 ), Colors::Blue, gfx );
+    font.DrawText( "buildings", Vei2( Graphics::ScreenWidth - m_width + 2, 210 ), Colors::Blue, gfx );
+    font.DrawText( "units", Vei2( Graphics::ScreenWidth - m_width + 2, 280 ), Colors::Blue, gfx );
+
+    /* minimap dummy */
+    RectI minimapRect( Graphics::ScreenWidth - m_width, Graphics::ScreenWidth, Graphics::ScreenHeight - 150, Graphics::ScreenHeight );
+    gfx.DrawRectBorder( minimapRect, 4, Colors::Yellow );
+    font.DrawText( "Minimap", minimapRect.GetCenter() - Vei2( m_width / 3, 10 ), Colors::Blue, gfx );
 
     /* building placing */
     if( m_bPlacing )
