@@ -135,42 +135,73 @@ void Cursor::draw( const Vei2& camPos, bool bScrollingPressed, bool bSelectingRe
         {
             if( y < r.top )
             {
-                m_gfx.DrawSprite( 0, 0, m_vArrowSpriteRects[ ( int )Direction::UP_LEFT ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+                if( camPos.x > Graphics::halfScreenWidth || camPos.y > Graphics::halfScreenHeight )
+                {
+                    m_gfx.DrawSprite( 0, 0, m_vArrowSpriteRects[ ( int )Direction::UP_LEFT ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+                    return;
+                }
             }
             else if( y > r.bottom )
             {
-                m_gfx.DrawSprite( 0, Graphics::ScreenHeight - m_arrowWidth, m_vArrowSpriteRects[ ( int )Direction::DOWN_LEFT ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+                if( camPos.x > Graphics::halfScreenWidth || camPos.y < m_level.getHeight() - Graphics::halfScreenHeight )
+                {
+                    m_gfx.DrawSprite( 0, Graphics::ScreenHeight - m_arrowWidth, m_vArrowSpriteRects[ ( int )Direction::DOWN_LEFT ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+                    return;
+                }
             }
             else
             {
-                m_gfx.DrawSprite( 5, y - m_arrowHeight / 2, m_vArrowSpriteRects[ ( int )Direction::LEFT ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+                if( camPos.x > Graphics::halfScreenWidth )
+                {
+                    m_gfx.DrawSprite( 5, y - m_arrowHeight / 2, m_vArrowSpriteRects[ ( int )Direction::LEFT ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+                    return;
+                }
             }
         }
         else if( x > r.right )
         {
             if( y < r.top )
             {
-                m_gfx.DrawSprite( Graphics::ScreenWidth - m_arrowWidth, 0, m_vArrowSpriteRects[ ( int )Direction::UP_RIGHT ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+                if( camPos.x < m_level.getWidth() + m_level.getActionBarWidth() - Graphics::halfScreenWidth || camPos.y > Graphics::halfScreenHeight )
+                {
+                    m_gfx.DrawSprite( Graphics::ScreenWidth - m_arrowWidth, 0, m_vArrowSpriteRects[ ( int )Direction::UP_RIGHT ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+                    return;
+                }
             }
             else if( y > r.bottom )
             {
-                m_gfx.DrawSprite( Graphics::ScreenWidth - m_arrowWidth, Graphics::ScreenHeight - m_arrowHeight,
-                                  m_vArrowSpriteRects[ ( int )Direction::DOWN_RIGHT ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+                if( camPos.x < m_level.getWidth() + m_level.getActionBarWidth() - Graphics::halfScreenWidth || camPos.y < m_level.getHeight() - Graphics::halfScreenHeight )
+                {
+                    m_gfx.DrawSprite( Graphics::ScreenWidth - m_arrowWidth, Graphics::ScreenHeight - m_arrowHeight,
+                                      m_vArrowSpriteRects[ ( int )Direction::DOWN_RIGHT ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+                    return;
+                }
             }
             else
             {
-                m_gfx.DrawSprite( Graphics::ScreenWidth - m_arrowWidth, y - m_arrowHeight / 2, m_vArrowSpriteRects[ ( int )Direction::RIGHT ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+                if( camPos.x < m_level.getWidth() + m_level.getActionBarWidth() - Graphics::halfScreenWidth )
+                {
+                    m_gfx.DrawSprite( Graphics::ScreenWidth - m_arrowWidth, y - m_arrowHeight / 2, m_vArrowSpriteRects[ ( int )Direction::RIGHT ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+                    return;
+                }
             }
         }
         else if( y < r.top )
         {
-            m_gfx.DrawSprite( x - m_arrowWidth / 2, 0, m_vArrowSpriteRects[ ( int )Direction::UP ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+            if( camPos.y > Graphics::halfScreenHeight )
+            {
+                m_gfx.DrawSprite( x - m_arrowWidth / 2, 0, m_vArrowSpriteRects[ ( int )Direction::UP ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+                return;
+            }
         }
-        else
+        else if( y > r.bottom )
         {
-            m_gfx.DrawSprite( x - m_arrowWidth / 2, Graphics::ScreenHeight - m_arrowHeight, m_vArrowSpriteRects[ ( int )Direction::DOWN ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+            if( camPos.y < m_level.getHeight() - Graphics::halfScreenHeight )
+            {
+                m_gfx.DrawSprite( x - m_arrowWidth / 2, Graphics::ScreenHeight - m_arrowHeight, m_vArrowSpriteRects[ ( int )Direction::DOWN ], m_arrowSprites, SpriteEffect::Chroma( Colors::White ) );
+                return;
+            }
         }
-        return;
     }
 
     if( x > Graphics::ScreenWidth - m_actionBarWidth )
