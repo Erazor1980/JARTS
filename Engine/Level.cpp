@@ -143,6 +143,10 @@ void Level::drawTileGrid( Graphics& gfx, const Vei2& camera, const bool drawFree
                 Vei2 br = { tile.right, tile.bottom };
                 gfx.DrawLine( tl, br, Colors::Red );
             }
+            else if( Tile::BUILDING == mp_content[ y * m_widthInTiles + x ] )
+            {
+                gfx.DrawRectBorder( tile, 1, Colors::Yellow );
+            }
             else if( drawFreeTiles )
             {
                 gfx.DrawRectBorder( tile, 1, Colors::Green );

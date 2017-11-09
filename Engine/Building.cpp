@@ -9,6 +9,17 @@ Building::Building( Building::Type type, const Surface& image, const std::vector
 {
     m_type          = type;
     m_sizeInTiles   = getSizeInTiles( type );
+
+    if( Type::BARRACKS == type )
+    {
+        m_life                  = 500;
+    }
+    else if( Type::FACTORY == type )
+    {
+        m_life                  = 1000;
+    }
+    m_maxLife           = m_life;
+    m_oneThirdMaxLife   = m_maxLife / 3.0f;
 }
 
 void Building::draw( Graphics& gfx, const Vei2& camPos, const bool drawExtraInfos ) const

@@ -35,6 +35,9 @@ private:
     Vei2 m_sizeInTiles = { 1, 1 };      /* number of tiles in x- and y-direction the building occupies */
     Type m_type;
     int m_life;
+    int m_maxLife;
+    float m_oneThirdMaxLife;
+
     const Level& m_level;
 
     /* graphics */
