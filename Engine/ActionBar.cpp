@@ -2,9 +2,11 @@
 #include "SpriteEffect.h"
 #include "RectF.h"
 
-ActionBar::ActionBar( const std::vector< Surface >& vBuildingImages )
+ActionBar::ActionBar( const std::vector< Surface >& vBuildingImages, const std::vector< Unit* >& vpUnits, const std::vector< Building >& vBuildings )
     :
     m_vBuildingImages( vBuildingImages ),
+    m_vpUnits( vpUnits ),
+    m_vBuildings( vBuildings ),
 #if _DEBUG
     m_img( "..\\images\\debugImg.bmp" )
 #else
@@ -112,14 +114,46 @@ void ActionBar::update( const float dt, const Vec2& mousePos, const Vei2& camPos
 
                 m_vBuildingIndices.push_back( idx );
                 m_vBuildingTiles.push_back( r );
+
+                bool bFreeTile = false;
                 if( Tile::EMPTY == tile )
                 {
-                    m_vTileOccupancy.push_back( true );
+                    bFreeTile = true;
+
+                    /* check for buildings */
+                    for( const auto b : m_vBuildings )
+                    {
+                        for( int i = 0; i < b.getTileIndices().size(); ++i )
+                        {
+                            if( b.getTileIndices()[ i ] == idx )
+                            {
+                                bFreeTile = false;
+                                break;
+                            }
+                        }
+                        if( bFreeTile == false )
+                        {
+                            break;
+                        }
+                    }
+
+                    /* check for ground units */
+                    if( bFreeTile )
+                    {
+                        for( const auto u : m_vpUnits )
+                        {
+                            if( u->isGroundUnit() && ( u->getTileIdx() == idx || u->getNextTileIdx() == idx ) )
+                            {
+                                bFreeTile = false;
+                                break;
+                            }
+                        }
+                    }
                     
                 }
-                else
+                m_vTileOccupancy.push_back( bFreeTile );
+                if( !bFreeTile )
                 {
-                    m_vTileOccupancy.push_back( false );
                     m_bFreeSpace = false;
                 }
             }

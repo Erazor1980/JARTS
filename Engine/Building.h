@@ -26,6 +26,10 @@ public:
     }
     static Vei2 getSizeInTiles( const Type type );
     
+    std::vector< int > getTileIndices() const
+    {
+        return m_vTileIndices;
+    }
 private:
     /* general attributes */
     Vei2 m_sizeInTiles = { 1, 1 };      /* number of tiles in x- and y-direction the building occupies */

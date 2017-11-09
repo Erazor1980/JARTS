@@ -7,11 +7,12 @@
 #include "RectI.h"
 #include "Font.h"
 #include "Level.h"
+#include "Unit.h"
 
 class ActionBar
 {
 public:
-    ActionBar( const std::vector< Surface >& vBuildingImages );
+    ActionBar( const std::vector< Surface >& vBuildingImages, const std::vector< Unit* >& vpUnits, const std::vector< Building >& vBuildings );
 
     void draw( Graphics& gfx, Font& font, const Vec2& mousePos );
 
@@ -52,5 +53,9 @@ private:
     /* rectangles for specific buildings/units inside the action bar */
     std::vector< RectI > m_vRectsInBar_buildings;
     std::vector< RectI > m_vRectsInBar_units;
+
+    /* all units and buildings in the current map (for free space test) */
+    const std::vector< Unit* >& m_vpUnits;
+    const std::vector< Building >& m_vBuildings;
 };
 
