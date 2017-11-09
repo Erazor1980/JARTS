@@ -17,7 +17,7 @@ public:
 
     void update( const float dt, const Vec2& mousePos, const Vei2& camPos, const Level& level );
 
-    void handleMouse( const Mouse::Event::Type& type, const Vec2& mousePos, std::vector< Building >& vBuildings );
+    void handleMouse( const Mouse::Event::Type& type, const Vec2& mousePos, std::vector< Building >& vBuildings, const Level& level );
     
     void cancelPlacing()
     {

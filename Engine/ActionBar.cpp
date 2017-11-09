@@ -58,8 +58,6 @@ void ActionBar::draw( Graphics& gfx, Font& font, const Vec2& mousePos )
     /* building placing */
     if( m_bPlacing )
     {
-        //const Surface* pCurrentBuilding = &m_vBuildingImages[ ( int )m_buildingType ];
-
         if( mousePos.x >= Graphics::ScreenWidth - m_width )
         {
             gfx.DrawSprite( ( int )mousePos.x, ( int )mousePos.y, m_vBuildingImages[ ( int )m_buildingType ], SpriteEffect::Ghost( { 255, 242, 0 } ) );
@@ -129,7 +127,7 @@ void ActionBar::update( const float dt, const Vec2& mousePos, const Vei2& camPos
     }
 }
 
-void ActionBar::handleMouse( const Mouse::Event::Type& type, const Vec2& mousePos, std::vector< Building >& vBuildings )
+void ActionBar::handleMouse( const Mouse::Event::Type& type, const Vec2& mousePos, std::vector< Building >& vBuildings, const Level& level )
 {
     if( type == Mouse::Event::Type::LPress )
     {
@@ -162,7 +160,7 @@ void ActionBar::handleMouse( const Mouse::Event::Type& type, const Vec2& mousePo
             /* place building */
             if( m_bPlacing && m_bFreeSpace )
             {
-                //vBuildings.push_back( Building( m_buildingType, m_vBuildingIndices ) );
+                vBuildings.push_back( Building( m_buildingType, m_vBuildingImages[ ( int )m_buildingType ], m_vBuildingIndices, level ) );
                 m_bPlacing = false;
             }
         }

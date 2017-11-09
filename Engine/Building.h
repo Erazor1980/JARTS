@@ -1,5 +1,10 @@
 #pragma once
 #include "Vei2.h"
+#include "Surface.h"
+#include "Graphics.h"
+#include "Level.h"
+
+#include <vector>
 
 class Building
 {
@@ -11,7 +16,9 @@ public:
     };
 
 public:
-    Building( Building::Type type );
+    Building( Building::Type type, const Surface& image, const std::vector< int >& vTileIndices, const Level& level );
+
+    void draw( Graphics& gfx, const Vei2& camPos, const bool drawExtraInfos = false ) const;
 
     Vei2 getSizeInTiles() const
     {
@@ -20,6 +27,14 @@ public:
     static Vei2 getSizeInTiles( const Type type );
     
 private:
-    Vei2 m_sizeInTiles = { 1, 1 };     /* number of tiles in x- and y-direction the building occupies */
+    /* general attributes */
+    Vei2 m_sizeInTiles = { 1, 1 };      /* number of tiles in x- and y-direction the building occupies */
     Type m_type;
+    int m_life;
+    const Level& m_level;
+
+    /* graphics */
+    const Surface& m_image;
+    
+    std::vector< int > m_vTileIndices;  /* indices of the building tiles in world (level) */
 };

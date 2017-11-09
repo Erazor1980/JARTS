@@ -385,7 +385,7 @@ void Game::handleMouse()
             const Mouse::Event e = wnd.mouse.Read();
 
             /* action bar */
-            m_actionBar.handleMouse( e.GetType(), wnd.mouse.GetPos(), m_vBuildings );
+            m_actionBar.handleMouse( e.GetType(), wnd.mouse.GetPos(), m_vBuildings, m_level );
 
             /* units */
             if( !bMouseOverActionBar )
@@ -472,6 +472,12 @@ void Game::ComposeFrame()
     /* LEVEL */
     m_level.draw( gfx, m_camPos, m_bDrawDebugStuff );
     
+    /* BUILDINGS */
+    for( const auto b : m_vBuildings )
+    {
+        b.draw( gfx, m_camPos );
+    }
+
     /* UNITS */
     drawAllUnits();
 
