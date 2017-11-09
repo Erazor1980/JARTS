@@ -45,7 +45,7 @@ void Level::init()
     }
     mp_content = new Tile[ m_widthInTiles * m_heightInTiles ];
 
-#if 1   /* random level */
+    /* random level */
     for( int i = 0; i < m_widthInTiles * m_heightInTiles; ++i )
     {
         if( rand() % 4 )
@@ -57,95 +57,6 @@ void Level::init()
             mp_content[ i ] = Tile::OBSTACLE;
         }
     }
-#else   /* test level 2 (river & bridge) */
-    for( int i = 0; i < m_widthInTiles * m_heightInTiles; ++i )
-    {
-        mp_content[ i ] = Tile::EMPTY;
-    }
-
-    mp_content[ 8 ] = Tile::OBSTACLE;
-    mp_content[ 9 ] = Tile::OBSTACLE;
-    mp_content[ 10 ] = Tile::OBSTACLE;
-    mp_content[ 11 ] = Tile::OBSTACLE;
-    mp_content[ 27 ] = Tile::OBSTACLE;
-    mp_content[ 28 ] = Tile::OBSTACLE;
-    mp_content[ 29 ] = Tile::OBSTACLE;
-    mp_content[ 45 ] = Tile::OBSTACLE;
-    mp_content[ 46 ] = Tile::OBSTACLE;
-    mp_content[ 49 ] = Tile::OBSTACLE;
-    mp_content[ 50 ] = Tile::OBSTACLE;
-    mp_content[ 66 ] = Tile::OBSTACLE;
-    mp_content[ 67 ] = Tile::OBSTACLE;
-    mp_content[ 69 ] = Tile::OBSTACLE;
-    mp_content[ 70 ] = Tile::OBSTACLE;
-    mp_content[ 86 ] = Tile::OBSTACLE;
-    mp_content[ 87 ] = Tile::OBSTACLE;
-    for( int i = 95; i <= 99; ++i )
-    {
-        mp_content[ i ] = Tile::OBSTACLE;
-    }
-    for( int i = 110; i <= 119; ++i )
-    {
-        mp_content[ i ] = Tile::OBSTACLE;
-    }
-    mp_content[ 120 ] = Tile::OBSTACLE;
-    mp_content[ 121 ] = Tile::OBSTACLE;
-    mp_content[ 140 ] = Tile::OBSTACLE;
-    mp_content[ 141 ] = Tile::OBSTACLE;
-    for( int i = 128; i <= 134; ++i )
-    {
-        mp_content[ i ] = Tile::OBSTACLE;
-    }
-    for( int i = 146; i <= 151; ++i )
-    {
-        mp_content[ i ] = Tile::OBSTACLE;
-    }
-    mp_content[ 164 ] = Tile::OBSTACLE;
-    mp_content[ 167 ] = Tile::OBSTACLE;
-    mp_content[ 168 ] = Tile::OBSTACLE;
-    mp_content[ 169 ] = Tile::OBSTACLE;
-    mp_content[ 175 ] = Tile::OBSTACLE;
-    mp_content[ 176 ] = Tile::OBSTACLE;
-    mp_content[ 177 ] = Tile::OBSTACLE;
-    for( int i = 182; i <= 185; ++i )
-    {
-        mp_content[ i ] = Tile::OBSTACLE;
-    }
-    for( int i = 200; i <= 206; ++i )
-    {
-        mp_content[ i ] = Tile::OBSTACLE;
-    }
-    for( int i = 220; i <= 224; ++i )
-    {
-        mp_content[ i ] = Tile::OBSTACLE;
-    }
-    mp_content[ 240 ] = Tile::OBSTACLE;
-    mp_content[ 241 ] = Tile::OBSTACLE;
-    mp_content[ 242 ] = Tile::OBSTACLE;
-    mp_content[ 260 ] = Tile::OBSTACLE;
-    mp_content[ 192 ] = Tile::OBSTACLE;
-    mp_content[ 193 ] = Tile::OBSTACLE;
-    mp_content[ 212 ] = Tile::OBSTACLE;
-    mp_content[ 213 ] = Tile::OBSTACLE;
-    mp_content[ 215 ] = Tile::OBSTACLE;
-    mp_content[ 216 ] = Tile::OBSTACLE;
-    mp_content[ 217 ] = Tile::OBSTACLE;
-    for( int i = 235; i <= 238; ++i )
-    {
-        mp_content[ i ] = Tile::OBSTACLE;
-    }
-    mp_content[ 257 ] = Tile::OBSTACLE;
-    mp_content[ 258 ] = Tile::OBSTACLE;
-    mp_content[ 245 ] = Tile::OBSTACLE;
-    mp_content[ 246 ] = Tile::OBSTACLE;
-    mp_content[ 265 ] = Tile::OBSTACLE;
-    mp_content[ 267 ] = Tile::OBSTACLE;
-    mp_content[ 268 ] = Tile::OBSTACLE;
-    mp_content[ 284 ] = Tile::OBSTACLE;
-    mp_content[ 285 ] = Tile::OBSTACLE;
-    mp_content[ 287 ] = Tile::OBSTACLE;
-    mp_content[ 288 ] = Tile::OBSTACLE;
-#endif
 
     m_bInitialized = true;
 }
@@ -180,6 +91,30 @@ void Level::draw( Graphics& gfx, const Vei2& camera, const bool drawGrid ) const
     {
         drawTileGrid( gfx, camera, false );
     }    
+}
+
+void Level::addBuilding( std::vector< int > vTileIndices )
+{
+    const int n = m_widthInTiles * m_heightInTiles;
+    for( const auto i : vTileIndices )
+    {
+        if( i > 0 && i < n )
+        {
+            mp_content[ i ] = Tile::BUILDING;
+        }
+    }
+}
+
+void Level::removeBuilding( std::vector< int > vTileIndices )
+{
+    const int n = m_widthInTiles * m_heightInTiles;
+    for( const auto i : vTileIndices )
+    {
+        if( i > 0 && i < n )
+        {
+            mp_content[ i ] = Tile::EMPTY;
+        }
+    }
 }
 
 void Level::drawTileGrid( Graphics& gfx, const Vei2& camera, const bool drawFreeTiles ) const

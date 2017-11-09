@@ -8,7 +8,8 @@ class PathFinder;
 enum class Tile
 {
     EMPTY,
-    OBSTACLE
+    OBSTACLE,
+    BUILDING    /* could be destroyed and become EMPTY again */
     //TODO add more here
 };
 
@@ -47,6 +48,12 @@ public:
     }
 
     void draw( Graphics& gfx, const Vei2& camera, const bool drawGrid = false /* for debugging */ ) const;
+
+    /* adding building to map (buildings' tiles become obstacles) */
+    void addBuilding( std::vector< int > vTileIndices );
+
+    /* removing building to map (buildings' tiles become empty) */
+    void removeBuilding( std::vector< int > vTileIndices );
 
     /* test functions for visualization and debugging */
     void drawTileGrid( Graphics& gfx, const Vei2& camera, const bool drawFreeTiles = false ) const;

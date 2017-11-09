@@ -161,7 +161,7 @@ void ActionBar::update( const float dt, const Vec2& mousePos, const Vei2& camPos
     }
 }
 
-void ActionBar::handleMouse( const Mouse::Event::Type& type, const Vec2& mousePos, std::vector< Building >& vBuildings, const Level& level )
+void ActionBar::handleMouse( const Mouse::Event::Type& type, const Vec2& mousePos, std::vector< Building >& vBuildings, Level& level )
 {
     if( type == Mouse::Event::Type::LPress )
     {
@@ -195,6 +195,7 @@ void ActionBar::handleMouse( const Mouse::Event::Type& type, const Vec2& mousePo
             if( m_bPlacing && m_bFreeSpace )
             {
                 vBuildings.push_back( Building( m_buildingType, m_vBuildingImages[ ( int )m_buildingType ], m_vBuildingIndices, level ) );
+                level.addBuilding( m_vBuildingIndices );
                 m_bPlacing = false;
             }
         }
