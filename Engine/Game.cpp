@@ -33,14 +33,16 @@ Game::Game( MainWindow& wnd )
 #endif
     m_pathFinder( m_level ),
     m_cursor( gfx, wnd.mouse, m_vpUnits, m_level, m_scrolling_rect, m_actionBar.getWidth() ),
-    m_explSeqSprite( "..\\images\\effects\\expl_seq.bmp" )
+    m_explSeqSprite( "..\\images\\effects\\expl_seq.bmp" ),
+    m_actionBar( m_vBuildingSprites )
 {
     srand( ( unsigned int )time( NULL ) );
 
     /* load images */
     m_vTankSprites = { Surface( "..\\images\\units\\tank_40x40.bmp" ), Surface( "..\\images\\effects\\expl_1.bmp" ), Surface( "..\\images\\effects\\expl_seq.bmp" ) };
     m_vJetSprites = { Surface( "..\\images\\units\\jet_40x40.bmp" ), Surface( "..\\images\\effects\\expl_1.bmp" ), Surface( "..\\images\\effects\\expl_seq.bmp" ) };
-    
+    m_vBuildingSprites = { Surface( "..\\images\\actionBar\\barracks.bmp" ), Surface( "..\\images\\actionBar\\factory.bmp" ) };
+
     /* load sounds - order important! selection -> command -> attack -> death */
     m_vTankSounds.push_back( Sound( L"..\\sounds\\ready_for_duty.wav" ) );
     m_vTankSounds.push_back( Sound( L"..\\sounds\\move_tank.wav" ) );
@@ -383,7 +385,7 @@ void Game::handleMouse()
             const Mouse::Event e = wnd.mouse.Read();
 
             /* action bar */
-            m_actionBar.handleMouse( e.GetType(), wnd.mouse.GetPos() );
+            m_actionBar.handleMouse( e.GetType(), wnd.mouse.GetPos(), m_vBuildings );
 
             /* units */
             if( !bMouseOverActionBar )

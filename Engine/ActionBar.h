@@ -11,13 +11,13 @@
 class ActionBar
 {
 public:
-    ActionBar();
+    ActionBar( const std::vector< Surface >& vBuildingImages );
 
     void draw( Graphics& gfx, Font& font, const Vec2& mousePos );
 
     void update( const float dt, const Vec2& mousePos, const Vei2& camPos, const Level& level );
 
-    void handleMouse( const Mouse::Event::Type& type, const Vec2& mousePos );
+    void handleMouse( const Mouse::Event::Type& type, const Vec2& mousePos, std::vector< Building >& vBuildings );
     
     void cancelPlacing()
     {
@@ -35,8 +35,7 @@ public:
 private:
     /* images and width of the action bar */
     Surface m_img;
-    Surface m_factoryImg;
-    Surface m_barracksImg;
+    const std::vector< Surface >& m_vBuildingImages;
     int m_width;
 
     /* current building attributes */

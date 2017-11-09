@@ -2,10 +2,9 @@
 #include "SpriteEffect.h"
 #include "RectF.h"
 
-ActionBar::ActionBar()
+ActionBar::ActionBar( const std::vector< Surface >& vBuildingImages )
     :
-    m_factoryImg( "..\\images\\actionBar\\factory.bmp" ),
-    m_barracksImg( "..\\images\\actionBar\\barracks.bmp" ),
+    m_vBuildingImages( vBuildingImages ),
 #if _DEBUG
     m_img( "..\\images\\debugImg.bmp" )
 #else
@@ -30,7 +29,6 @@ void ActionBar::draw( Graphics& gfx, Font& font, const Vec2& mousePos )
 {
     RectI r( Graphics::ScreenWidth - m_width, Graphics::ScreenWidth, 0, Graphics::ScreenHeight );
     gfx.DrawRect( r, Colors::LightGray );
-    //gfx.DrawSprite( Graphics::ScreenWidth - m_width, 0, m_img, SpriteEffect::Copy{} );
 
     /* draw building rects */
     for( auto b : m_vRectsInBar_buildings )
@@ -40,9 +38,9 @@ void ActionBar::draw( Graphics& gfx, Font& font, const Vec2& mousePos )
 
     /* draw building names/images */
     gfx.DrawSprite( m_vRectsInBar_buildings[ ( int )Building::Type::BARRACKS ].left + 10, m_vRectsInBar_buildings[ ( int )Building::Type::BARRACKS ].top + 10,
-                    m_barracksImg, SpriteEffect::Chroma( { 255, 242, 0 } ) );
+                    m_vBuildingImages[ ( int )Building::Type::BARRACKS ], SpriteEffect::Chroma( { 255, 242, 0 } ) );
     gfx.DrawSprite( m_vRectsInBar_buildings[ ( int )Building::Type::FACTORY ].left, m_vRectsInBar_buildings[ ( int )Building::Type::BARRACKS ].top + 10,
-                    m_factoryImg, SpriteEffect::Chroma( { 255, 242, 0 } ) );
+                    m_vBuildingImages[ ( int )Building::Type::FACTORY ], SpriteEffect::Chroma( { 255, 242, 0 } ) );
     font.DrawText( "B", m_vRectsInBar_buildings[ ( int )Building::Type::BARRACKS ].GetCenter() - Vei2( m_width / 5, m_width / 5 ), Colors::Blue, gfx );
     font.DrawText( "F", m_vRectsInBar_buildings[ ( int )Building::Type::FACTORY ].GetCenter() - Vei2( m_width / 5, m_width / 5 ), Colors::Blue, gfx );
 
@@ -60,22 +58,11 @@ void ActionBar::draw( Graphics& gfx, Font& font, const Vec2& mousePos )
     /* building placing */
     if( m_bPlacing )
     {
-        Surface* pCurrentBuilding = nullptr;
-        switch( m_buildingType )
-        {
-        case Building::Type::BARRACKS:
-            pCurrentBuilding = &m_barracksImg;
-            break;
-        case Building::Type::FACTORY:
-            pCurrentBuilding = &m_factoryImg;
-            break;
-        default:
-            pCurrentBuilding = nullptr;
-        }
+        //const Surface* pCurrentBuilding = &m_vBuildingImages[ ( int )m_buildingType ];
 
         if( mousePos.x >= Graphics::ScreenWidth - m_width )
         {
-            gfx.DrawSprite( ( int )mousePos.x, ( int )mousePos.y, *pCurrentBuilding, SpriteEffect::Ghost( { 255, 242, 0 } ) );
+            gfx.DrawSprite( ( int )mousePos.x, ( int )mousePos.y, m_vBuildingImages[ ( int )m_buildingType ], SpriteEffect::Ghost( { 255, 242, 0 } ) );
         }
         else
         {
@@ -92,11 +79,13 @@ void ActionBar::draw( Graphics& gfx, Font& font, const Vec2& mousePos )
             }
             if( m_bFreeSpace )
             {
-                gfx.DrawSprite( ( int )m_vBuildingTiles.front().left, ( int )m_vBuildingTiles.front().top, *pCurrentBuilding, SpriteEffect::Chroma( { 255, 242, 0 } ) );
+                gfx.DrawSprite( ( int )m_vBuildingTiles.front().left, ( int )m_vBuildingTiles.front().top, 
+                                m_vBuildingImages[ ( int )m_buildingType ], SpriteEffect::Chroma( { 255, 242, 0 } ) );
             }
             else
             {
-                gfx.DrawSprite( ( int )m_vBuildingTiles.front().left, ( int )m_vBuildingTiles.front().top, *pCurrentBuilding, SpriteEffect::Ghost( { 255, 242, 0 } ) );
+                gfx.DrawSprite( ( int )m_vBuildingTiles.front().left, ( int )m_vBuildingTiles.front().top,
+                                m_vBuildingImages[ ( int )m_buildingType ], SpriteEffect::Ghost( { 255, 242, 0 } ) );
             }
         }        
     }
@@ -140,7 +129,7 @@ void ActionBar::update( const float dt, const Vec2& mousePos, const Vei2& camPos
     }
 }
 
-void ActionBar::handleMouse( const Mouse::Event::Type& type, const Vec2& mousePos )
+void ActionBar::handleMouse( const Mouse::Event::Type& type, const Vec2& mousePos, std::vector< Building >& vBuildings )
 {
     if( type == Mouse::Event::Type::LPress )
     {
@@ -166,6 +155,16 @@ void ActionBar::handleMouse( const Mouse::Event::Type& type, const Vec2& mousePo
             //{
                 //TODO add later
             //}
+        }
+        /* outside action bar */
+        else
+        {
+            /* place building */
+            if( m_bPlacing && m_bFreeSpace )
+            {
+                //vBuildings.push_back( Building( m_buildingType, m_vBuildingIndices ) );
+                m_bPlacing = false;
+            }
         }
 
     }

@@ -75,10 +75,13 @@ private:
     std::vector< Surface > m_vTankSprites;
     std::vector< Surface > m_vJetSprites;
     std::vector< Surface > m_vSoldierSprites;
+    std::vector< Surface > m_vBuildingSprites;
     std::vector< Sound > m_vTankSounds;
     std::vector< Sound > m_vJetSounds;
     std::vector< Sound > m_vSoldierSounds;
     std::vector< Unit* > m_vpUnits;
+
+    std::vector< Building > m_vBuildings;
     
     Sound m_backGroundSound;
 
